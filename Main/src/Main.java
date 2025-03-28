@@ -1,15 +1,34 @@
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        // Création d'un client de test
+        Client testClient = new Client("TestClient1", "client123", "Alara TANGUY", "alaratanguy@example.com");
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+        // Création d'un administrateur
+        Administrateur admin = new Administrateur("Admin", "admin123", "Admin", "admin@example.com");
+
+        // Initialisation de Scanner pour lire l'entrée de l'utilisateur
+        Scanner scanner = new Scanner(System.in);
+
+        // Demander les identifiants
+        System.out.print("Entrez votre identifiant: ");
+        String identifiant = scanner.nextLine();
+        System.out.print("Entrez votre mot de passe: ");
+        String motDePasse = scanner.nextLine();
+
+        // Vérification des identifiants
+        if (identifiant.equals(testClient.getIdentifiant()) && motDePasse.equals(testClient.getMotDePasse())) {
+            testClient.afficherInterfaceClient();
+        } else if (identifiant.equals(admin.getIdentifiant()) && motDePasse.equals(admin.getMotDePasse())) {
+            admin.afficherInterfaceAdministrateur();
+        } else {
+            System.out.println("Identifiant ou mot de passe incorrect.");
         }
+
+        // Fermer le scanner
+        scanner.close();
     }
 }
+
+// Test
