@@ -3,7 +3,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         // Création d'un client de test
-        Client testClient = new Client("TestClient1", "client123", "Alara TANGUY", "alaratanguy@example.com");
+        /*Client testClient = new Client("TestClient1", "client123", "Alara TANGUY", "alaratanguy@example.com");
 
         // Création d'un administrateur
         Administrateur admin = new Administrateur("Admin", "admin123", "Admin", "admin@example.com");
@@ -27,7 +27,9 @@ public class Main {
         }
 
         // Fermer le scanner
-        scanner.close();
+        scanner.close();*/
+        Fenetres identify = new Fenetres();
+        identify.affichage();
     }
 }
 
