@@ -11,7 +11,7 @@ import java.sql.SQLException;
  * (ici un driver JDBC MySQL) et se connecte à la base de données. La Factory peut fournir plusieurs DAO (ici,
  * il n'y en a qu'un seul, UtilisateurDao, qui correspond à une table de la base).
  */
-public class DaoShopping {
+public class DaoFactory {
     /**
      * Attributs private pour la connexion JDBC
      */
@@ -20,7 +20,7 @@ public class DaoShopping {
     private String password;
 
     // constructeur
-    public DaoShopping(String url, String username, String password) {
+    public DaoFactory(String url, String username, String password) {
         this.url = url;
         this.username = username;
         this.password = password;
@@ -31,7 +31,7 @@ public class DaoShopping {
      * @param : url, username et password de la base de données
      * @return : objet de la classe DaoFactoru
      */
-    public static DaoShopping getInstance(String database, String username, String password) {
+    public static DaoFactory getInstance(String database, String username, String password) {
         try {
             // chargement driver "com.mysql.cj.jdbc.Driver"
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -43,7 +43,7 @@ public class DaoShopping {
         url = "jdbc:mysql://localhost:3306/" + database;
 
         // Instancier une instance l'objet de DaoFactory
-        DaoShopping instance = new DaoShopping(url, username,password );
+        DaoFactory instance = new DaoFactory(url, username,password );
 
         // Retourner cette instance
         return instance;

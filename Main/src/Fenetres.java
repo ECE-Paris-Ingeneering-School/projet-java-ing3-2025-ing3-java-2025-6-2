@@ -5,13 +5,10 @@ import java.awt.event.ActionListener;
 
 public class Fenetres implements ActionListener
 {
-    JPanel connecter_text, inscrire_text, accueil_text, profil_text, accueil_button, connecter_button, inscrire_button, profil_button;
-    JFrame inscrire, connecter, accueil, profil; /// View.Fenetre principale
-    TextField affichage, nom, prenom, mail, mdp;
-    private double valeur;
-    private boolean virgule = false;
-    private String op;
-    private double nb1, nb2, res;
+    JPanel connecter_text, inscrire_text, accueil_text, profil_text; /// Zones texte
+    JPanel accueil_button, connecter_button, inscrire_button, profil_button; /// Zones boutons
+    JFrame inscrire, connecter, accueil, profil; /// Fenêtres de navigation
+    TextField affichage, nom, prenom, mail, mdp; /// Zones de saisie
 
     public Fenetres() /// Constructeur de chaque fenêtre
     {
