@@ -4,8 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Fenetres implements ActionListener {
-    JPanel connecter_text, inscrire_text, connecter_button, inscrire_button;
-    JFrame inscrire, connecter; /// View.Fenetre principale
+    JPanel connecter_text, inscrire_text, accueil_text, profil_text, accueil_button, connecter_button, inscrire_button, profil_button;
+    JFrame inscrire, connecter, accueil, profil; /// View.Fenetre principale
     TextField affichage, nom, prenom, mail, mdp;
     private double valeur;
     private boolean virgule = false;
@@ -16,6 +16,8 @@ public class Fenetres implements ActionListener {
     {
         setIdentification();
         setInscrire();
+        setAccueil();
+        setProfil();
     }
 
     public void setInscrire()
@@ -73,6 +75,47 @@ public class Fenetres implements ActionListener {
         connecter.pack();
     }
 
+    public void setAccueil()
+    {
+        accueil = new JFrame();
+        accueil.setSize(900, 700);
+        accueil.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        accueil.setTitle("Accueil");
+        accueil.setLayout(new BoxLayout(accueil.getContentPane(), BoxLayout.Y_AXIS));
+        accueil_text = new JPanel();
+        JLabel label1 = new JLabel("texte");
+        accueil_text.add(label1);
+        accueil_button = new JPanel();
+        JLabel label2 = new JLabel("texte2");
+        accueil_text.add(label2);
+        addButton(accueil_button, "Profil");
+        addButton(accueil_button, "Catalogue");
+        addButton(accueil_button, "Deconnexion");
+        accueil.add(accueil_text, BorderLayout.CENTER);
+        accueil.add(accueil_button, BorderLayout.SOUTH);
+        accueil.pack();
+    }
+
+    public void setProfil()
+    {
+        profil = new JFrame();
+        profil.setSize(900, 700);
+        profil.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        profil.setTitle("Profil");
+        profil.setLayout(new BoxLayout(profil.getContentPane(), BoxLayout.Y_AXIS));
+        profil_text = new JPanel();
+        JLabel label1 = new JLabel("texte");
+        profil_text.add(label1);
+        profil_button = new JPanel();
+        JLabel label2 = new JLabel("texte2");
+        profil_text.add(label2);
+        addButton(profil_button, "Accueil");
+        addButton(profil_button, "Catalogue");
+        profil.add(profil_text, BorderLayout.CENTER);
+        profil.add(profil_button, BorderLayout.SOUTH);
+        profil.pack();
+    }
+
     public void affichage()
     {
         connecter.setVisible(true);
@@ -92,10 +135,31 @@ public class Fenetres implements ActionListener {
         switch(button.getText())
         {
             case "Valider":
+                accueil.setVisible(true);
+                connecter.setVisible(false);
+                profil.setVisible(false);
+                inscrire.setVisible(false);
                 break;
             case "Inscrire":
                 inscrire.setVisible(true);
                 connecter.setVisible(false);
+                profil.setVisible(false);
+                break;
+            case "Profil":
+                profil.setVisible(true);
+                accueil.setVisible(false);
+                inscrire.setVisible(false);
+                break;
+            case "Accueil":
+                accueil.setVisible(true);
+                connecter.setVisible(false);
+                profil.setVisible(false);
+                break;
+            case "Deconnexion":
+                connecter.setVisible(true);
+                accueil.setVisible(false);
+                inscrire.setVisible(false);
+                profil.setVisible(false);
                 break;
         }
     }
