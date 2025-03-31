@@ -3,7 +3,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Fenetres implements ActionListener {
+public class Fenetres implements ActionListener
+{
     JPanel connecter_text, inscrire_text, accueil_text, profil_text, accueil_button, connecter_button, inscrire_button, profil_button;
     JFrame inscrire, connecter, accueil, profil; /// View.Fenetre principale
     TextField affichage, nom, prenom, mail, mdp;
@@ -12,7 +13,7 @@ public class Fenetres implements ActionListener {
     private String op;
     private double nb1, nb2, res;
 
-    public Fenetres()
+    public Fenetres() /// Constructeur de chaque fenêtre
     {
         setIdentification();
         setInscrire();
@@ -20,7 +21,7 @@ public class Fenetres implements ActionListener {
         setProfil();
     }
 
-    public void setInscrire()
+    public void setInscrire() /// Fenêtre inscription utilisateur
     {
         inscrire = new JFrame();
         inscrire.setSize(900, 700);
@@ -45,13 +46,14 @@ public class Fenetres implements ActionListener {
         JLabel label4 = new JLabel("Mdp");
         inscrire_text.add(label4);
         inscrire_text.add(mdp);
-        addButton(inscrire_button, "Valider");
+        addButton(inscrire_button, "Valider l'inscription");
+        addButton(inscrire_button, "Connexion");
         inscrire.add(inscrire_text, BorderLayout.CENTER);
         inscrire.add(inscrire_button, BorderLayout.SOUTH);
         inscrire.pack();
     }
 
-    public void setIdentification()
+    public void setIdentification() /// Fenêtre connexion utilisateur
     {
         connecter = new JFrame();
         connecter.setSize(900, 700);
@@ -75,7 +77,7 @@ public class Fenetres implements ActionListener {
         connecter.pack();
     }
 
-    public void setAccueil()
+    public void setAccueil() /// Fenêtre page d'accueil
     {
         accueil = new JFrame();
         accueil.setSize(900, 700);
@@ -96,7 +98,7 @@ public class Fenetres implements ActionListener {
         accueil.pack();
     }
 
-    public void setProfil()
+    public void setProfil() /// Fenêtre vue du profil utilisateur
     {
         profil = new JFrame();
         profil.setSize(900, 700);
@@ -116,12 +118,12 @@ public class Fenetres implements ActionListener {
         profil.pack();
     }
 
-    public void affichage()
+    public void affichage() /// Permier affichage au démarrage (gestion ensuite par les boutons)
     {
         connecter.setVisible(true);
     }
 
-    private void addButton(JPanel panel, String label)
+    private void addButton(JPanel panel, String label) /// Ajout d'un bouton sur une page
     {
         JButton button = new JButton(label);
         button.addActionListener(this);
@@ -129,7 +131,7 @@ public class Fenetres implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e)
+    public void actionPerformed(ActionEvent e) /// Action des boutons de chaque fenêtre
     {
         JButton button = (JButton) e.getSource();
         switch(button.getText())
@@ -144,6 +146,7 @@ public class Fenetres implements ActionListener {
                 inscrire.setVisible(true);
                 connecter.setVisible(false);
                 profil.setVisible(false);
+                accueil.setVisible(false);
                 break;
             case "Profil":
                 profil.setVisible(true);
@@ -160,6 +163,18 @@ public class Fenetres implements ActionListener {
                 accueil.setVisible(false);
                 inscrire.setVisible(false);
                 profil.setVisible(false);
+                break;
+            case "Connexion" :
+                connecter.setVisible(true);
+                inscrire.setVisible(false);
+                profil.setVisible(false);
+                accueil.setVisible(false);
+                break;
+            case "Valider l'inscription":
+                connecter.setVisible(true);
+                inscrire.setVisible(false);
+                profil.setVisible(false);
+                accueil.setVisible(false);
                 break;
         }
     }
