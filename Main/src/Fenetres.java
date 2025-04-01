@@ -119,14 +119,14 @@ public class Fenetres implements ActionListener
         profil.add(profil_button);
     }
 
-    public void setEvent()
+    public void setEvent() /// Gestion des erreurs
     {
         event = new JFrame();
         event.setSize(300, 100);
         event.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public void affichage() /// Permier affichage au démarrage (gestion ensuite par les boutons)
+    public void affichage() /// Premier affichage au démarrage (gestion ensuite par les boutons)
     {
         connecter.setVisible(true);
     }
@@ -142,6 +142,9 @@ public class Fenetres implements ActionListener
     public void actionPerformed(ActionEvent e) /// Action des boutons de chaque fenêtre
     {
         JButton button = (JButton) e.getSource();
+        /// Préparation fenêtre évènement
+        JLabel label_event;
+        JPanel erreur_text;
         switch(button.getText())
         {
             case "Valider":
@@ -151,10 +154,11 @@ public class Fenetres implements ActionListener
                     password = mdp_id.getText();
                     if (email.equals("") || password.equals(""))
                     {
-                        JPanel erreur_text = new JPanel();
+                        event.getContentPane().removeAll();
+                        erreur_text = new JPanel();
                         event.setTitle("Erreur");
-                        JLabel label1 = new JLabel("Erreur pendant la tentative de connexion");
-                        erreur_text.add(label1);
+                        label_event = new JLabel("Erreur pendant la tentative de connexion");
+                        erreur_text.add(label_event);
                         JPanel erreur_button = new JPanel();
                         addButton(erreur_button, "Retour");
                         event.add(erreur_text, BorderLayout.CENTER);
@@ -177,10 +181,11 @@ public class Fenetres implements ActionListener
                     password = mdp.getText();
                     System.out.println(surname + " " + name + " " + email + " " + password);
                     inscrire.setVisible(false);
+                    event.getContentPane().removeAll();
                     event.setTitle("Inscription");
                     JPanel text = new JPanel();
-                    JLabel label1 = new JLabel("Inscription terminee");
-                    text.add(label1);
+                    label_event = new JLabel("Inscription terminee");
+                    text.add(label_event);
                     JPanel erreur_button = new JPanel();
                     addButton(erreur_button, "Retour");
                     event.add(text, BorderLayout.CENTER);
@@ -220,9 +225,10 @@ public class Fenetres implements ActionListener
             case "Catalogue" :
                 if(profil.isVisible() || accueil.isVisible())
                 {
-                    JPanel erreur_text = new JPanel();
-                    JLabel label1 = new JLabel("Erreur pendant la tentative d'affichage");
-                    erreur_text.add(label1);
+                    event.getContentPane().removeAll();
+                    erreur_text = new JPanel();
+                    label_event = new JLabel("Erreur pendant la tentative d'affichage");
+                    erreur_text.add(label_event);
                     JPanel erreur_button = new JPanel();
                     addButton(erreur_button, "Retour");
                     event.add(erreur_text, BorderLayout.CENTER);
