@@ -5,10 +5,9 @@ import java.awt.event.ActionListener;
 
 public class Fenetres implements ActionListener
 {
-    JPanel connecter_text, inscrire_text, accueil_text, profil_text; /// Zones texte
-    JPanel accueil_button, connecter_button, inscrire_button, profil_button; /// Zones boutons
-    JFrame inscrire, connecter, accueil, profil; /// Fenêtres de navigation
-    TextField affichage, nom, prenom, mail, mdp; /// Zones de saisie
+    JFrame inscrire, connecter, accueil, profil, event; /// Fenêtres de navigation
+    TextField affichage, nom, prenom, mail, mdp, mail_id, mdp_id; /// Zones de saisie
+    private String surname, name, email, password;
 
     public Fenetres() /// Constructeur de chaque fenêtre
     {
@@ -16,6 +15,7 @@ public class Fenetres implements ActionListener
         setInscrire();
         setAccueil();
         setProfil();
+        setEvent();
     }
 
     public void setInscrire() /// Fenêtre inscription utilisateur
@@ -25,29 +25,34 @@ public class Fenetres implements ActionListener
         inscrire.setTitle("Inscription");
         inscrire.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         inscrire.setLayout(new BoxLayout(inscrire.getContentPane(), BoxLayout.Y_AXIS));
-        inscrire_text = new JPanel();
+        JPanel inscrire_nom = new JPanel();
         JLabel label1 = new JLabel("Nom");
-        inscrire_text.add(label1);
-        inscrire_button = new JPanel();
+        inscrire_nom.add(label1);
+        JPanel inscrire_button = new JPanel();
         nom = new TextField(10);
         prenom = new TextField(10);
         mail = new TextField(10);
         mdp = new TextField(10);
-        inscrire_text.add(nom);
+        inscrire_nom.add(nom);
+        JPanel inscrire_prenom = new JPanel();
         JLabel label2 = new JLabel("Prenom");
-        inscrire_text.add(label2);
-        inscrire_text.add(prenom);
+        inscrire_prenom.add(label2);
+        inscrire_prenom.add(prenom);
         JLabel label3 = new JLabel("Mail");
-        inscrire_text.add(label3);
-        inscrire_text.add(mail);
-        JLabel label4 = new JLabel("Mdp");
-        inscrire_text.add(label4);
-        inscrire_text.add(mdp);
-        addButton(inscrire_button, "Valider l'inscription");
+        JPanel inscrire_mail = new JPanel();
+        inscrire_mail.add(label3);
+        inscrire_mail.add(mail);
+        JLabel label4 = new JLabel("Mot de passe");
+        JPanel inscrire_mdp = new JPanel();
+        inscrire_mdp.add(label4);
+        inscrire_mdp.add(mdp);
+        addButton(inscrire_button, "Valider");
         addButton(inscrire_button, "Connexion");
-        inscrire.add(inscrire_text, BorderLayout.CENTER);
-        inscrire.add(inscrire_button, BorderLayout.SOUTH);
-        inscrire.pack();
+        inscrire.add(inscrire_nom);
+        inscrire.add(inscrire_prenom);
+        inscrire.add(inscrire_mail);
+        inscrire.add(inscrire_mdp);
+        inscrire.add(inscrire_button);
     }
 
     public void setIdentification() /// Fenêtre connexion utilisateur
@@ -57,21 +62,22 @@ public class Fenetres implements ActionListener
         connecter.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         connecter.setTitle("Connexion");
         connecter.setLayout(new BoxLayout(connecter.getContentPane(), BoxLayout.Y_AXIS));
-        connecter_text = new JPanel();
+        JPanel connecter_mail = new JPanel();
         JLabel label1 = new JLabel("Mail");
-        connecter_text.add(label1);
-        connecter_button = new JPanel();
-        mail = new TextField(10);
-        mdp = new TextField(10);
-        connecter_text.add(mail);
-        JLabel label2 = new JLabel("Mdp");
-        connecter_text.add(label2);
-        connecter_text.add(mdp);
+        connecter_mail.add(label1);
+        JPanel connecter_button = new JPanel();
+        mail_id = new TextField(10);
+        mdp_id = new TextField(10);
+        connecter_mail.add(mail_id);
+        JLabel label2 = new JLabel("Mot de passe");
+        JPanel connecter_mdp = new JPanel();
+        connecter_mdp.add(label2);
+        connecter_mdp.add(mdp_id);
         addButton(connecter_button, "Valider");
         addButton(connecter_button, "Inscrire");
-        connecter.add(connecter_text, BorderLayout.CENTER);
-        connecter.add(connecter_button, BorderLayout.SOUTH);
-        connecter.pack();
+        connecter.add(connecter_mail);
+        connecter.add(connecter_mdp);
+        connecter.add(connecter_button);
     }
 
     public void setAccueil() /// Fenêtre page d'accueil
@@ -81,18 +87,17 @@ public class Fenetres implements ActionListener
         accueil.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         accueil.setTitle("Accueil");
         accueil.setLayout(new BoxLayout(accueil.getContentPane(), BoxLayout.Y_AXIS));
-        accueil_text = new JPanel();
+        JPanel accueil_text = new JPanel();
         JLabel label1 = new JLabel("texte");
         accueil_text.add(label1);
-        accueil_button = new JPanel();
+        JPanel accueil_button = new JPanel();
         JLabel label2 = new JLabel("texte2");
         accueil_text.add(label2);
         addButton(accueil_button, "Profil");
         addButton(accueil_button, "Catalogue");
         addButton(accueil_button, "Deconnexion");
-        accueil.add(accueil_text, BorderLayout.CENTER);
-        accueil.add(accueil_button, BorderLayout.SOUTH);
-        accueil.pack();
+        accueil.add(accueil_button);
+        accueil.add(accueil_text);
     }
 
     public void setProfil() /// Fenêtre vue du profil utilisateur
@@ -102,17 +107,23 @@ public class Fenetres implements ActionListener
         profil.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         profil.setTitle("Profil");
         profil.setLayout(new BoxLayout(profil.getContentPane(), BoxLayout.Y_AXIS));
-        profil_text = new JPanel();
+        JPanel profil_text = new JPanel();
         JLabel label1 = new JLabel("texte");
         profil_text.add(label1);
-        profil_button = new JPanel();
+        JPanel profil_button = new JPanel();
         JLabel label2 = new JLabel("texte2");
         profil_text.add(label2);
         addButton(profil_button, "Accueil");
         addButton(profil_button, "Catalogue");
-        profil.add(profil_text, BorderLayout.CENTER);
-        profil.add(profil_button, BorderLayout.SOUTH);
-        profil.pack();
+        profil.add(profil_text);
+        profil.add(profil_button);
+    }
+
+    public void setEvent()
+    {
+        event = new JFrame();
+        event.setSize(300, 100);
+        event.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public void affichage() /// Permier affichage au démarrage (gestion ensuite par les boutons)
@@ -134,10 +145,49 @@ public class Fenetres implements ActionListener
         switch(button.getText())
         {
             case "Valider":
-                accueil.setVisible(true);
-                connecter.setVisible(false);
-                profil.setVisible(false);
-                inscrire.setVisible(false);
+                if(connecter.isVisible())
+                {
+                    email = mail_id.getText();
+                    password = mdp_id.getText();
+                    if (email.equals("") || password.equals(""))
+                    {
+                        JPanel erreur_text = new JPanel();
+                        event.setTitle("Erreur");
+                        JLabel label1 = new JLabel("Erreur pendant la tentative de connexion");
+                        erreur_text.add(label1);
+                        JPanel erreur_button = new JPanel();
+                        addButton(erreur_button, "Retour");
+                        event.add(erreur_text, BorderLayout.CENTER);
+                        event.add(erreur_button, BorderLayout.SOUTH);
+                        event.setVisible(true);
+                    }
+                    else
+                    {
+                        accueil.setVisible(true);
+                        connecter.setVisible(false);
+                        profil.setVisible(false);
+                        inscrire.setVisible(false);
+                    }
+                }
+                else if (inscrire.isVisible())
+                {
+                    surname = nom.getText();
+                    name = prenom.getText();
+                    email = mail.getText();
+                    password = mdp.getText();
+                    System.out.println(surname + " " + name + " " + email + " " + password);
+                    inscrire.setVisible(false);
+                    event.setTitle("Inscription");
+                    JPanel text = new JPanel();
+                    JLabel label1 = new JLabel("Inscription terminee");
+                    text.add(label1);
+                    JPanel erreur_button = new JPanel();
+                    addButton(erreur_button, "Retour");
+                    event.add(text, BorderLayout.CENTER);
+                    event.add(erreur_button, BorderLayout.SOUTH);
+                    connecter.setVisible(true);
+                    event.setVisible(true);
+                }
                 break;
             case "Inscrire":
                 inscrire.setVisible(true);
@@ -147,7 +197,7 @@ public class Fenetres implements ActionListener
                 break;
             case "Profil":
                 profil.setVisible(true);
-                accueil.setVisible(false);
+                accueil.setVisible(true);
                 inscrire.setVisible(false);
                 break;
             case "Accueil":
@@ -167,12 +217,23 @@ public class Fenetres implements ActionListener
                 profil.setVisible(false);
                 accueil.setVisible(false);
                 break;
-            case "Valider l'inscription":
-                connecter.setVisible(true);
-                inscrire.setVisible(false);
-                profil.setVisible(false);
-                accueil.setVisible(false);
+            case "Catalogue" :
+                if(profil.isVisible() || accueil.isVisible())
+                {
+                    JPanel erreur_text = new JPanel();
+                    JLabel label1 = new JLabel("Erreur pendant la tentative d'affichage");
+                    erreur_text.add(label1);
+                    JPanel erreur_button = new JPanel();
+                    addButton(erreur_button, "Retour");
+                    event.add(erreur_text, BorderLayout.CENTER);
+                    event.add(erreur_button, BorderLayout.SOUTH);
+                    event.setVisible(true);
+                }
                 break;
+            case "Retour":
+                if(inscrire.isVisible())
+                    connecter.setVisible(true);
+                event.setVisible(false);
         }
     }
 }
