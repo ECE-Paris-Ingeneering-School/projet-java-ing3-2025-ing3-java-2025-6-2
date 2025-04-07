@@ -1,3 +1,8 @@
+package Model;
+import View.*;
+import Control.*;
+import Control.Réduction;
+
 import java.util.HashMap;
 import java.util.Map;
 

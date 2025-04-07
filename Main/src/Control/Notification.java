@@ -1,3 +1,8 @@
+package Control;
+import View.*;
+import Model.*;
+import Model.Client;
+
 public class Notification {
     private int id;
     private Client client;

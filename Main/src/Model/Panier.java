@@ -1,9 +1,13 @@
+package Model;
+import View.*;
+import Control.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class Panier {
     private Client client;
-    private Map<Article, Integer> articles; // Article et quantité
+    private Map<Article, Integer> articles; // Model.Article et quantité
 
     public Panier(Client client) {
         this.client = client;

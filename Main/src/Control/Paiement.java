@@ -1,3 +1,7 @@
+package Control;
+import View.*;
+import Model.*;
+
 public class Paiement {
     private int id;
     private Commande commande;

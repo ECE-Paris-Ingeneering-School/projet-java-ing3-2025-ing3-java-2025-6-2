@@ -1,8 +1,14 @@
+package Control;
+import View.*;
+import Model.*;
+import Model.Article;
+import Model.Client;
+
 import java.util.Map;
 
 public class Commande {
     private Client client;
-    private Map<Article, Integer> articles; // Article et quantité
+    private Map<Article, Integer> articles; // Model.Article et quantité
     private double prixTotal;
     private String date;
 

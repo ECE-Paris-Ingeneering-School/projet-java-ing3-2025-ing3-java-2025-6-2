@@ -1,3 +1,9 @@
+package Control;
+import View.*;
+import Model.*;
+import Model.Article;
+import Model.Client;
+
 public class Avis {
     private int id;
     private Client client;

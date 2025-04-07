@@ -1,3 +1,7 @@
+package Control;
+import View.*;
+import Model.*;
+
 public class RéductionClient extends Réduction {
     private Client client;
 
@@ -8,7 +12,7 @@ public class RéductionClient extends Réduction {
 
     @Override
     public void afficherDetails() {
-        System.out.println("Réduction pour le client: " + client.getNom() + ", Pourcentage: " + getPourcentage() + "%, Valide jusqu'au: " + getDateFin());
+        System.out.println("Control.Réduction pour le client: " + client.getNom() + ", Pourcentage: " + getPourcentage() + "%, Valide jusqu'au: " + getDateFin());
     }
 
     // Getters et Setters

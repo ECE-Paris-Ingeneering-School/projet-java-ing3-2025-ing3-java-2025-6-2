@@ -1,3 +1,7 @@
+package Model;
+import View.*;
+import Control.*;
+
 public class Utilisateurs
 {
     private String identifiant;

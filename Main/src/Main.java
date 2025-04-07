@@ -1,12 +1,12 @@
-import java.util.Scanner;
+import View.Fenetres;
 
 public class Main {
     public static void main(String[] args) {
         // Création d'un client de test
-        /*Client testClient = new Client("TestClient1", "client123", "Alara TANGUY", "alaratanguy@example.com");
+        /*Model.Client testClient = new Model.Client("TestClient1", "client123", "Alara TANGUY", "alaratanguy@example.com");
 
         // Création d'un administrateur
-        Administrateur admin = new Administrateur("Admin", "admin123", "Admin", "admin@example.com");
+        Model.Administrateur admin = new Model.Administrateur("Admin", "admin123", "Admin", "admin@example.com");
 
         // Initialisation de Scanner pour lire l'entrée de l'utilisateur
         Scanner scanner = new Scanner(System.in);

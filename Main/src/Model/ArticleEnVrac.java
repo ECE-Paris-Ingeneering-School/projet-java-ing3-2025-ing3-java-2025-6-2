@@ -1,3 +1,7 @@
+package Model;
+import View.*;
+import Control.*;
+
 public class ArticleEnVrac extends Article {
     private double prixEnVrac;
     private int quantiteEnVrac;
