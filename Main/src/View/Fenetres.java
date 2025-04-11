@@ -8,15 +8,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+/** Fenetres constitue l'ensemble des interfaces graphiques utilisées au cour du projet
+ * @L'ensemble des liens entre elles sont effectuées ici
+ */
 public class Fenetres implements ActionListener
 {
     JFrame inscrire, connecter, accueil, profil, event, paiement; /// Fenêtres de navigation
     TextField affichage, nom, prenom, mail, mdp, mail_id, mdp_id, numero_carte, expiration_carte, cvv; /// Zones de saisie
-    private String surname, name, email, password;
-    JComboBox<String> payment_type;
-    private String payment, num_card, exp_date, cvv_number;
+    private String surname, name, email, password; /// Inscription dans la database
+    JComboBox<String> payment_type; /// Choix du mode de paiement
+    private String payment, num_card, exp_date, cvv_number; /// Effectuer le paiement
 
-    public Fenetres() /// Constructeur de chaque fenêtre
+    /// Constructeur de chaque fenêtre
+    public Fenetres()
     {
         setIdentification();
         setInscrire();
@@ -26,7 +30,8 @@ public class Fenetres implements ActionListener
         setPaiement();
     }
 
-    public void setInscrire() /// Fenêtre inscription utilisateur
+    /// Fenêtre inscription utilisateur
+    public void setInscrire()
     {
         inscrire = new JFrame();
         inscrire.setSize(900, 700);
@@ -63,7 +68,8 @@ public class Fenetres implements ActionListener
         inscrire.add(inscrire_button);
     }
 
-    public void setIdentification() /// Fenêtre connexion utilisateur
+    /// Fenêtre connexion utilisateur
+    public void setIdentification()
     {
         connecter = new JFrame();
         connecter.setSize(900, 700);
@@ -88,7 +94,8 @@ public class Fenetres implements ActionListener
         connecter.add(connecter_button);
     }
 
-    public void setAccueil() /// Fenêtre page d'accueil
+    /// Fenêtre page d'accueil
+    public void setAccueil()
     {
         accueil = new JFrame();
         accueil.setSize(900, 700);
@@ -108,7 +115,8 @@ public class Fenetres implements ActionListener
         accueil.add(accueil_text);
     }
 
-    public void setProfil() /// Fenêtre vue du profil utilisateur
+    /// Fenêtre vue du profil utilisateur
+    public void setProfil()
     {
         profil = new JFrame();
         profil.setSize(900, 700);
@@ -127,13 +135,15 @@ public class Fenetres implements ActionListener
         profil.add(profil_button);
     }
 
-    public void setEvent() /// Gestion des erreurs
+    /// Gestion des erreurs
+    public void setEvent()
     {
         event = new JFrame();
         event.setSize(300, 100);
         event.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    /// Paiement d'un article
     public void setPaiement()
     {
         paiement = new JFrame();
@@ -173,20 +183,23 @@ public class Fenetres implements ActionListener
         paiement.add(paiement_button);
     }
 
-    public void affichage() /// Premier affichage au démarrage (gestion ensuite par les boutons)
+    /// Premier affichage au démarrage (gestion ensuite par les boutons)
+    public void affichage()
     {
         paiement.setVisible(true);
     }
 
-    private void addButton(JPanel panel, String label) /// Ajout d'un bouton sur une page
+    /// Ajout d'un bouton sur une page
+    private void addButton(JPanel panel, String label)
     {
         JButton button = new JButton(label);
         button.addActionListener(this);
         panel.add(button);
     }
 
+    /// Action des boutons de chaque fenêtre
     @Override
-    public void actionPerformed(ActionEvent e) /// Action des boutons de chaque fenêtre
+    public void actionPerformed(ActionEvent e)
     {
         JButton button = (JButton) e.getSource();
         /// Préparation fenêtre évènement
@@ -201,7 +214,7 @@ public class Fenetres implements ActionListener
                     password = mdp_id.getText();
                     if (email.equals("") || password.equals(""))
                     {
-                        event.getContentPane().removeAll();
+                        event.getContentPane().removeAll(); /// Retire le contenu de la page event
                         erreur_text = new JPanel();
                         event.setTitle("Erreur");
                         label_event = new JLabel("Erreur pendant la tentative de connexion");
@@ -272,7 +285,7 @@ public class Fenetres implements ActionListener
             case "Catalogue" :
                 if(profil.isVisible() || accueil.isVisible())
                 {
-                    event.getContentPane().removeAll();
+                    event.getContentPane().removeAll(); /// Retire le contenu de la page event
                     erreur_text = new JPanel();
                     label_event = new JLabel("Erreur pendant la tentative d'affichage");
                     erreur_text.add(label_event);
