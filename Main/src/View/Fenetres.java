@@ -6,12 +6,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class Fenetres implements ActionListener
 {
-    JFrame inscrire, connecter, accueil, profil, event; /// Fenêtres de navigation
-    TextField affichage, nom, prenom, mail, mdp, mail_id, mdp_id; /// Zones de saisie
+    JFrame inscrire, connecter, accueil, profil, event, paiement; /// Fenêtres de navigation
+    TextField affichage, nom, prenom, mail, mdp, mail_id, mdp_id, numero_carte, expiration_carte, cvv; /// Zones de saisie
     private String surname, name, email, password;
+    JComboBox<String> payment_type;
+    private String payment, num_card, exp_date, cvv_number;
 
     public Fenetres() /// Constructeur de chaque fenêtre
     {
@@ -20,6 +23,7 @@ public class Fenetres implements ActionListener
         setAccueil();
         setProfil();
         setEvent();
+        setPaiement();
     }
 
     public void setInscrire() /// Fenêtre inscription utilisateur
@@ -130,9 +134,48 @@ public class Fenetres implements ActionListener
         event.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    public void setPaiement()
+    {
+        paiement = new JFrame();
+        paiement.setSize(900, 700);
+        paiement.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        paiement.setTitle("Paiement");
+        paiement.setLayout(new BoxLayout(paiement.getContentPane(), BoxLayout.Y_AXIS));
+        JPanel paiement_text = new JPanel();
+        JLabel label1 = new JLabel("Moyen de paiement");
+        paiement_text.add(label1);
+        String[] moyen_paiement = {"Visa", "Mastercard", "American Express", "PayPal"}; /// Liste des moyens de paiement
+        payment_type = new JComboBox<>(moyen_paiement); /// Liste associée
+        payment_type.setSelectedIndex(0);
+        payment_type.setBounds(50, 50, 100, 20);
+        paiement_text.add(payment_type);
+        JPanel num_carte = new JPanel();
+        JLabel label2 = new JLabel("Numero de carte");
+        num_carte.add(label2);
+        numero_carte = new TextField(10);
+        num_carte.add(numero_carte);
+        JPanel expiration = new JPanel();
+        JLabel label3 = new JLabel("Date d'expiration");
+        expiration.add(label3);
+        expiration_carte = new TextField(10);
+        expiration.add(expiration_carte);
+        JPanel cvv_text = new JPanel();
+        JLabel label4 = new JLabel("CVV");
+        cvv_text.add(label4);
+        cvv = new TextField(10);
+        cvv_text.add(cvv);
+        JPanel paiement_button = new JPanel();
+        addButton(paiement_button, "Valider et payer");
+        paiement.add(paiement_text);
+        paiement.add(num_carte);
+        paiement.add(expiration);
+        paiement.add(cvv_text);
+        paiement.add(paiement_button);
+    }
+
     public void affichage() /// Premier affichage au démarrage (gestion ensuite par les boutons)
     {
-        connecter.setVisible(true);
+        paiement.setVisible(true);
     }
 
     private void addButton(JPanel panel, String label) /// Ajout d'un bouton sur une page
@@ -240,6 +283,12 @@ public class Fenetres implements ActionListener
                     event.setVisible(true);
                 }
                 break;
+            case "Valider et payer":
+                payment = (String) payment_type.getSelectedItem();
+                num_card = numero_carte.getText();
+                exp_date = expiration_carte.getText();
+                cvv_number = cvv.getText();
+                System.out.println("Paiement : " + payment +" Numero de carte : " + num_card + " Date d'expiration : " + exp_date + " Numero CVV : " + cvv_number);
             case "Retour":
                 if(inscrire.isVisible())
                     connecter.setVisible(true);
