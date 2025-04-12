@@ -1,7 +1,4 @@
-package Control;
-import View.*;
-import Model.*;
-import Model.Client;
+package Model;
 
 public class Notification {
     private int id;

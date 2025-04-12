@@ -19,10 +19,6 @@ public class Article {
         this.disponibilite = disponibilite;
     }
 
-    public void afficherDetails() {
-        System.out.println("ID: " + id + ", Nom: " + nom + ", Marque: " + marque + ", Catégorie: " + categorie + ", Prix: " + prixUnitaire + ", Disponibilité: " + disponibilite);
-    }
-
     public boolean verifierDisponibilite(String dates) {
         // Implémentation de la vérification de disponibilité
         return disponibilite;

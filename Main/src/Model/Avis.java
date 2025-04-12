@@ -1,8 +1,4 @@
-package Control;
-import View.*;
-import Model.*;
-import Model.Article;
-import Model.Client;
+package Model;
 
 public class Avis {
     private int id;

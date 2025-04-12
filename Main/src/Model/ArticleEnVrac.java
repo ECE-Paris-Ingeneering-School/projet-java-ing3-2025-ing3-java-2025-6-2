@@ -12,12 +12,6 @@ public class ArticleEnVrac extends Article {
         this.quantiteEnVrac = quantiteEnVrac;
     }
 
-    @Override
-    public void afficherDetails() {
-        super.afficherDetails();
-        System.out.println("Prix en vrac: " + prixEnVrac + ", Quantité en vrac: " + quantiteEnVrac);
-    }
-
     // Getters et Setters
     public double getPrixEnVrac() { return prixEnVrac; }
     public void setPrixEnVrac(double prixEnVrac) { this.prixEnVrac = prixEnVrac; }

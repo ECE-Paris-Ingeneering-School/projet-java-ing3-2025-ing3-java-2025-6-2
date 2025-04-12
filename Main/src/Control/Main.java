@@ -1,4 +1,5 @@
-import View.FenTest;
+package Control;
+
 import View.Fenetres;
 
 public class Main {

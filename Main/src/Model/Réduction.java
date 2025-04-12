@@ -1,6 +1,4 @@
-package Control;
-import View.*;
-import Model.*;
+package Model;
 
 public class Réduction {
     private int id;
@@ -13,10 +11,6 @@ public class Réduction {
         this.pourcentage = pourcentage;
         this.dateDebut = dateDebut;
         this.dateFin = dateFin;
-    }
-
-    public void afficherDetails() {
-        System.out.println("Control.Réduction: " + pourcentage + "%, Valide du " + dateDebut + " au " + dateFin);
     }
 
     // Getters et Setters

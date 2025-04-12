@@ -12,12 +12,6 @@ public class ArticleEnPromotion extends Article {
         this.dateFinPromotion = dateFinPromotion;
     }
 
-    @Override
-    public void afficherDetails() {
-        super.afficherDetails();
-        System.out.println("Pourcentage de réduction: " + pourcentageReduction + ", Date de fin de promotion: " + dateFinPromotion);
-    }
-
     // Getters et Setters
     public double getPourcentageReduction() { return pourcentageReduction; }
     public void setPourcentageReduction(double pourcentageReduction) { this.pourcentageReduction = pourcentageReduction; }

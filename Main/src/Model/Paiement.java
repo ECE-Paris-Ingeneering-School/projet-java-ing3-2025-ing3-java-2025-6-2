@@ -1,6 +1,4 @@
-package Control;
-import View.*;
-import Model.*;
+package Model;
 
 public class Paiement {
     private int id;
