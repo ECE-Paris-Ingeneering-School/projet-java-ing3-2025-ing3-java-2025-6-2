@@ -22,11 +22,6 @@ public class Client extends Utilisateurs {
         return new Commande(this, new HashMap<>());
     }
 
-    public void afficherInterfaceClient() {
-        System.out.println("Bienvenue dans l'interface client!");
-        // Ajouter ici les fonctionnalités de l'interface client
-    }
-
     // Getters et Setters
     public boolean getStatut() {
         return statut;

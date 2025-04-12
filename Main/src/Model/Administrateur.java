@@ -3,15 +3,13 @@ package Model;
 import java.util.HashMap;
 import java.util.Map;
 
+
+/// Administrateur de l'application
 public class Administrateur extends Utilisateurs {
 
-    public Administrateur(String identifiant, String motDePasse, String nom, String email) {
+    public Administrateur(String identifiant, String motDePasse, String nom, String email)
+    {
         super(identifiant, motDePasse, nom, email);
-    }
-
-    public void afficherInterfaceAdministrateur() {
-        System.out.println("Bienvenue dans l'interface administrateur!");
-        // Ajouter ici les fonctionnalités de l'interface administrateur
     }
 
     public void ajouterArticle(Article article) {
