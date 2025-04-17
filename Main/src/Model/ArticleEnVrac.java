@@ -6,8 +6,8 @@ public class ArticleEnVrac extends Article {
     private double prixEnVrac;
     private int quantiteEnVrac;
 
-    public ArticleEnVrac(int id, String nom, String marque, String categorie, double prixUnitaire, boolean disponibilite, double prixEnVrac, int quantiteEnVrac) {
-        super(id, nom, marque, categorie, prixUnitaire, disponibilite);
+    public ArticleEnVrac(int id, int stock, int seuil_remise, String nom, String marque, String categorie, String description, float prixUnitaire, boolean disponibilite, double prixEnVrac, int quantiteEnVrac) {
+        super(id, stock, seuil_remise, nom, marque, categorie, description, prixUnitaire, disponibilite);
         this.prixEnVrac = prixEnVrac;
         this.quantiteEnVrac = quantiteEnVrac;
     }

@@ -17,11 +17,6 @@ public class Utilisateurs
         this.type_utilisateur = type_utilisateur;
     }
 
-    public void seDeconnecter()
-    {
-        System.out.println("Utilisateur déconnecté.");
-    }
-
     // Getters et Setters
     public int getIdentifiant()
     {

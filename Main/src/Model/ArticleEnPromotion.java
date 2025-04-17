@@ -6,8 +6,8 @@ public class ArticleEnPromotion extends Article {
     private double pourcentageReduction;
     private String dateFinPromotion;
 
-    public ArticleEnPromotion(int id, String nom, String marque, String categorie, double prixUnitaire, boolean disponibilite, double pourcentageReduction, String dateFinPromotion) {
-        super(id, nom, marque, categorie, prixUnitaire, disponibilite);
+    public ArticleEnPromotion(int id, int stock, int seuil_remise, String nom, String marque, String categorie, String description, float prixUnitaire, boolean disponibilite, double pourcentageReduction, String dateFinPromotion) {
+        super(id, stock, seuil_remise, nom, marque, categorie, description, prixUnitaire, disponibilite);
         this.pourcentageReduction = pourcentageReduction;
         this.dateFinPromotion = dateFinPromotion;
     }

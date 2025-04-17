@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : jeu. 17 avr. 2025 à 13:33
+-- Généré le : jeu. 17 avr. 2025 à 15:07
 -- Version du serveur :  5.7.31
 -- Version de PHP : 7.3.21
 
@@ -35,43 +35,11 @@ CREATE TABLE IF NOT EXISTS `article` (
   `prix` decimal(10,2) NOT NULL,
   `stock` int(11) NOT NULL DEFAULT '0',
   `seuil_remise` int(11) DEFAULT NULL,
-  `id_categorie` int(11) DEFAULT NULL,
-  `id_marque` int(11) DEFAULT NULL,
+  `categorie` varchar(255) NOT NULL,
+  `marque` varchar(255) NOT NULL,
   `date_ajout` datetime DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id_article`),
-  KEY `id_categorie` (`id_categorie`),
-  KEY `id_marque` (`id_marque`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
-
---
--- Déchargement des données de la table `article`
---
-
-INSERT INTO `article` (`id_article`, `nom`, `description`, `prix`, `stock`, `seuil_remise`, `id_categorie`, `id_marque`, `date_ajout`) VALUES
-(1, 'Smartphone X', 'Smartphone haut de gamme avec écran OLED', '799.99', 49, 5, 1, 1, '2025-04-15 10:12:52'),
-(2, 'T-Shirt Casual', 'T-shirt en coton bio, plusieurs coloris', '29.99', 98, 10, 2, 2, '2025-04-15 10:12:52');
-
--- --------------------------------------------------------
-
---
--- Structure de la table `categorie`
---
-
-DROP TABLE IF EXISTS `categorie`;
-CREATE TABLE IF NOT EXISTS `categorie` (
-  `id_categorie` int(11) NOT NULL AUTO_INCREMENT,
-  `nom_categorie` varchar(100) NOT NULL,
-  `description` text,
-  PRIMARY KEY (`id_categorie`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
-
---
--- Déchargement des données de la table `categorie`
---
-
-INSERT INTO `categorie` (`id_categorie`, `nom_categorie`, `description`) VALUES
-(1, 'Électronique', 'Appareils électroniques et gadgets'),
-(2, 'Vêtements', 'Vêtements pour hommes, femmes et enfants');
+  PRIMARY KEY (`id_article`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -151,28 +119,6 @@ CREATE TABLE IF NOT EXISTS `lignepanier` (
 INSERT INTO `lignepanier` (`id_ligne_panier`, `id_panier`, `id_article`, `quantite`) VALUES
 (1, 1, 1, 1),
 (2, 1, 2, 3);
-
--- --------------------------------------------------------
-
---
--- Structure de la table `marque`
---
-
-DROP TABLE IF EXISTS `marque`;
-CREATE TABLE IF NOT EXISTS `marque` (
-  `id_marque` int(11) NOT NULL AUTO_INCREMENT,
-  `nom_marque` varchar(100) NOT NULL,
-  `description` text,
-  PRIMARY KEY (`id_marque`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
-
---
--- Déchargement des données de la table `marque`
---
-
-INSERT INTO `marque` (`id_marque`, `nom_marque`, `description`) VALUES
-(1, 'TechBrand', 'Marque spécialisée en high-tech'),
-(2, 'FashionLine', 'Marque de vêtements tendance');
 
 -- --------------------------------------------------------
 
@@ -268,13 +214,6 @@ INSERT INTO `utilisateur` (`id_utilisateur`, `nom`, `prenom`, `email`, `mot_de_p
 --
 -- Contraintes pour les tables déchargées
 --
-
---
--- Contraintes pour la table `article`
---
-ALTER TABLE `article`
-  ADD CONSTRAINT `article_ibfk_1` FOREIGN KEY (`id_categorie`) REFERENCES `categorie` (`id_categorie`),
-  ADD CONSTRAINT `article_ibfk_2` FOREIGN KEY (`id_marque`) REFERENCES `marque` (`id_marque`);
 
 --
 -- Contraintes pour la table `commande`

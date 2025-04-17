@@ -15,11 +15,20 @@ import Dao.*;
  */
 public class Fenetres extends Component implements ActionListener
 {
-    JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue; /// Fenêtres de navigation
-    TextField nom, prenom, mail, mdp, mail_id, mdp_id, numero_carte, expiration_carte, cvv; /// Zones de saisie
-    private String account_type, surname, name, email, password; /// Inscription dans la database
-    JComboBox<String> type_compte, payment_type; /// Choix du mode de paiement et du type de compte
+    JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article; /// Fenêtres de navigation
+    TextField nom, prenom, mail, mdp, mail_id, mdp_id; /// Zones de saisie connexion et inscriptions
+    TextField numero_carte, expiration_carte, cvv; /// Zones de saisies paiement
+    private String account_type, surname, name, email, password; /// Inscription utilisateur dans la database
+
+    /// Gestion articles
+    TextField nom_article, description, prix, stock, seuil_remise; /// Zones de saisies article
+    private String categorie_type, name_article, describe, mark;
+    private int max_rabais, reserve;
+    private float price;
+    JComboBox<String> type_compte, payment_type, categorie, marque; /// Choix du mode de paiement et du type de compte
     private String payment, num_card, exp_date, cvv_number; /// Effectuer le paiement
+
+    /// Fenetre catalogue
     private JPanel PTitre, Liste, PannelRetour;
     private JButton Retour;
     private JLabel titrre;
@@ -341,12 +350,70 @@ public class Fenetres extends Component implements ActionListener
         PannelRetour.add(Retour);
     }
 
+    public void setNewArticle()
+    {
+        ajout_article = new JFrame();
+        ajout_article.setSize(900, 700);
+        ajout_article.setTitle("Ajout article");
+        ajout_article.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        ajout_article.setLayout(new BoxLayout(ajout_article.getContentPane(), BoxLayout.Y_AXIS));
+        JLabel label1 = new JLabel("Categorie");
+        ajout_article.add(label1);
+        String[] type = {"Electromenager", "Nourriture", "Necessite"};
+        categorie = new JComboBox<>(type); /// Liste associée
+        categorie.setSelectedIndex(0);
+        categorie.setBounds(50, 50, 100, 20);
+        ajout_article.add(categorie);
+        JLabel label2 = new JLabel("Marque");
+        ajout_article.add(label2);
+        String[] type2 = {"Bosch", "Samsung", "Nestlé"};
+        marque = new JComboBox<>(type2); /// Liste associée
+        marque.setSelectedIndex(0);
+        marque.setBounds(50, 50, 100, 20);
+        ajout_article.add(marque);
+        JPanel inscrire_nom = new JPanel();
+        JLabel label3 = new JLabel("Nom");
+        inscrire_nom.add(label3);
+        JPanel ajout_article_button = new JPanel();
+        nom = new TextField(10);
+        prix = new TextField(10);
+        stock = new TextField(10);
+        description = new TextField(10);
+        seuil_remise = new TextField(10);
+        inscrire_nom.add(nom);
+        JPanel inscrire_prix = new JPanel();
+        JLabel label4 = new JLabel("Prix");
+        inscrire_prix.add(label4);
+        inscrire_prix.add(prix);
+        JLabel label5 = new JLabel("Stock");
+        JPanel inscrire_stock = new JPanel();
+        inscrire_stock.add(label5);
+        inscrire_stock.add(stock);
+        JLabel label6 = new JLabel("Seuil de remise");
+        JPanel inscrire_remise = new JPanel();
+        inscrire_remise.add(label6);
+        inscrire_remise.add(seuil_remise);
+        JPanel decrire = new JPanel();
+        JLabel label7 = new JLabel("Description");
+        decrire.add(label7);
+        decrire.add(description);
+        addButton(ajout_article_button, "Valider");
+        addButton(ajout_article_button, "Retour");
+        ajout_article.add(inscrire_nom);
+        ajout_article.add(inscrire_prix);
+        ajout_article.add(inscrire_stock);
+        ajout_article.add(inscrire_remise);
+        ajout_article.add(decrire);
+        ajout_article.add(ajout_article_button);
+    }
+
     /// Action des boutons de chaque fenêtre
     @Override
     public void actionPerformed(ActionEvent e)
     {
         DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
         UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
+        ArticleDAOImpl artdao = new ArticleDAOImpl(dao);
         JButton button = (JButton) e.getSource();
         /// Préparation fenêtre évènement
         JLabel label_event;
@@ -390,7 +457,6 @@ public class Fenetres extends Component implements ActionListener
                     password = mdp.getText();
                     account_type = (String) type_compte.getSelectedItem();
                     Utilisateurs new_user = new Utilisateurs(id, surname, name, email, password, account_type);
-                    System.out.println(surname + " " + name + " " + email + " " + password);
                     userdao.ajouterUtilisateur(new_user);
                     inscrire.setVisible(false);
                     event.getContentPane().removeAll();
@@ -405,6 +471,32 @@ public class Fenetres extends Component implements ActionListener
                     connecter.setVisible(true);
                     event.setVisible(true);
                 }
+                else if(ajout_article.isVisible())
+                {
+                    int id_article = new Random().nextInt();
+                    name_article = nom_article.getText();
+                    describe = description.getText();
+                    price = Float.parseFloat(prix.getText());
+                    reserve = Integer.parseInt(stock.getText());
+                    max_rabais = Integer.parseInt(seuil_remise.getText());
+                    categorie_type = (String)marque.getSelectedItem();
+                    mark = (String) marque.getSelectedItem();
+                    Article new_article = new Article(id_article, reserve, max_rabais, name_article, mark, categorie_type, describe, price, true);
+                    System.out.println(id_article+" "+reserve+" "+max_rabais +" "+name_article+" "+mark+" "+categorie_type+" "+describe+" "+price);
+                    artdao.ajouterArticle(new_article);
+                    ajout_article.setVisible(false);
+                    event.getContentPane().removeAll();
+                    event.setTitle("Ajout article");
+                    JPanel text = new JPanel();
+                    label_event = new JLabel("Ajout effectué");
+                    text.add(label_event);
+                    JPanel erreur_button = new JPanel();
+                    addButton(erreur_button, "Retour");
+                    event.add(text, BorderLayout.CENTER);
+                    event.add(erreur_button, BorderLayout.SOUTH);
+                    profil.setVisible(true);
+                    event.setVisible(true);
+                }
                 break;
             case "Inscrire":
                 inscrire.setVisible(true);
@@ -412,12 +504,20 @@ public class Fenetres extends Component implements ActionListener
                 break;
             case "Profil":
                 profil.setVisible(true);
+                accueil.setVisible(true);
+                connecter.setVisible(false);
                 break;
             case "Accueil":
                 accueil.setVisible(true);
                 connecter.setVisible(false);
                 profil.setVisible(false);
                 break;
+            case "Ajouter article":
+                setNewArticle();
+                profil.setVisible(true);
+                accueil.setVisible(true);
+                ajout_article.setVisible(true);
+                connecter.setVisible(false);
             case "Deconnexion":
                 connecter.setVisible(true);
                 accueil.setVisible(false);
@@ -451,9 +551,10 @@ public class Fenetres extends Component implements ActionListener
             case "Retour":
                 if(inscrire.isVisible())
                     connecter.setVisible(true);
+                if(ajout_article.isVisible())
+                    profil.setVisible(true);
                 event.setVisible(false);
-                if(catalogue.isVisible())
-                    catalogue.setVisible(false);
+                catalogue.setVisible(false);
                 break;
         }
     }

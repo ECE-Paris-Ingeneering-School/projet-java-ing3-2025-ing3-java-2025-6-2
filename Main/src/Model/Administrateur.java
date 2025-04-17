@@ -3,6 +3,11 @@ package Model;
 import java.util.HashMap;
 import java.util.Map;
 
+import Dao.ArticleDAOImpl;
+import Dao.DaoFactory;
+import Dao.UtilisateurDAOImpl;
+import View.Fenetres;
+
 
 /// Administrateur de l'application
 public class Administrateur extends Utilisateurs
@@ -13,8 +18,11 @@ public class Administrateur extends Utilisateurs
         super(identifiant, nom, prenom, email, motDePasse, type_utilisateur);
     }
 
-    public void ajouterArticle(Article article) {
-        // Implémentation de l'ajout d'article
+    public void ajouterArticle(Article article)
+    {
+        DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
+        ArticleDAOImpl artdao = new ArticleDAOImpl(dao);
+        artdao.ajouterArticle(article);
     }
 
     public void modifierArticle(Article article) {
