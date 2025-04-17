@@ -30,7 +30,6 @@ public class Fenetres extends Component implements ActionListener
 
     /// Fenetre catalogue
     private JPanel PTitre, Liste, PannelRetour;
-    private JButton Retour;
     private JLabel titrre;
     private JScrollPane Scroll;
     private Random random = new Random();
@@ -44,6 +43,7 @@ public class Fenetres extends Component implements ActionListener
         setEvent();
         setPaiement();
         setNewArticle();
+        setCatalogue();
     }
 
     /// Fenêtre inscription utilisateur
@@ -345,10 +345,8 @@ public class Fenetres extends Component implements ActionListener
         PannelRetour.setBackground(new Color(240, 240, 240));
         PannelRetour.setPreferredSize(new Dimension(getWidth(), 100));
         PannelRetour.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        Retour = new JButton("Retour");
-        Retour.setPreferredSize(new Dimension(150, 50));
         PannelRetour.setLayout(new GridBagLayout());
-        PannelRetour.add(Retour);
+        addButton(PannelRetour, "Retour");
     }
 
     public void setNewArticle()
@@ -444,7 +442,6 @@ public class Fenetres extends Component implements ActionListener
                     else
                     {
                         setProfil();
-                        setCatalogue();
                         accueil.setVisible(true);
                         connecter.setVisible(false);
                     }
@@ -512,6 +509,7 @@ public class Fenetres extends Component implements ActionListener
                 break;
             case "Ajouter article":
                 ajout_article.setVisible(true);
+                break;
             case "Deconnexion":
                 connecter.setVisible(true);
                 accueil.setVisible(false);
