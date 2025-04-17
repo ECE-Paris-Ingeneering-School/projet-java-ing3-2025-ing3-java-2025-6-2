@@ -16,9 +16,9 @@ import Dao.*;
 public class Fenetres implements ActionListener
 {
     JFrame inscrire, connecter, accueil, profil, event, paiement; /// Fenêtres de navigation
-    TextField affichage, nom, prenom, mail, mdp, mail_id, mdp_id, numero_carte, expiration_carte, cvv; /// Zones de saisie
-    private String surname, name, email, password; /// Inscription dans la database
-    JComboBox<String> payment_type; /// Choix du mode de paiement
+    TextField nom, prenom, mail, mdp, mail_id, mdp_id, numero_carte, expiration_carte, cvv; /// Zones de saisie
+    private String account_type, surname, name, email, password; /// Inscription dans la database
+    JComboBox<String> type_compte, payment_type; /// Choix du mode de paiement et du type de compte
     private String payment, num_card, exp_date, cvv_number; /// Effectuer le paiement
 
     /// Constructeur de chaque fenêtre
@@ -27,7 +27,6 @@ public class Fenetres implements ActionListener
         setIdentification();
         setInscrire();
         setAccueil();
-        setProfil();
         setEvent();
         setPaiement();
     }
@@ -40,9 +39,16 @@ public class Fenetres implements ActionListener
         inscrire.setTitle("Inscription");
         inscrire.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         inscrire.setLayout(new BoxLayout(inscrire.getContentPane(), BoxLayout.Y_AXIS));
+        JLabel label1 = new JLabel("Type de compte");
+        inscrire.add(label1);
+        String[] type = {"admin", "client"};
+        type_compte = new JComboBox<>(type); /// Liste associée
+        type_compte.setSelectedIndex(0);
+        type_compte.setBounds(50, 50, 100, 20);
+        inscrire.add(type_compte);
         JPanel inscrire_nom = new JPanel();
-        JLabel label1 = new JLabel("Nom");
-        inscrire_nom.add(label1);
+        JLabel label2 = new JLabel("Nom");
+        inscrire_nom.add(label2);
         JPanel inscrire_button = new JPanel();
         nom = new TextField(10);
         prenom = new TextField(10);
@@ -50,16 +56,16 @@ public class Fenetres implements ActionListener
         mdp = new TextField(10);
         inscrire_nom.add(nom);
         JPanel inscrire_prenom = new JPanel();
-        JLabel label2 = new JLabel("Prenom");
-        inscrire_prenom.add(label2);
+        JLabel label3 = new JLabel("Prenom");
+        inscrire_prenom.add(label3);
         inscrire_prenom.add(prenom);
-        JLabel label3 = new JLabel("Mail");
+        JLabel label4 = new JLabel("Mail");
         JPanel inscrire_mail = new JPanel();
-        inscrire_mail.add(label3);
+        inscrire_mail.add(label4);
         inscrire_mail.add(mail);
-        JLabel label4 = new JLabel("Mot de passe");
+        JLabel label5 = new JLabel("Mot de passe");
         JPanel inscrire_mdp = new JPanel();
-        inscrire_mdp.add(label4);
+        inscrire_mdp.add(label5);
         inscrire_mdp.add(mdp);
         addButton(inscrire_button, "Valider");
         addButton(inscrire_button, "Connexion");
@@ -120,16 +126,22 @@ public class Fenetres implements ActionListener
     /// Fenêtre vue du profil utilisateur
     public void setProfil()
     {
+        /// Appel de la requête connexion pour utiliser le profil actuel
+        DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
+        UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
+        Utilisateurs user = new Utilisateurs(0, "", "", email, password, "");
+        Utilisateurs user_actuel = userdao.connexionUtilisateur(user);
+        /// Création de la page avec les informations correspondantes
         profil = new JFrame();
         profil.setSize(900, 700);
         profil.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         profil.setTitle("Profil");
         profil.setLayout(new BoxLayout(profil.getContentPane(), BoxLayout.Y_AXIS));
         JPanel profil_text = new JPanel();
-        JLabel label1 = new JLabel("texte");
+        JLabel label1 = new JLabel("Bonjour " + user_actuel.getNom() + " " +user_actuel.getPrenom());
         profil_text.add(label1);
         JPanel profil_button = new JPanel();
-        JLabel label2 = new JLabel("texte2");
+        JLabel label2 = new JLabel("Vous êtes un "+user_actuel.getType_utilisateur());
         profil_text.add(label2);
         addButton(profil_button, "Accueil");
         addButton(profil_button, "Catalogue");
@@ -204,6 +216,7 @@ public class Fenetres implements ActionListener
     public void actionPerformed(ActionEvent e)
     {
         DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
+        UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
         JButton button = (JButton) e.getSource();
         /// Préparation fenêtre évènement
         JLabel label_event;
@@ -215,7 +228,9 @@ public class Fenetres implements ActionListener
                 {
                     email = mail_id.getText();
                     password = mdp_id.getText();
-                    if (email.equals("") || password.equals(""))
+                    Utilisateurs user = new Utilisateurs(0, "", "", email, password, "");
+                    Utilisateurs connect = userdao.connexionUtilisateur(user);
+                    if (connect == null)
                     {
                         event.getContentPane().removeAll(); /// Retire le contenu de la page event
                         erreur_text = new JPanel();
@@ -230,6 +245,7 @@ public class Fenetres implements ActionListener
                     }
                     else
                     {
+                        setProfil();
                         accueil.setVisible(true);
                         connecter.setVisible(false);
                         profil.setVisible(false);
@@ -238,13 +254,13 @@ public class Fenetres implements ActionListener
                 }
                 else if (inscrire.isVisible())
                 {
-                    UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
                     int id = new Random().nextInt();
                     surname = nom.getText();
                     name = prenom.getText();
                     email = mail.getText();
                     password = mdp.getText();
-                    Utilisateurs new_user = new Utilisateurs(id, surname, name, email, password, "admin");
+                    account_type = (String) type_compte.getSelectedItem();
+                    Utilisateurs new_user = new Utilisateurs(id, surname, name, email, password, account_type);
                     System.out.println(surname + " " + name + " " + email + " " + password);
                     userdao.ajouterUtilisateur(new_user);
                     inscrire.setVisible(false);
@@ -264,7 +280,6 @@ public class Fenetres implements ActionListener
             case "Inscrire":
                 inscrire.setVisible(true);
                 connecter.setVisible(false);
-                profil.setVisible(false);
                 accueil.setVisible(false);
                 break;
             case "Profil":

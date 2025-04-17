@@ -33,7 +33,6 @@ public class DaoFactory {
         try {
             // chargement driver "com.mysql.cj.jdbc.Driver"
             Class.forName("com.mysql.cj.jdbc.Driver");
-            System.out.println("Connexion réussie");
         }
         catch (ClassNotFoundException e) {
             System.out.println("Erreur de connexion à la base de données");

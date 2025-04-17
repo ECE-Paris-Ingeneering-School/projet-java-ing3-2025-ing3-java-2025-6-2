@@ -17,32 +17,42 @@ public class UtilisateurDAOImpl implements UtilisateurDAO
     }
 
     /** Utilisé dans le profil
-     * @Récupère les informations d'un utilisateur pour les afficher dans son profil
+     * @Récupère les informations d'un utilisateur pour les afficher dans son profil ou dans les autres pages nécessitant l'utilisation de ses données
      */
-    public boolean connexionUtilisateur(Utilisateurs utilisateur)
+    public Utilisateurs connexionUtilisateur(Utilisateurs utilisateur)
     {
+        Utilisateurs user = null;
         try
         {
             /// connexion à la base de données
             Connection connexion = daoFactory.getConnection();
+            Statement statement = connexion.createStatement();
 
             /// Récupération de l'utilisateur correspondant
-            PreparedStatement preparedStatement = connexion.prepareStatement("select * from utilisateur where email = '" + utilisateur.getEmail() + "' AND mdp = '" + utilisateur.getMotDePasse() + "'");
-            preparedStatement.executeUpdate();
+            ResultSet resultats = statement.executeQuery("select id_utilisateur, nom, prenom, type_utilisateur from utilisateur where email = '" + utilisateur.getEmail() + "' AND mot_de_passe = '" + utilisateur.getMotDePasse() + "'");
+            if(resultats.next())
+            {
+                int Id = resultats.getInt(1);
+                String Nom = resultats.getString(2);
+                String Prenom = resultats.getString(3);
+                String type = resultats.getString(4);
+                user = new Utilisateurs(Id, Nom, Prenom, utilisateur.getEmail(), utilisateur.getMotDePasse(), type);
+            }
+
         }
         catch (SQLException e)
         {
             ///traitement de l'exception
             e.printStackTrace();
-            System.out.println("Création de la liste de clients impossible");
+            System.out.println("Utilisateur inconnu");
         }
-        return true;
+        return user;
     }
 
     @Override
     public Utilisateurs getUtilisateur(Utilisateurs utilisateur)
     {
-        return null;
+        return utilisateur;
     }
 
     /** Utilisé pour la création d'un compte

@@ -19,5 +19,5 @@ public interface UtilisateurDAO
     /** Utilisé pour la connexion
      * @Permet à un utilisateur de se connecter
      */
-    public boolean connexionUtilisateur(Utilisateurs utilisateur);
+    public Utilisateurs connexionUtilisateur(Utilisateurs utilisateur);
 }
