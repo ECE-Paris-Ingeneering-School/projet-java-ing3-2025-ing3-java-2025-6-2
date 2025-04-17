@@ -13,13 +13,18 @@ import Dao.*;
 /** Fenetres constitue l'ensemble des interfaces graphiques utilisées au cour du projet
  * @L'ensemble des liens entre elles sont effectuées ici
  */
-public class Fenetres implements ActionListener
+public class Fenetres extends Component implements ActionListener
 {
-    JFrame inscrire, connecter, accueil, profil, event, paiement; /// Fenêtres de navigation
+    JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue; /// Fenêtres de navigation
     TextField nom, prenom, mail, mdp, mail_id, mdp_id, numero_carte, expiration_carte, cvv; /// Zones de saisie
     private String account_type, surname, name, email, password; /// Inscription dans la database
     JComboBox<String> type_compte, payment_type; /// Choix du mode de paiement et du type de compte
     private String payment, num_card, exp_date, cvv_number; /// Effectuer le paiement
+    private JPanel PTitre, Liste, PannelRetour;
+    private JButton Retour;
+    private JLabel titrre;
+    private JScrollPane Scroll;
+    private Random random = new Random();
 
     /// Constructeur de chaque fenêtre
     public Fenetres()
@@ -211,6 +216,123 @@ public class Fenetres implements ActionListener
         panel.add(button);
     }
 
+    public void setCatalogue()
+    {
+        catalogue = new JFrame();
+        catalogue.setTitle("Catalogue");
+        catalogue.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        catalogue.setSize(1200, 800);
+        catalogue.setLocationRelativeTo(null);
+        catalogue.setLayout(new BorderLayout());
+
+        Titre();
+        Produits();
+        creerRetour();
+
+        catalogue.add(PTitre, BorderLayout.NORTH);
+        catalogue.add(Scroll, BorderLayout.CENTER);
+        catalogue.add(PannelRetour, BorderLayout.SOUTH);
+    }
+
+    private void Titre() {
+        PTitre = new JPanel();
+        PTitre.setPreferredSize(new Dimension(getWidth(), 100));
+        PTitre.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        titrre = new JLabel("Catalogue", SwingConstants.CENTER);
+        titrre.setFont(new Font("Arial", Font.BOLD, 32));
+        PTitre.setLayout(new BorderLayout());
+        PTitre.add(titrre, BorderLayout.CENTER);
+    }
+
+    private void Produits() {
+        Liste = new JPanel();
+        Liste.setBackground(Color.WHITE);
+        Liste.setLayout(new GridLayout(0, 3, 20, 20)); // 3 colonnes, espacement 20px
+
+        // Noms et prix aléatoires pour l'exemple
+        String[] produits = {"Rétroviseur", "Pied de Table", "Coussin", "Nid d'Abeille", "Larme", "Guillotine", "Vent", "Argent"};
+        String[] proprietaires = {"Jean Pard", "Pierre Moulin", "Akim Lemahfouf", "Vitalie Pristine", "Maggie Smith", "Bernard Arnaud", "Elon Musk", "Elizabeth II"};
+
+        for (int i = 1; i <= 12; i++) {
+            JPanel PanelProduits = CreerListe(
+                    produits[random.nextInt(produits.length)],
+                    proprietaires[random.nextInt(proprietaires.length)],
+                    random.nextInt(900) + 100, // Prix entre 100 et 1000
+                    random.nextInt(50) // Stock entre 0 et 50
+            );
+            Liste.add(PanelProduits);
+        }
+
+        Scroll = new JScrollPane(Liste);
+        Scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        Scroll.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    }
+
+    private JPanel CreerListe(String nom, String proprietaire, int prix, int stock) {
+        JPanel p = new JPanel();
+        p.setBackground(Color.WHITE);
+        p.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1),
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+
+        // 1. Titre du produit
+        JLabel titleLabel = new JLabel(nom, SwingConstants.CENTER);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        p.add(titleLabel);
+
+        p.add(Box.createRigidArea(new Dimension(0, 10))); // Espace
+
+        // 2. Propriétaire
+        JLabel ownerLabel = new JLabel("Propriétaire: " + proprietaire);
+        ownerLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.add(ownerLabel);
+
+        // 3. Prix
+        JLabel priceLabel = new JLabel("Prix: " + prix + " €");
+        priceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.add(priceLabel);
+
+        // 4. Stock
+        JLabel stockLabel = new JLabel("Stock: " + stock + " unités");
+        stockLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.add(stockLabel);
+
+        p.add(Box.createRigidArea(new Dimension(0, 15))); // Espace
+
+        // 5. Image
+        JPanel imagePanel = new JPanel();
+        imagePanel.setPreferredSize(new Dimension(300, 200));
+        imagePanel.setBackground(random.nextBoolean() ? new Color(70, 130, 180) : new Color(220, 60, 60));
+        imagePanel.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1));
+        imagePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        p.add(imagePanel);
+
+        p.add(Box.createRigidArea(new Dimension(0, 20))); // Espace
+
+        // 6. Voir
+        JButton Voir = new JButton("Voir");
+        Voir.setAlignmentX(Component.CENTER_ALIGNMENT);
+        Voir.setPreferredSize(new Dimension(120, 40));
+        Voir.setMaximumSize(new Dimension(120, 40));
+
+        p.add(Voir);
+
+        return p;
+    }
+
+    private void creerRetour() {
+        PannelRetour = new JPanel();
+        PannelRetour.setBackground(new Color(240, 240, 240));
+        PannelRetour.setPreferredSize(new Dimension(getWidth(), 100));
+        PannelRetour.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Retour = new JButton("Retour");
+        Retour.setPreferredSize(new Dimension(150, 50));
+        PannelRetour.setLayout(new GridBagLayout());
+        PannelRetour.add(Retour);
+    }
+
     /// Action des boutons de chaque fenêtre
     @Override
     public void actionPerformed(ActionEvent e)
@@ -246,10 +368,9 @@ public class Fenetres implements ActionListener
                     else
                     {
                         setProfil();
+                        setCatalogue();
                         accueil.setVisible(true);
                         connecter.setVisible(false);
-                        profil.setVisible(false);
-                        inscrire.setVisible(false);
                     }
                 }
                 else if (inscrire.isVisible())
@@ -280,12 +401,9 @@ public class Fenetres implements ActionListener
             case "Inscrire":
                 inscrire.setVisible(true);
                 connecter.setVisible(false);
-                accueil.setVisible(false);
                 break;
             case "Profil":
                 profil.setVisible(true);
-                accueil.setVisible(true);
-                inscrire.setVisible(false);
                 break;
             case "Accueil":
                 accueil.setVisible(true);
@@ -297,26 +415,14 @@ public class Fenetres implements ActionListener
                 accueil.setVisible(false);
                 inscrire.setVisible(false);
                 profil.setVisible(false);
+                catalogue.setVisible(false);
                 break;
             case "Connexion" :
                 connecter.setVisible(true);
                 inscrire.setVisible(false);
-                profil.setVisible(false);
-                accueil.setVisible(false);
                 break;
             case "Catalogue" :
-                if(profil.isVisible() || accueil.isVisible())
-                {
-                    event.getContentPane().removeAll(); /// Retire le contenu de la page event
-                    erreur_text = new JPanel();
-                    label_event = new JLabel("Erreur pendant la tentative d'affichage");
-                    erreur_text.add(label_event);
-                    JPanel erreur_button = new JPanel();
-                    addButton(erreur_button, "Retour");
-                    event.add(erreur_text, BorderLayout.CENTER);
-                    event.add(erreur_button, BorderLayout.SOUTH);
-                    event.setVisible(true);
-                }
+                catalogue.setVisible(true);
                 break;
             case "Valider et payer":
                 payment = (String) payment_type.getSelectedItem();
@@ -324,10 +430,23 @@ public class Fenetres implements ActionListener
                 exp_date = expiration_carte.getText();
                 cvv_number = cvv.getText();
                 System.out.println("Paiement : " + payment +" Numero de carte : " + num_card + " Date d'expiration : " + exp_date + " Numero CVV : " + cvv_number);
+                break;
+
+            case "Voir":
+                JOptionPane.showMessageDialog(this,
+                        "Détails du produit:\n" +
+                                "Nom: " + nom + "\n" +
+                                "Propriétaire: " +   "\n" +
+                                "Prix: " +    " €\n" +
+                                "Stock: " +   " unités");
+                break;
             case "Retour":
                 if(inscrire.isVisible())
                     connecter.setVisible(true);
                 event.setVisible(false);
+                if(catalogue.isVisible())
+                    catalogue.setVisible(false);
+                break;
         }
     }
 }
