@@ -503,8 +503,6 @@ public class Fenetres extends Component implements ActionListener
                 break;
             case "Profil":
                 profil.setVisible(true);
-                accueil.setVisible(true);
-                connecter.setVisible(false);
                 break;
             case "Accueil":
                 accueil.setVisible(true);
