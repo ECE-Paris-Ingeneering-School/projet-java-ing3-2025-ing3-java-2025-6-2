@@ -4,22 +4,17 @@ import Control.*;
 
 public class Utilisateurs
 {
-    private String identifiant;
-    private String motDePasse;
-    private String nom;
-    private String email;
+    private int identifiant;
+    private String nom, prenom, email, motDePasse, type_utilisateur;
 
-    public Utilisateurs(String identifiant, String motDePasse, String nom, String email)
+    public Utilisateurs(int identifiant, String nom, String prenom, String email, String motDePasse, String type_utilisateur)
     {
         this.identifiant = identifiant;
-        this.motDePasse = motDePasse;
         this.nom = nom;
+        this.prenom = prenom;
         this.email = email;
-    }
-
-    public boolean seConnecter(String identifiant, String motDePasse)
-    {
-        return this.identifiant.equals(identifiant) && this.motDePasse.equals(motDePasse);
+        this.motDePasse = motDePasse;
+        this.type_utilisateur = type_utilisateur;
     }
 
     public void seDeconnecter()
@@ -28,27 +23,34 @@ public class Utilisateurs
     }
 
     // Getters et Setters
-    public String getIdentifiant()
-    { return identifiant; }
-
-    public void setIdentifiant(String identifiant)
-    { this.identifiant = identifiant; }
-
-    public String getMotDePasse()
-    { return motDePasse; }
-
-    public void setMotDePasse(String motDePasse)
-    { this.motDePasse = motDePasse; }
+    public int getIdentifiant()
+    {
+        return identifiant;
+    }
 
     public String getNom()
-    { return nom; }
+    {
+        return nom;
+    }
 
-    public void setNom(String nom)
-    { this.nom = nom; }
+    public String getPrenom()
+    {
+        return prenom;
+    }
+
 
     public String getEmail()
-    { return email; }
+    {
+        return email;
+    }
 
-    public void setEmail(String email)
-    { this.email = email; }
+    public String getMotDePasse()
+    {
+        return motDePasse;
+    }
+
+    public String getType_utilisateur()
+    {
+        return type_utilisateur;
+    }
 }

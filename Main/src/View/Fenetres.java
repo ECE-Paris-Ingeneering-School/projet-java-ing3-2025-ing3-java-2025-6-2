@@ -6,7 +6,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
+import java.util.Random;
+
+import Dao.*;
 
 /** Fenetres constitue l'ensemble des interfaces graphiques utilisées au cour du projet
  * @L'ensemble des liens entre elles sont effectuées ici
@@ -186,7 +188,7 @@ public class Fenetres implements ActionListener
     /// Premier affichage au démarrage (gestion ensuite par les boutons)
     public void affichage()
     {
-        paiement.setVisible(true);
+        connecter.setVisible(true);
     }
 
     /// Ajout d'un bouton sur une page
@@ -201,6 +203,7 @@ public class Fenetres implements ActionListener
     @Override
     public void actionPerformed(ActionEvent e)
     {
+        DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
         JButton button = (JButton) e.getSource();
         /// Préparation fenêtre évènement
         JLabel label_event;
@@ -235,11 +238,15 @@ public class Fenetres implements ActionListener
                 }
                 else if (inscrire.isVisible())
                 {
+                    UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
+                    int id = new Random().nextInt();
                     surname = nom.getText();
                     name = prenom.getText();
                     email = mail.getText();
                     password = mdp.getText();
+                    Utilisateurs new_user = new Utilisateurs(id, surname, name, email, password, "admin");
                     System.out.println(surname + " " + name + " " + email + " " + password);
+                    userdao.ajouterUtilisateur(new_user);
                     inscrire.setVisible(false);
                     event.getContentPane().removeAll();
                     event.setTitle("Inscription");

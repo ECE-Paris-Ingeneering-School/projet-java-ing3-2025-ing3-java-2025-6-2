@@ -7,8 +7,9 @@ public class Client extends Utilisateurs {
     private boolean statut; // true: ancien, false: nouveau
     private final List<Commande> historiqueDesCommandes;
 
-    public Client(String identifiant, String motDePasse, String nom, String email) {
-        super(identifiant, motDePasse, nom, email);
+    public Client(int identifiant, String nom, String prenom, String email, String motDePasse, String type_utilisateur)
+    {
+        super(identifiant, nom, prenom, email, motDePasse, type_utilisateur);
         this.statut = false; // Nouveau client par défaut
         this.historiqueDesCommandes = new ArrayList<>();
     }

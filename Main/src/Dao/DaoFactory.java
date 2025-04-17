@@ -1,10 +1,8 @@
 package Dao;
 
 // import des packages
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * La DAO Factory (DaoFactory.java) permet d'initialiser le DAO en chargeant notamment les drivers nécessaires
@@ -29,12 +27,13 @@ public class DaoFactory {
     /**
      * Méthode qui retourne 1 objet de DaoFactory
      * @param : url, username et password de la base de données
-     * @return : objet de la classe DaoFactoru
+     * @return : objet de la classe DaoFactory
      */
     public static DaoFactory getInstance(String database, String username, String password) {
         try {
             // chargement driver "com.mysql.cj.jdbc.Driver"
             Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("Connexion réussie");
         }
         catch (ClassNotFoundException e) {
             System.out.println("Erreur de connexion à la base de données");
@@ -58,11 +57,6 @@ public class DaoFactory {
         // Retourner la connection du driver de la base de données
         return DriverManager.getConnection(url, username, password);
     }
-
-    /**
-     * Récupération du Dao pour le produit
-     * @return : objet de la classe ProduitDAOImpl
-     */
 
     /**
      *     Fermer la connexion à la base de données
