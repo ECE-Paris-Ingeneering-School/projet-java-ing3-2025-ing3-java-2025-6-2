@@ -43,6 +43,7 @@ public class Fenetres extends Component implements ActionListener
         setAccueil();
         setEvent();
         setPaiement();
+        setNewArticle();
     }
 
     /// Fenêtre inscription utilisateur
@@ -375,12 +376,12 @@ public class Fenetres extends Component implements ActionListener
         JLabel label3 = new JLabel("Nom");
         inscrire_nom.add(label3);
         JPanel ajout_article_button = new JPanel();
-        nom = new TextField(10);
+        nom_article = new TextField(10);
         prix = new TextField(10);
         stock = new TextField(10);
         description = new TextField(10);
         seuil_remise = new TextField(10);
-        inscrire_nom.add(nom);
+        inscrire_nom.add(nom_article);
         JPanel inscrire_prix = new JPanel();
         JLabel label4 = new JLabel("Prix");
         inscrire_prix.add(label4);
@@ -397,7 +398,7 @@ public class Fenetres extends Component implements ActionListener
         JLabel label7 = new JLabel("Description");
         decrire.add(label7);
         decrire.add(description);
-        addButton(ajout_article_button, "Valider");
+        addButton(ajout_article_button, "Valider l'ajout");
         addButton(ajout_article_button, "Retour");
         ajout_article.add(inscrire_nom);
         ajout_article.add(inscrire_prix);
@@ -471,32 +472,30 @@ public class Fenetres extends Component implements ActionListener
                     connecter.setVisible(true);
                     event.setVisible(true);
                 }
-                else if(ajout_article.isVisible())
-                {
-                    int id_article = new Random().nextInt();
-                    name_article = nom_article.getText();
-                    describe = description.getText();
-                    price = Float.parseFloat(prix.getText());
-                    reserve = Integer.parseInt(stock.getText());
-                    max_rabais = Integer.parseInt(seuil_remise.getText());
-                    categorie_type = (String)marque.getSelectedItem();
-                    mark = (String) marque.getSelectedItem();
-                    Article new_article = new Article(id_article, reserve, max_rabais, name_article, mark, categorie_type, describe, price, true);
-                    System.out.println(id_article+" "+reserve+" "+max_rabais +" "+name_article+" "+mark+" "+categorie_type+" "+describe+" "+price);
-                    artdao.ajouterArticle(new_article);
-                    ajout_article.setVisible(false);
-                    event.getContentPane().removeAll();
-                    event.setTitle("Ajout article");
-                    JPanel text = new JPanel();
-                    label_event = new JLabel("Ajout effectué");
-                    text.add(label_event);
-                    JPanel erreur_button = new JPanel();
-                    addButton(erreur_button, "Retour");
-                    event.add(text, BorderLayout.CENTER);
-                    event.add(erreur_button, BorderLayout.SOUTH);
-                    profil.setVisible(true);
-                    event.setVisible(true);
-                }
+                break;
+            case "Valider l'ajout":
+                int id_article = new Random().nextInt();
+                name_article = nom_article.getText();
+                describe = description.getText();
+                price = Float.parseFloat(prix.getText());
+                reserve = Integer.parseInt(stock.getText());
+                max_rabais = Integer.parseInt(seuil_remise.getText());
+                categorie_type = (String) categorie.getSelectedItem();
+                mark = (String) marque.getSelectedItem();
+                Article new_article = new Article(id_article, reserve, max_rabais, name_article, mark, categorie_type, describe, price, true);
+                artdao.ajouterArticle(new_article);
+                ajout_article.setVisible(false);
+                event.getContentPane().removeAll();
+                event.setTitle("Ajout article");
+                JPanel text = new JPanel();
+                label_event = new JLabel("Ajout effectué");
+                text.add(label_event);
+                JPanel erreur_button = new JPanel();
+                addButton(erreur_button, "Retour");
+                event.add(text, BorderLayout.CENTER);
+                event.add(erreur_button, BorderLayout.SOUTH);
+                profil.setVisible(true);
+                event.setVisible(true);
                 break;
             case "Inscrire":
                 inscrire.setVisible(true);
@@ -511,13 +510,10 @@ public class Fenetres extends Component implements ActionListener
                 accueil.setVisible(true);
                 connecter.setVisible(false);
                 profil.setVisible(false);
+                inscrire.setVisible(false);
                 break;
             case "Ajouter article":
-                setNewArticle();
-                profil.setVisible(true);
-                accueil.setVisible(true);
                 ajout_article.setVisible(true);
-                connecter.setVisible(false);
             case "Deconnexion":
                 connecter.setVisible(true);
                 accueil.setVisible(false);
@@ -551,8 +547,9 @@ public class Fenetres extends Component implements ActionListener
             case "Retour":
                 if(inscrire.isVisible())
                     connecter.setVisible(true);
-                if(ajout_article.isVisible())
+                else if(ajout_article.isVisible())
                     profil.setVisible(true);
+                    ajout_article.setVisible(false);
                 event.setVisible(false);
                 catalogue.setVisible(false);
                 break;

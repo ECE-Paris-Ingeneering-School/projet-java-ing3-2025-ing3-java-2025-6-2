@@ -36,12 +36,13 @@ public class ArticleDAOImpl implements ArticleDAO
             String nom = article.getNom();
             String description = article.getDescription();
             double prix = article.getPrixUnitaire();
+            int stock = article.getStock();
             int seuil_remise = article.getSeuil_remise();
             String categroie = article.getCategorie();
             String marque = article.getMarque();
 
             /// Exécution de la requête INSERT INTO de l'objet client en paramètre
-            PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO article(id_article, nom, description, prix, seuil_remise, categorie, marque) VALUES ('"+id_article+"', '"+nom+"', '"+description+"', '"+prix+"', '"+seuil_remise+"', '"+categroie+"', '"+marque+"')");
+            PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO article(id_article, nom, description, prix, stock, seuil_remise, categorie, marque) VALUES ('"+id_article+"', '"+nom+"', '"+description+"', '"+prix+"', '"+stock+"', '"+seuil_remise+"', '"+categroie+"', '"+marque+"')");
             preparedStatement.executeUpdate();
         }
         catch (SQLException e) {
