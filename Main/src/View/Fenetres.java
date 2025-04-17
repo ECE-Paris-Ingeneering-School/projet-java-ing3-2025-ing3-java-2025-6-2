@@ -150,6 +150,14 @@ public class Fenetres extends Component implements ActionListener
         profil_text.add(label2);
         addButton(profil_button, "Accueil");
         addButton(profil_button, "Catalogue");
+        /// Cas pour un administrateur (gérer les articles, les rabais, les dossiers clients, statistiques)
+        if(user_actuel.getType_utilisateur().equals("admin"))
+        {
+            addButton(profil_button, "Ajouter article");
+            addButton(profil_button, "Modifier un article");
+            addButton(profil_button, "Gerer les dossiers clients");
+            addButton(profil_button, "Statistiques");
+        }
         profil.add(profil_text);
         profil.add(profil_button);
     }

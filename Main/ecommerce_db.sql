@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : jeu. 17 avr. 2025 à 09:11
+-- Généré le : jeu. 17 avr. 2025 à 13:33
 -- Version du serveur :  5.7.31
 -- Version de PHP : 7.3.21
 
@@ -20,28 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Base de données : `ecommerce_db`
 --
-
--- --------------------------------------------------------
-
---
--- Structure de la table `administrateur`
---
-
-DROP TABLE IF EXISTS `administrateur`;
-CREATE TABLE IF NOT EXISTS `administrateur` (
-  `id_admin` int(11) NOT NULL,
-  `nom` varchar(100) NOT NULL,
-  `prenom` varchar(100) NOT NULL,
-  `niveau_acces` int(11) DEFAULT '1',
-  PRIMARY KEY (`id_admin`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Déchargement des données de la table `administrateur`
---
-
-INSERT INTO `administrateur` (`id_admin`, `nom`, `prenom`, `niveau_acces`) VALUES
-(1, 'Doe', 'John', 2);
 
 -- --------------------------------------------------------
 
@@ -94,29 +72,6 @@ CREATE TABLE IF NOT EXISTS `categorie` (
 INSERT INTO `categorie` (`id_categorie`, `nom_categorie`, `description`) VALUES
 (1, 'Électronique', 'Appareils électroniques et gadgets'),
 (2, 'Vêtements', 'Vêtements pour hommes, femmes et enfants');
-
--- --------------------------------------------------------
-
---
--- Structure de la table `client`
---
-
-DROP TABLE IF EXISTS `client`;
-CREATE TABLE IF NOT EXISTS `client` (
-  `id_client` int(11) NOT NULL,
-  `nom` varchar(100) NOT NULL,
-  `prenom` varchar(100) NOT NULL,
-  `adresse` text,
-  `telephone` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`id_client`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Déchargement des données de la table `client`
---
-
-INSERT INTO `client` (`id_client`, `nom`, `prenom`, `adresse`, `telephone`) VALUES
-(2, 'Dupont', 'Jean', '123 Rue de Test, 75000 Paris', '0612345678');
 
 -- --------------------------------------------------------
 
@@ -298,7 +253,7 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
   `date_derniere_connexion` datetime DEFAULT NULL,
   PRIMARY KEY (`id_utilisateur`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=2139289819 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `utilisateur`
@@ -306,17 +261,13 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
 
 INSERT INTO `utilisateur` (`id_utilisateur`, `nom`, `prenom`, `email`, `mot_de_passe`, `type_utilisateur`, `date_creation`, `date_derniere_connexion`) VALUES
 (1, '', '', 'admin@test.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', '2025-04-15 10:12:52', NULL),
-(2, '', '', 'client@test.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'client', '2025-04-15 10:12:52', NULL);
+(2, '', '', 'client@test.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'client', '2025-04-15 10:12:52', NULL),
+(1022904176, 'Andria', 'Andy', 'andri@gmail.com', '123456', 'admin', '2025-04-17 11:47:16', NULL),
+(2139289818, 'Andry', 'Andre', 'andry@mail.fr', 'sardine', 'client', '2025-04-17 14:56:27', NULL);
 
 --
 -- Contraintes pour les tables déchargées
 --
-
---
--- Contraintes pour la table `administrateur`
---
-ALTER TABLE `administrateur`
-  ADD CONSTRAINT `administrateur_ibfk_1` FOREIGN KEY (`id_admin`) REFERENCES `utilisateur` (`id_utilisateur`) ON DELETE CASCADE;
 
 --
 -- Contraintes pour la table `article`
@@ -324,12 +275,6 @@ ALTER TABLE `administrateur`
 ALTER TABLE `article`
   ADD CONSTRAINT `article_ibfk_1` FOREIGN KEY (`id_categorie`) REFERENCES `categorie` (`id_categorie`),
   ADD CONSTRAINT `article_ibfk_2` FOREIGN KEY (`id_marque`) REFERENCES `marque` (`id_marque`);
-
---
--- Contraintes pour la table `client`
---
-ALTER TABLE `client`
-  ADD CONSTRAINT `client_ibfk_1` FOREIGN KEY (`id_client`) REFERENCES `utilisateur` (`id_utilisateur`) ON DELETE CASCADE;
 
 --
 -- Contraintes pour la table `commande`
