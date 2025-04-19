@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : jeu. 17 avr. 2025 à 15:29
+-- Généré le : sam. 19 avr. 2025 à 12:47
 -- Version du serveur :  5.7.31
 -- Version de PHP : 7.3.21
 
@@ -39,14 +39,15 @@ CREATE TABLE IF NOT EXISTS `article` (
   `marque` varchar(255) NOT NULL,
   `date_ajout` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_article`)
-) ENGINE=InnoDB AUTO_INCREMENT=949478471 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1768251591 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `article`
 --
 
 INSERT INTO `article` (`id_article`, `nom`, `description`, `prix`, `stock`, `seuil_remise`, `categorie`, `marque`, `date_ajout`) VALUES
-(949478470, 'ae', 'ae', '12.00', 1, 5, 'Electromenager', 'Bosch', '2025-04-17 17:28:56');
+(949478470, 'ae', 'ae', '12.00', 1, 5, 'Electromenager', 'Bosch', '2025-04-17 17:28:56'),
+(1768251590, 'lave-vaiselle', 'Un lave-vaiselle comme un autre', '1235.00', 145, 6, 'Electromenager', 'Bosch', '2025-04-19 14:41:04');
 
 -- --------------------------------------------------------
 

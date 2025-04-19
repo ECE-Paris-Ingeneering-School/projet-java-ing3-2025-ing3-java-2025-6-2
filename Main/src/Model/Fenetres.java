@@ -1,5 +1,4 @@
-package View;
-import Model.*;
+package Model;
 import Dao.ArticleDAO;
 import Dao.ArticleDAOImpl;
 import Dao.DaoFactory;
@@ -12,6 +11,7 @@ import java.util.Random;
 import java.io.File;
 
 import Control.FenetreControl;
+import View.VueArticle;
 
 /** Fenetres constitue l'ensemble des interfaces graphiques utilisées au cour du projet
  * @L'ensemble des liens entre elles sont effectuées ici

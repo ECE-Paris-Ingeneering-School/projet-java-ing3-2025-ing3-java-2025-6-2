@@ -1,6 +1,6 @@
 package Control;
 
-import View.Fenetres;
+import Model.Fenetres;
 
 public class Main
 {
