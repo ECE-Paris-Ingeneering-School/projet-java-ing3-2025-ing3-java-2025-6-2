@@ -2,7 +2,6 @@ package Dao;
 
 // import des packages
 import java.sql.*;
-import java.util.ArrayList;
 
 /**
  * La DAO Factory (DaoFactory.java) permet d'initialiser le DAO en chargeant notamment les drivers nécessaires
@@ -10,26 +9,32 @@ import java.util.ArrayList;
  * il n'y en a qu'un seul, UtilisateurDao, qui correspond à une table de la base).
  */
 public class DaoFactory {
-    private static DaoFactory instance;
-    private String url = "jdbc:mysql://localhost:3306/ecommerce_db";
-    private String username = "root";
-    private String password = "";
+    private static String url;
+    private String username;
+    private String password;
 
-    private DaoFactory() {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    // constructeur
+    public DaoFactory(String url, String username, String password) {
+        this.url = url;
+        this.username = username;
+        this.password = password;
     }
 
     public static DaoFactory getInstance(String database, String username, String password) {
-        if (instance == null) {
-            instance = new DaoFactory();
-            instance.url = "jdbc:mysql://localhost:3306/" + database;
-            instance.username = username;
-            instance.password = password;
+        try {
+            // chargement driver "com.mysql.cj.jdbc.Driver"
+            Class.forName("com.mysql.cj.jdbc.Driver");
         }
+        catch (ClassNotFoundException e) {
+            System.out.println("Erreur de connexion à la base de données");
+        }
+
+        url = "jdbc:mysql://localhost:3306/" + database;
+
+        // Instancier une instance l'objet de DaoFactory
+        DaoFactory instance = new DaoFactory(url, username,password );
+
+        // Retourner cette instance
         return instance;
     }
 

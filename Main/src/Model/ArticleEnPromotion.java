@@ -1,6 +1,4 @@
 package Model;
-import View.*;
-import Control.*;
 
 public class ArticleEnPromotion extends Article {
     private double pourcentageReduction;

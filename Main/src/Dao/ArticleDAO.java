@@ -1,7 +1,7 @@
 package Dao;
 
 import Model.Article;
-import Model.Utilisateurs;
+
 import java.util.List;
 
 public interface ArticleDAO

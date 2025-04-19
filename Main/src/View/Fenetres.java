@@ -1,6 +1,5 @@
 package View;
 import Model.*;
-import Control.*;
 import Dao.ArticleDAO;
 import Dao.ArticleDAOImpl;
 import Dao.DaoFactory;
@@ -12,33 +11,34 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
 import java.io.File;
-import java.util.List;
+
+import Control.FenetreControl;
 
 /** Fenetres constitue l'ensemble des interfaces graphiques utilisées au cour du projet
  * @L'ensemble des liens entre elles sont effectuées ici
  */
 public class Fenetres extends Component implements ActionListener
 {
-    JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article; /// Fenêtres de navigation
-    TextField nom, prenom, mail, mdp, mail_id, mdp_id; /// Zones de saisie connexion et inscriptions
-    TextField numero_carte, expiration_carte, cvv; /// Zones de saisies paiement
-    private String account_type, surname, name, email, password; /// Inscription utilisateur dans la database
+    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article; /// Fenêtres de navigation
+    public TextField nom, prenom, mail, mdp, mail_id, mdp_id; /// Zones de saisie connexion et inscriptions
+    public TextField numero_carte, expiration_carte, cvv; /// Zones de saisies paiement
+    public String account_type, surname, name, email, password; /// Inscription utilisateur dans la database
 
     /// Gestion articles
-    TextField nom_article, description, prix, stock, seuil_remise; /// Zones de saisies article
-    private String categorie_type, name_article, describe, mark;
-    private int max_rabais, reserve;
-    private float price;
-    JComboBox<String> type_compte, payment_type, categorie, marque; /// Choix du mode de paiement et du type de compte
-    private String payment, num_card, exp_date, cvv_number; /// Effectuer le paiement
+    public TextField nom_article, description, prix, stock, seuil_remise; /// Zones de saisies article
+    public String categorie_type, name_article, describe, mark;
+    public int max_rabais, reserve;
+    public float price;
+    public JComboBox<String> type_compte, payment_type, categorie, marque; /// Choix du mode de paiement et du type de compte
+    public String payment, num_card, exp_date, cvv_number; /// Effectuer le paiement
 
     /// Fenetre catalogue
-    private JPanel PTitre, Liste, PannelRetour;
-    private JLabel titrre;
-    private JScrollPane Scroll;
-    private Random random = new Random();
+    public JPanel PTitre, Liste, PannelRetour;
+    public JLabel titrre;
+    public JScrollPane Scroll;
+    public Random random = new Random();
 
-    private ArticleDAO articleDao;
+    public ArticleDAO articleDao;
 
     /// Constructeur de chaque fenêtre
     public Fenetres()
@@ -151,8 +151,10 @@ public class Fenetres extends Component implements ActionListener
         mainPanel.add(Box.createRigidArea(new Dimension(0, 40)));
         
         // Custom text field style
-        class StyledTextField extends TextField {
-            StyledTextField(int columns) {
+        class StyledTextField extends TextField
+        {
+            StyledTextField(int columns)
+            {
                 super(columns);
                 setBackground(new Color(250, 250, 250));
                 setForeground(new Color(60, 60, 60));
@@ -198,54 +200,6 @@ public class Fenetres extends Component implements ActionListener
         buttonsPanel.setBackground(Color.WHITE);
         buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
         buttonsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
-        // Custom button style
-        class StyledButton extends JButton {
-            StyledButton(String text, boolean isPrimary) {
-                super(text);
-                setFont(new Font("Arial", Font.BOLD, 14));
-                setBorderPainted(false);
-                setFocusPainted(false);
-                setContentAreaFilled(true);
-                if (isPrimary) {
-                    setBackground(new Color(51, 122, 183));
-                    setForeground(Color.WHITE);
-                } else {
-                    setBackground(new Color(245, 245, 245));
-                    setForeground(new Color(70, 70, 70));
-                }
-                setPreferredSize(new Dimension(130, 40));
-            }
-            
-            @Override
-            protected void paintComponent(Graphics g) {
-                if (getModel().isPressed()) {
-                    g.setColor(darken(getBackground()));
-                } else if (getModel().isRollover()) {
-                    g.setColor(brighten(getBackground()));
-                } else {
-                    g.setColor(getBackground());
-                }
-                g.fillRoundRect(0, 0, getWidth(), getHeight(), 5, 5);
-                super.paintComponent(g);
-            }
-            
-            private Color darken(Color color) {
-                return new Color(
-                    Math.max((int)(color.getRed() * 0.9), 0),
-                    Math.max((int)(color.getGreen() * 0.9), 0),
-                    Math.max((int)(color.getBlue() * 0.9), 0)
-                );
-            }
-            
-            private Color brighten(Color color) {
-                return new Color(
-                    Math.min((int)(color.getRed() * 1.1), 255),
-                    Math.min((int)(color.getGreen() * 1.1), 255),
-                    Math.min((int)(color.getBlue() * 1.1), 255)
-                );
-            }
-        }
         
         JButton validerButton = new StyledButton("Valider", true);
         JButton inscrireButton = new StyledButton("Inscrire", false);
@@ -378,7 +332,7 @@ public class Fenetres extends Component implements ActionListener
         
         JButton promotionsButton = createNavButton("Promotions", e -> {
             // TODO: Implémenter la vue des promotions
-            System.out.println("Vue promotions à implémenter");
+            //System.out.println("Vue promotions à implémenter");
         });
         
         JButton catalogueButton = createNavButton("Catalogue", e -> {
@@ -394,14 +348,14 @@ public class Fenetres extends Component implements ActionListener
         JPanel rightSection = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 0));
         rightSection.setBackground(Color.WHITE);
         
-        JButton loginButton = createNavButton("Connexion", e -> {
-            connecter.setVisible(true);
+        JButton loginButton = createNavButton("Profil", e -> {
+            profil.setVisible(true);
             accueil.setVisible(false);
         });
         
         JButton cartButton = createNavButton("Panier (0)", e -> {
             // TODO: Implémenter la vue du panier
-            System.out.println("Vue panier à implémenter");
+            //System.out.println("Vue panier à implémenter");
         });
         
         rightSection.add(loginButton);
@@ -611,7 +565,7 @@ public class Fenetres extends Component implements ActionListener
     }
 
     /// Ajout d'un bouton sur une page
-    private void addButton(JPanel panel, String label)
+    public void addButton(JPanel panel, String label)
     {
         JButton button = new JButton(label);
         button.addActionListener(this);
@@ -646,7 +600,8 @@ public class Fenetres extends Component implements ActionListener
         PTitre.add(titrre, BorderLayout.CENTER);
     }
 
-    private void Produits() {
+    private void Produits()
+    {
         try {
             Liste = new JPanel();
             Liste.setBackground(Color.WHITE);
@@ -700,20 +655,20 @@ public class Fenetres extends Component implements ActionListener
             searchPanel.add(Box.createRigidArea(new Dimension(0, 10)));
             searchPanel.add(filterPanel);
 
-            System.out.println("Tentative de connexion à la base de données...");
+            //System.out.println("Tentative de connexion à la base de données...");
             // Récupération des articles depuis la base de données
             DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
-            System.out.println("DaoFactory créé avec succès");
+            //System.out.println("DaoFactory créé avec succès");
             
             ArticleDAOImpl articleDAO = new ArticleDAOImpl(dao);
-            System.out.println("ArticleDAOImpl créé avec succès");
+            //System.out.println("ArticleDAOImpl créé avec succès");
             
             java.util.List<Article> articles = articleDAO.listerArticles();
-            System.out.println("Nombre d'articles récupérés : " + articles.size());
+            //System.out.println("Nombre d'articles récupérés : " + articles.size());
 
             // Affichage des articles
             for (Article article : articles) {
-                System.out.println("Ajout de l'article : " + article.getNom());
+                //System.out.println("Ajout de l'article : " + article.getNom());
                 JPanel articlePanel = CreerListe(article);
                 Liste.add(articlePanel);
             }
@@ -752,7 +707,7 @@ public class Fenetres extends Component implements ActionListener
             });
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Erreur lors du chargement du catalogue : " + e.getMessage());
+            //System.out.println("Erreur lors du chargement du catalogue : " + e.getMessage());
             // Afficher un message d'erreur à l'utilisateur
             JOptionPane.showMessageDialog(this,
                 "Erreur lors du chargement du catalogue : " + e.getMessage(),
@@ -795,7 +750,7 @@ public class Fenetres extends Component implements ActionListener
         if (fileName != null) {
             // Utiliser la catégorie sans accent pour le chemin
             imagePath = String.format("Main/src/View/image/%s/%s", categorieDossier, fileName);
-            System.out.println("Tentative de chargement de l'image: " + imagePath);
+            //System.out.println("Tentative de chargement de l'image: " + imagePath);
         }
         
         try {
@@ -804,9 +759,9 @@ public class Fenetres extends Component implements ActionListener
             
             if (imageFile.exists()) {
                 imageIcon = new ImageIcon(imagePath);
-                System.out.println("Image trouvée et chargée: " + imagePath);
+                //System.out.println("Image trouvée et chargée: " + imagePath);
             } else {
-                System.out.println("Image non trouvée: " + imagePath + ", utilisation de l'image par défaut");
+                //System.out.println("Image non trouvée: " + imagePath + ", utilisation de l'image par défaut");
                 imageIcon = new ImageIcon(defaultImagePath);
             }
             
@@ -828,7 +783,7 @@ public class Fenetres extends Component implements ActionListener
                 throw new Exception("Image invalide");
             }
         } catch (Exception e) {
-            System.out.println("Erreur lors du chargement de l'image pour " + article.getNom() + ": " + e.getMessage());
+            //System.out.println("Erreur lors du chargement de l'image pour " + article.getNom() + ": " + e.getMessage());
             JLabel placeholder = new JLabel(article.getNom().substring(0, 1).toUpperCase());
             placeholder.setFont(new Font("Arial", Font.BOLD, 48));
             placeholder.setForeground(new Color(200, 200, 200));
@@ -964,7 +919,7 @@ public class Fenetres extends Component implements ActionListener
         }
 
         // Si aucune correspondance n'est trouvée, retourner null pour utiliser l'image par défaut
-        System.out.println("Aucune image trouvée pour l'article: " + nomArticle + " (catégorie: " + categorie + ")");
+        //System.out.println("Aucune image trouvée pour l'article: " + nomArticle + " (catégorie: " + categorie + ")");
         return null;
     }
 
@@ -1034,55 +989,10 @@ public class Fenetres extends Component implements ActionListener
         ajout_article.add(ajout_article_button);
     }
 
-    /// Action des boutons de chaque fenêtre
     @Override
     public void actionPerformed(ActionEvent e)
     {
-        JButton button = (JButton) e.getSource();
-        String buttonText = button.getText();
-
-        switch(buttonText) {
-            case "Valider":
-                if(connecter.isVisible()) {
-                    // Récupération des identifiants
-                    email = mail_id.getText();
-                    password = mdp_id.getText();
-
-                    // Connexion à la base de données
-                    DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
-                    UtilisateurDAOImpl userDao = new UtilisateurDAOImpl(dao);
-                    Utilisateurs user = new Utilisateurs(0, "", "", email, password, "");
-                    Utilisateurs connectedUser = userDao.connexionUtilisateur(user);
-
-                    if (connectedUser == null) {
-                        JOptionPane.showMessageDialog(this,
-                            "Identifiants incorrects",
-                            "Erreur de connexion",
-                            JOptionPane.ERROR_MESSAGE);
-                    } else {
-                        // Connexion réussie
-                        connecter.setVisible(false);
-                        accueil.setVisible(true);
-                    }
-                }
-                break;
-
-            case "Connexion":
-                connecter.setVisible(true);
-                accueil.setVisible(false);
-                break;
-
-            case "Articles":
-            case "Catalogue":
-                catalogue.setVisible(true);
-                accueil.setVisible(false);
-                break;
-
-            case "Retour":
-                accueil.setVisible(true);
-                connecter.setVisible(false);
-                catalogue.setVisible(false);
-                break;
-        }
+        FenetreControl control = new FenetreControl();
+        control.control(e);
     }
 }

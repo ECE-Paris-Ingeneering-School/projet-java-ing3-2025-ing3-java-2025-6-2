@@ -1,7 +1,6 @@
 package Dao;
 
 import Model.Article;
-import Model.Utilisateurs;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

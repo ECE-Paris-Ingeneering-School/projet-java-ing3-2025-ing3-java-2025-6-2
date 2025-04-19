@@ -1,6 +1,5 @@
 package Control;
 
-import Dao.DaoFactory;
 import View.Fenetres;
 
 public class Main

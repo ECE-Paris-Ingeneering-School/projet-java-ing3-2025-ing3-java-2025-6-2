@@ -5,8 +5,6 @@ import java.util.Map;
 
 import Dao.ArticleDAOImpl;
 import Dao.DaoFactory;
-import Dao.UtilisateurDAOImpl;
-import View.Fenetres;
 
 
 /// Administrateur de l'application
