@@ -21,7 +21,7 @@ public class Commande
     public float calculerPrixTotal() {
         float total = 0;
         for (Map.Entry<Article, Integer> entry : articles.entrySet()) {
-            total += (float) (entry.getKey().getPrixUnitaire() * entry.getValue());
+            total += entry.getKey().getPrixUnitaire() * entry.getValue();
         }
         return total;
     }

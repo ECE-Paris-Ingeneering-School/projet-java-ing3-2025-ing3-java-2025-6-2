@@ -44,7 +44,7 @@ public class CommandeDAOImpl implements CommandeDAO
     }
 
     @Override
-    public void ajouterDansCommandeEnCours(Commande commande, Article article, Panier panier)
+    public void ajouterDansCommandeEnCours(Commande commande, Article article)
     {
         try
         {
@@ -52,15 +52,15 @@ public class CommandeDAOImpl implements CommandeDAO
             Connection connexion = daoFactory.getConnection();
 
             /// récupération des informations saisies dans la page de commande
-            int id_ligne_panier = new Random().nextInt();
-            int id_panier = panier.getId();
-            int id_article = panier.getId();
-            int quantite = panier.getArticles().size();
+            int id_ligne_commande = new Random().nextInt();
+            int id_commande = commande.getId();
+            int id_article = article.getId();
+            int quantite = commande.getArticles().size();
             float prix_unitaire = article.getPrixUnitaire();
-            float montant_total = panier.calculerPrixTotal();
+            float montant_total = commande.getPrixTotal();
 
             /// Exécution de la requête INSERT INTO de l'objet client en paramètre
-            PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO lignepanier(id_ligne_panier, id_panier, id_article, quantite, prix_unitaire, prix_apres_remise) VALUES ('"+id_ligne_panier+"','"+id_panier+"', '"+id_article+"', '"+quantite+"', '"+prix_unitaire+"','"+montant_total+"')");
+            PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO lignecommande(id_ligne_pcommande, id_commande, id_article, quantite, prix_unitaire, prix_apres_remise) VALUES ('"+id_ligne_commande+"','"+id_commande+"', '"+id_article+"', '"+quantite+"', '"+prix_unitaire+"','"+montant_total+"')");
             preparedStatement.executeUpdate();
         }
         catch (SQLException e) {

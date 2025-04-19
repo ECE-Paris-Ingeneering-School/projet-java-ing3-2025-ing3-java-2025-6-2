@@ -312,22 +312,15 @@ public class Fenetres extends Component
         leftSection.add(searchField);
 
         // Menu principal (centre)
-        JPanel centerSection = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 1));
+        JPanel centerSection = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         centerSection.setBackground(Color.WHITE);
         
         // Création des boutons avec ActionListener
-        JButton articlesButton = createNavButton("Articles", e -> {
-            catalogue.setVisible(true);
-        });
+        JButton articlesButton = createNavButton("Articles", e -> fenetreControl.actionPerformed(e));
         
-        JButton promotionsButton = createNavButton("Promotions", e -> {
-            // TODO: Implémenter la vue des promotions
-            //System.out.println("Vue promotions à implémenter");
-        });
+        JButton promotionsButton = createNavButton("Promotions", e -> fenetreControl.actionPerformed(e));
         
-        JButton catalogueButton = createNavButton("Catalogue", e -> {
-            catalogue.setVisible(true);
-        });
+        JButton catalogueButton = createNavButton("Catalogue", e -> fenetreControl.actionPerformed(e));
 
         centerSection.add(articlesButton);
         centerSection.add(promotionsButton);
@@ -337,19 +330,11 @@ public class Fenetres extends Component
         JPanel rightSection = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 0));
         rightSection.setBackground(Color.WHITE);
         
-        JButton profileButton = createNavButton("Profil", e -> {
-            profil.setVisible(true);
-            accueil.setVisible(false);
-        });
+        JButton profileButton = createNavButton("Profil", e -> fenetreControl.actionPerformed(e));
 
-        JButton loginButton = createNavButton("Deconnexion", e -> {
-            connecter.setVisible(true);
-            accueil.setVisible(false);
-        });
+        JButton loginButton = createNavButton("Deconnexion", e -> fenetreControl.actionPerformed(e));
         
-        JButton cartButton = createNavButton("Panier", e -> {
-            panier.setVisible(true);
-        });
+        JButton cartButton = createNavButton("Panier", e -> fenetreControl.actionPerformed(e));
         
         rightSection.add(cartButton);
         rightSection.add(loginButton);
