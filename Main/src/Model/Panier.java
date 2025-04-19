@@ -1,6 +1,4 @@
 package Model;
-import View.*;
-import Control.*;
 
 import java.util.HashMap;
 import java.util.Map;

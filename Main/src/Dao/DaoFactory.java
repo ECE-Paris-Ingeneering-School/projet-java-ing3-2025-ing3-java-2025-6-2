@@ -2,7 +2,6 @@ package Dao;
 
 // import des packages
 import java.sql.*;
-import java.util.ArrayList;
 
 /**
  * La DAO Factory (DaoFactory.java) permet d'initialiser le DAO en chargeant notamment les drivers nécessaires
@@ -10,9 +9,6 @@ import java.util.ArrayList;
  * il n'y en a qu'un seul, UtilisateurDao, qui correspond à une table de la base).
  */
 public class DaoFactory {
-    /**
-     * Attributs private pour la connexion JDBC
-     */
     private static String url;
     private String username;
     private String password;
@@ -24,11 +20,6 @@ public class DaoFactory {
         this.password = password;
     }
 
-    /**
-     * Méthode qui retourne 1 objet de DaoFactory
-     * @param : url, username et password de la base de données
-     * @return : objet de la classe DaoFactory
-     */
     public static DaoFactory getInstance(String database, String username, String password) {
         try {
             // chargement driver "com.mysql.cj.jdbc.Driver"
