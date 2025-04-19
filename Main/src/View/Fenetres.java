@@ -183,6 +183,7 @@ public class Fenetres extends Component implements ActionListener
         profil_text.setBorder(BorderFactory.createEmptyBorder(20, 50, 0, 0));
 
         //A dynnamiser
+        //TEST COMIT
 
         profil_text.add(new JLabel("Nom: " + Nom));
         profil_text.add(Box.createVerticalStrut(10));
