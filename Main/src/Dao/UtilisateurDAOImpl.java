@@ -8,9 +8,7 @@ public class UtilisateurDAOImpl implements UtilisateurDAO
 {
     private DaoFactory daoFactory;
 
-    // constructeur dépendant de la classe DaoFactory
-
-
+    /// constructeur dépendant de la classe DaoFactory
     public UtilisateurDAOImpl(DaoFactory daoFactory)
     {
         this.daoFactory = daoFactory;
@@ -50,9 +48,9 @@ public class UtilisateurDAOImpl implements UtilisateurDAO
     }
 
     @Override
-    public Utilisateurs getUtilisateur(Utilisateurs utilisateur)
+    public UtilisateurDAO getUtilisateur()
     {
-        return utilisateur;
+        return this;
     }
 
     /** Utilisé pour la création d'un compte

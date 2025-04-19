@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ArticleDAO
 {
-    public Article getArticle(Article article);
+    public ArticleDAOImpl getArticle();
 
     /** Utilisé pour la création d'un article
      * @Ajoute un nouvel article dans la base de données (réservé aux admins)

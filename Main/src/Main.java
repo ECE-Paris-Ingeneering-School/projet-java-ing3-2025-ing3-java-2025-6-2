@@ -1,5 +1,4 @@
-package Control;
-
+import Control.FenetreControl;
 import Model.Fenetres;
 
 public class Main

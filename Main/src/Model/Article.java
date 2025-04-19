@@ -1,6 +1,4 @@
 package Model;
-import View.*;
-import Control.*;
 
 public class Article {
     private int id, stock, seuil_remise;
@@ -20,7 +18,7 @@ public class Article {
         this.description = description;
         this.prixUnitaire = prixUnitaire;
         this.disponibilite = disponibilite;
-        this.image = "Control.Main/src/View/image/default_product.png"; // Default image path
+        this.image = "Main/src/View/image/default_product.png"; // Default image path
     }
 
     public boolean verifierDisponibilite(String dates)
@@ -46,7 +44,7 @@ public class Article {
     {
         return categorie;
     }
-    public double getPrixUnitaire()
+    public float getPrixUnitaire()
     {
         return prixUnitaire;
     }

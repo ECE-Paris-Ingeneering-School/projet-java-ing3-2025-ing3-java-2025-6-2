@@ -23,10 +23,9 @@ public class ArticleDAOImpl implements ArticleDAO
     }
 
     @Override
-    public Article getArticle(Article article)
+    public ArticleDAOImpl getArticle()
     {
-        // Implémentation à compléter
-        return article;
+        return this;
     }
 
     @Override

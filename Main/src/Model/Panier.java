@@ -3,11 +3,15 @@ package Model;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Panier {
+public class Panier
+{
+    private int id;
     private Client client;
     private Map<Article, Integer> articles; // Model.Article et quantité
 
-    public Panier(Client client) {
+    public Panier(int id, Client client)
+    {
+        this.id = id;
         this.client = client;
         this.articles = new HashMap<>();
     }
@@ -20,8 +24,8 @@ public class Panier {
         articles.remove(article);
     }
 
-    public double calculerPrixTotal() {
-        double total = 0;
+    public float calculerPrixTotal() {
+        float total = 0;
         for (Map.Entry<Article, Integer> entry : articles.entrySet()) {
             total += entry.getKey().getPrixUnitaire() * entry.getValue();
         }
@@ -29,6 +33,11 @@ public class Panier {
     }
 
     // Getters et Setters
+
+    public int getId()
+    {
+        return id;
+    }
     public Client getClient() { return client; }
     public void setClient(Client client) { this.client = client; }
     public Map<Article, Integer> getArticles() { return articles; }

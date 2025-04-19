@@ -20,7 +20,7 @@ public class Client extends Utilisateurs {
 
     public Commande passerCommande() {
         // Implémentation de la commande
-        return new Commande(this, new HashMap<>());
+        return new Commande(0, this, new HashMap<>());
     }
 
     // Getters et Setters

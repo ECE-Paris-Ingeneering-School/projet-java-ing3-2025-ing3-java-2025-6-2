@@ -59,7 +59,7 @@ public class Fenetres extends Component
         catalogue.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ajout_article.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Initialisation des autres composants
+        /// Initialisation des autres composants
         DaoFactory daoFactory = DaoFactory.getInstance("ecommerce_db", "root", "");
         articleDao = new ArticleDAOImpl(daoFactory);
     }
@@ -296,7 +296,7 @@ public class Fenetres extends Component
         leftSection.setBackground(Color.WHITE);
         
         // Chargement et redimensionnement du logo
-        ImageIcon originalIcon = new ImageIcon("Control.Main/src/View/image/Logo.png");
+        ImageIcon originalIcon = new ImageIcon("Main/src/View/image/Logo.png");
         Image originalImage = originalIcon.getImage();
         Image resizedImage = originalImage.getScaledInstance(100, 40, Image.SCALE_SMOOTH);
         ImageIcon resizedIcon = new ImageIcon(resizedImage);
@@ -401,7 +401,7 @@ public class Fenetres extends Component
         try {
             String imagePath = getImageFileName(article.getNom(), article.getCategorie());
             if (imagePath != null) {
-                ImageIcon icon = new ImageIcon("Control.Main/src/View/image/" + article.getCategorie().toLowerCase() + "/" + imagePath);
+                ImageIcon icon = new ImageIcon("Main/src/View/image/" + article.getCategorie().toLowerCase() + "/" + imagePath);
                 Image scaledImage = icon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH);
                 JLabel imageLabel = new JLabel(new ImageIcon(scaledImage));
                 imagePanel.add(imageLabel);
@@ -771,7 +771,7 @@ public class Fenetres extends Component
         imagePanel.setLayout(new BorderLayout());
         
         // Chargement de l'image en fonction de la catégorie
-        String defaultImagePath = "Control.Main/src/View/image/default_product.png";
+        String defaultImagePath = "Main/src/View/image/default_product.png";
         
         // Convertir la catégorie en version sans accent pour le chemin du dossier
         String categorieDossier = article.getCategorie().toLowerCase()
@@ -788,7 +788,7 @@ public class Fenetres extends Component
         String fileName = getImageFileName(article.getNom(), article.getCategorie());
         if (fileName != null) {
             // Utiliser la catégorie sans accent pour le chemin
-            imagePath = String.format("Control.Main/src/View/image/%s/%s", categorieDossier, fileName);
+            imagePath = String.format("Main/src/View/image/%s/%s", categorieDossier, fileName);
             //System.out.println("Tentative de chargement de l'image: " + imagePath);
         }
         
@@ -1031,7 +1031,7 @@ public class Fenetres extends Component
     public void setPanier()
     {
         panier = new JFrame();
-        panier.setTitle("Catalogue");
+        panier.setTitle("Panier");
         panier.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         panier.setSize(1200, 800);
         panier.setLocationRelativeTo(null);

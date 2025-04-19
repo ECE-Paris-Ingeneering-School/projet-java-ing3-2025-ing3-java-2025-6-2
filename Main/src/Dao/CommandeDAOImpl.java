@@ -3,6 +3,7 @@ package Dao;
 import Model.Article;
 import Model.Client;
 import Model.Commande;
+import Model.Panier;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,6 +21,55 @@ public class CommandeDAOImpl implements CommandeDAO
     }
 
     @Override
+    public void nouvelleCommande(Client client, Panier panier, String adresse)
+    {
+        try
+        {
+            // connexion
+            Connection connexion = daoFactory.getConnection();
+
+            /// récupération des informations saisies dans la page de commande
+            int id_commande = new Random().nextInt();
+            int id_client = client.getIdentifiant();
+            float montant_total = panier.calculerPrixTotal();
+
+            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+            PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO commande(id_commande, id_client, statut, adresse_livraison, montant_total) VALUES ('"+id_commande+"','"+id_client+"', 'non payé', '"+adresse+"', '"+montant_total+"')");
+            preparedStatement.executeUpdate();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Ajout d'une nouvelle commande impossible");
+        }
+    }
+
+    @Override
+    public void ajouterDansCommandeEnCours(Commande commande, Article article, Panier panier)
+    {
+        try
+        {
+            // connexion
+            Connection connexion = daoFactory.getConnection();
+
+            /// récupération des informations saisies dans la page de commande
+            int id_ligne_panier = new Random().nextInt();
+            int id_panier = panier.getId();
+            int id_article = panier.getId();
+            int quantite = panier.getArticles().size();
+            float prix_unitaire = article.getPrixUnitaire();
+            float montant_total = panier.calculerPrixTotal();
+
+            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+            PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO lignepanier(id_ligne_panier, id_panier, id_article, quantite, prix_unitaire, prix_apres_remise) VALUES ('"+id_ligne_panier+"','"+id_panier+"', '"+id_article+"', '"+quantite+"', '"+prix_unitaire+"','"+montant_total+"')");
+            preparedStatement.executeUpdate();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Ajout de l'article impossible");
+        }
+    }
+
+    @Override
     public void paiementCommande(Commande commande)
     {
         try {
@@ -27,12 +77,10 @@ public class CommandeDAOImpl implements CommandeDAO
             Connection connexion = daoFactory.getConnection();
 
             /// récupération des informations saisies dans la page de commande
-            int id_commande = new Random().nextInt();
-            int id_client = commande.getClient().getIdentifiant();
-            float prix = commande.getPrixTotal();
+            int id_commande = commande.getId();
 
             /// Exécution de la requête INSERT INTO de l'objet client en paramètre
-            PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO commande(id_commande, id_client, montant_total) VALUES ('"+id_commande+"','"+id_client+"','"+prix+"')");
+            PreparedStatement preparedStatement = connexion.prepareStatement("UPDATE commande SET (statut = 'payé') WHERE id_commande = '"+id_commande+"'");
             preparedStatement.executeUpdate();
         }
         catch (SQLException e) {
@@ -89,8 +137,8 @@ public class CommandeDAOImpl implements CommandeDAO
                     Client client = new Client(id_client, Nom, Prenom, email, mot_de_passe, type_utilisateur);
                     String date_commande = resultSet.getString("date_commande");
                     float prix = resultSet.getFloat("montant_total");
-                    Commande nextCommmande = new Commande(client, liste);
-                    articles.add(nextCommmande);
+                    //Commande nextCommmande = new Commande(client, liste);
+                    //articles.add(nextCommmande);
                 }
             }
         } catch (SQLException e) {

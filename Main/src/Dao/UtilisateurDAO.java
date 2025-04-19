@@ -6,10 +6,12 @@ import Model.Utilisateurs;
  */
 public interface UtilisateurDAO
 {
-    /** Utilisé dans le profil
+    /**
+     * Utilisé dans le profil
+     *
      * @Récupère les informations d'un utilisateur pour les afficher dans son profil
      */
-    public Utilisateurs getUtilisateur(Utilisateurs utilisateur);
+    public UtilisateurDAO getUtilisateur();
 
     /** Utilisé pour la création d'un compte
      * @Ajoute un nouvel utilisateur dans la base de données
