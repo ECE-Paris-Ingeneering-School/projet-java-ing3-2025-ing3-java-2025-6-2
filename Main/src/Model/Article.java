@@ -20,7 +20,7 @@ public class Article {
         this.description = description;
         this.prixUnitaire = prixUnitaire;
         this.disponibilite = disponibilite;
-        this.image = "Main/src/View/image/default_product.png"; // Default image path
+        this.image = "Control.Main/src/View/image/default_product.png"; // Default image path
     }
 
     public boolean verifierDisponibilite(String dates)

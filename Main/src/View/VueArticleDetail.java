@@ -53,7 +53,7 @@ public class VueArticleDetail extends JFrame {
             imageIcon = new ImageIcon(resizedImage);
         } else {
             // Image par défaut si aucune image n'est trouvée
-            imageIcon = new ImageIcon("Main/src/View/image/default.png");
+            imageIcon = new ImageIcon("Control.Main/src/View/image/default.png");
         }
 
         JLabel imageLabel = new JLabel(imageIcon);
@@ -111,7 +111,7 @@ public class VueArticleDetail extends JFrame {
         if (fileName == null) {
             return null;
         }
-        String imagePath = "Main/src/View/image/" + fileName;
+        String imagePath = "Control.Main/src/View/image/" + fileName;
         File imageFile = new File(imagePath);
         return imageFile.exists() ? imagePath : null;
     }

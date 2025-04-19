@@ -7,7 +7,6 @@ import Dao.UtilisateurDAOImpl;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
 import java.io.File;
@@ -17,20 +16,16 @@ import Control.FenetreControl;
 /** Fenetres constitue l'ensemble des interfaces graphiques utilisées au cour du projet
  * @L'ensemble des liens entre elles sont effectuées ici
  */
-public class Fenetres extends Component implements ActionListener
+public class Fenetres extends Component
 {
     public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article; /// Fenêtres de navigation
     public TextField nom, prenom, mail, mdp, mail_id, mdp_id; /// Zones de saisie connexion et inscriptions
     public TextField numero_carte, expiration_carte, cvv; /// Zones de saisies paiement
-    public String account_type, surname, name, email, password; /// Inscription utilisateur dans la database
+    public String email, password; /// Inscription utilisateur dans la database
 
     /// Gestion articles
     public TextField nom_article, description, prix, stock, seuil_remise; /// Zones de saisies article
-    public String categorie_type, name_article, describe, mark;
-    public int max_rabais, reserve;
-    public float price;
     public JComboBox<String> type_compte, payment_type, categorie, marque; /// Choix du mode de paiement et du type de compte
-    public String payment, num_card, exp_date, cvv_number; /// Effectuer le paiement
 
     /// Fenetre catalogue
     public JPanel PTitre, Liste, PannelRetour;
@@ -39,6 +34,7 @@ public class Fenetres extends Component implements ActionListener
     public Random random = new Random();
 
     public ArticleDAO articleDao;
+    private FenetreControl fenetreControl;
 
     /// Constructeur de chaque fenêtre
     public Fenetres()
@@ -66,15 +62,11 @@ public class Fenetres extends Component implements ActionListener
         // Initialisation des autres composants
         DaoFactory daoFactory = DaoFactory.getInstance("ecommerce_db", "root", "");
         articleDao = new ArticleDAOImpl(daoFactory);
-        
-        // Configuration des fenêtres
-        setIdentification();
-        setInscrire();
-        setAccueil();
-        setEvent();
-        setPaiement();
-        setNewArticle();
-        setCatalogue();
+    }
+
+    public void setControleur(FenetreControl controleur)
+    {
+        this.fenetreControl = controleur;
     }
 
     /// Fenêtre inscription utilisateur
@@ -204,11 +196,11 @@ public class Fenetres extends Component implements ActionListener
         JButton validerButton = new StyledButton("Valider", true);
         JButton inscrireButton = new StyledButton("Inscrire", false);
         
-        validerButton.addActionListener(this);
-        inscrireButton.addActionListener(this);
-        
+
+        validerButton.addActionListener(fenetreControl);
         buttonsPanel.add(validerButton);
         buttonsPanel.add(Box.createRigidArea(new Dimension(15, 0)));
+        inscrireButton.addActionListener(fenetreControl);
         buttonsPanel.add(inscrireButton);
         
         mainPanel.add(buttonsPanel);
@@ -273,7 +265,6 @@ public class Fenetres extends Component implements ActionListener
             categoryButton.setBorderPainted(false);
             categoryButton.addActionListener(e -> {
                 catalogue.setVisible(true);
-                accueil.setVisible(false);
             });
             categoriesPanel.add(categoryButton);
         }
@@ -305,7 +296,7 @@ public class Fenetres extends Component implements ActionListener
         leftSection.setBackground(Color.WHITE);
         
         // Chargement et redimensionnement du logo
-        ImageIcon originalIcon = new ImageIcon("Main/src/View/image/Logo.png");
+        ImageIcon originalIcon = new ImageIcon("Control.Main/src/View/image/Logo.png");
         Image originalImage = originalIcon.getImage();
         Image resizedImage = originalImage.getScaledInstance(100, 40, Image.SCALE_SMOOTH);
         ImageIcon resizedIcon = new ImageIcon(resizedImage);
@@ -321,13 +312,12 @@ public class Fenetres extends Component implements ActionListener
         leftSection.add(searchField);
 
         // Menu principal (centre)
-        JPanel centerSection = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        JPanel centerSection = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 1));
         centerSection.setBackground(Color.WHITE);
         
         // Création des boutons avec ActionListener
         JButton articlesButton = createNavButton("Articles", e -> {
             catalogue.setVisible(true);
-            accueil.setVisible(false);
         });
         
         JButton promotionsButton = createNavButton("Promotions", e -> {
@@ -337,7 +327,6 @@ public class Fenetres extends Component implements ActionListener
         
         JButton catalogueButton = createNavButton("Catalogue", e -> {
             catalogue.setVisible(true);
-            accueil.setVisible(false);
         });
 
         centerSection.add(articlesButton);
@@ -348,8 +337,13 @@ public class Fenetres extends Component implements ActionListener
         JPanel rightSection = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 0));
         rightSection.setBackground(Color.WHITE);
         
-        JButton loginButton = createNavButton("Profil", e -> {
+        JButton profileButton = createNavButton("Profil", e -> {
             profil.setVisible(true);
+            accueil.setVisible(false);
+        });
+
+        JButton loginButton = createNavButton("Deconexion", e -> {
+            connecter.setVisible(true);
             accueil.setVisible(false);
         });
         
@@ -358,8 +352,9 @@ public class Fenetres extends Component implements ActionListener
             //System.out.println("Vue panier à implémenter");
         });
         
-        rightSection.add(loginButton);
         rightSection.add(cartButton);
+        rightSection.add(loginButton);
+        rightSection.add(profileButton);
 
         navBar.add(leftSection, BorderLayout.WEST);
         navBar.add(centerSection, BorderLayout.CENTER);
@@ -407,7 +402,7 @@ public class Fenetres extends Component implements ActionListener
         try {
             String imagePath = getImageFileName(article.getNom(), article.getCategorie());
             if (imagePath != null) {
-                ImageIcon icon = new ImageIcon("Main/src/View/image/" + article.getCategorie().toLowerCase() + "/" + imagePath);
+                ImageIcon icon = new ImageIcon("Control.Main/src/View/image/" + article.getCategorie().toLowerCase() + "/" + imagePath);
                 Image scaledImage = icon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH);
                 JLabel imageLabel = new JLabel(new ImageIcon(scaledImage));
                 imagePanel.add(imageLabel);
@@ -558,17 +553,14 @@ public class Fenetres extends Component implements ActionListener
         paiement.add(paiement_button);
     }
 
-    /// Premier affichage au démarrage (gestion ensuite par les boutons)
-    public void affichage()
-    {
-        connecter.setVisible(true);
-    }
-
     /// Ajout d'un bouton sur une page
     public void addButton(JPanel panel, String label)
     {
         JButton button = new JButton(label);
-        button.addActionListener(this);
+        if (fenetreControl != null)
+        {
+            button.addActionListener(fenetreControl);
+        }
         panel.add(button);
     }
 
@@ -732,7 +724,7 @@ public class Fenetres extends Component implements ActionListener
         imagePanel.setLayout(new BorderLayout());
         
         // Chargement de l'image en fonction de la catégorie
-        String defaultImagePath = "Main/src/View/image/default_product.png";
+        String defaultImagePath = "Control.Main/src/View/image/default_product.png";
         
         // Convertir la catégorie en version sans accent pour le chemin du dossier
         String categorieDossier = article.getCategorie().toLowerCase()
@@ -749,7 +741,7 @@ public class Fenetres extends Component implements ActionListener
         String fileName = getImageFileName(article.getNom(), article.getCategorie());
         if (fileName != null) {
             // Utiliser la catégorie sans accent pour le chemin
-            imagePath = String.format("Main/src/View/image/%s/%s", categorieDossier, fileName);
+            imagePath = String.format("Control.Main/src/View/image/%s/%s", categorieDossier, fileName);
             //System.out.println("Tentative de chargement de l'image: " + imagePath);
         }
         
@@ -987,12 +979,5 @@ public class Fenetres extends Component implements ActionListener
         ajout_article.add(inscrire_remise);
         ajout_article.add(decrire);
         ajout_article.add(ajout_article_button);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e)
-    {
-        FenetreControl control = new FenetreControl();
-        control.control(e);
     }
 }
