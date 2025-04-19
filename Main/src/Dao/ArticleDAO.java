@@ -8,13 +8,13 @@ public interface ArticleDAO
 {
     public Article getArticle(Article article);
 
-    /** Utilisé pour la création d'un compte
-     * @Ajoute un nouvel utilisateur dans la base de données
+    /** Utilisé pour la création d'un article
+     * @Ajoute un nouvel article dans la base de données (réservé aux admins)
      */
     public void ajouterArticle(Article article);
 
-    /** Utilisé pour la connexion
-     * @Permet à un utilisateur de se connecter
+    /** Utilisé pour la modification d'un article
+     * @Modifie un article dans la base de données (réservé aux admins)
      */
     public void modifierArticle(Article article);
 

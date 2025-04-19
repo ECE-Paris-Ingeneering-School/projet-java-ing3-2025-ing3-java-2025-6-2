@@ -18,7 +18,7 @@ import View.VueArticle;
  */
 public class Fenetres extends Component
 {
-    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article; /// Fenêtres de navigation
+    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, panier; /// Fenêtres de navigation
     public TextField nom, prenom, mail, mdp, mail_id, mdp_id; /// Zones de saisie connexion et inscriptions
     public TextField numero_carte, expiration_carte, cvv; /// Zones de saisies paiement
     public String email, password; /// Inscription utilisateur dans la database
@@ -342,14 +342,13 @@ public class Fenetres extends Component
             accueil.setVisible(false);
         });
 
-        JButton loginButton = createNavButton("Deconexion", e -> {
+        JButton loginButton = createNavButton("Deconnexion", e -> {
             connecter.setVisible(true);
             accueil.setVisible(false);
         });
         
-        JButton cartButton = createNavButton("Panier (0)", e -> {
-            // TODO: Implémenter la vue du panier
-            //System.out.println("Vue panier à implémenter");
+        JButton cartButton = createNavButton("Panier", e -> {
+            panier.setVisible(true);
         });
         
         rightSection.add(cartButton);
@@ -480,29 +479,77 @@ public class Fenetres extends Component
         Utilisateurs user = new Utilisateurs(0, "", "", email, password, "");
         Utilisateurs user_actuel = userdao.connexionUtilisateur(user);
         /// Création de la page avec les informations correspondantes
+
         profil = new JFrame();
-        profil.setSize(900, 700);
-        profil.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        profil.setSize(500, 400);
+        profil.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         profil.setTitle("Profil");
-        profil.setLayout(new BoxLayout(profil.getContentPane(), BoxLayout.Y_AXIS));
-        JPanel profil_text = new JPanel();
-        JLabel label1 = new JLabel("Bonjour " + user_actuel.getNom() + " " +user_actuel.getPrenom());
-        profil_text.add(label1);
-        JPanel profil_button = new JPanel();
-        JLabel label2 = new JLabel("Vous êtes un "+user_actuel.getType_utilisateur());
-        profil_text.add(label2);
+        profil.setLayout(new BorderLayout());
+        String Nom = "FF";
+        String Prenom = "bebreb";
+        int Age = 19;
+        double Thune = 1000;
+
+
+        JPanel profil_button = new JPanel(new FlowLayout(FlowLayout.CENTER));
         addButton(profil_button, "Accueil");
         addButton(profil_button, "Catalogue");
-        /// Cas pour un administrateur (gérer les articles, les rabais, les dossiers clients, statistiques)
-        if(user_actuel.getType_utilisateur().equals("admin"))
-        {
-            addButton(profil_button, "Ajouter article");
-            addButton(profil_button, "Modifier un article");
-            addButton(profil_button, "Gerer les dossiers clients");
-            addButton(profil_button, "Statistiques");
+        profil.add(profil_button, BorderLayout.NORTH);
+
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        titlePanel.add(new JLabel("TITRE"));
+        profil.add(titlePanel, BorderLayout.PAGE_START);
+
+        JPanel panel_info = new JPanel(new BorderLayout());
+
+        JPanel profil_photo = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.setColor(Color.BLACK);
+                g.fillRect(20, 20, 175, 200);
+            }
+        };
+        profil_photo.setPreferredSize(new Dimension(175, 200));
+        JPanel profil_text = new JPanel();
+        profil_text.setLayout(new BoxLayout(profil_text, BoxLayout.Y_AXIS));
+        profil_text.setBorder(BorderFactory.createEmptyBorder(20, 50, 0, 0));
+
+        //A dynnamiser
+
+        profil_text.add(new JLabel("Nom: " + Nom));
+        profil_text.add(Box.createVerticalStrut(10));
+        profil_text.add(new JLabel("Prénom: " + Prenom));
+        profil_text.add(Box.createVerticalStrut(10));
+        profil_text.add(new JLabel("Âge: " + Age));
+        profil_text.add(Box.createVerticalStrut(10));
+        profil_text.add(new JLabel("Argent: " + Thune + " €"));
+        panel_info.add(profil_photo, BorderLayout.WEST);
+        panel_info.add(profil_text, BorderLayout.CENTER);
+
+        JPanel pied_page = new JPanel();
+        pied_page.setLayout(new BoxLayout(pied_page, BoxLayout.Y_AXIS));
+        pied_page.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+
+
+        if (user_actuel.getType_utilisateur().equals("admin")) {
+            addButton(pied_page, "Ajouter article");
+            addButton(pied_page, "Modifier un article");
+            addButton(pied_page, "Gerer les dossiers clients");
+            addButton(pied_page, "Statistiques");
         }
-        profil.add(profil_text);
-        profil.add(profil_button);
+        pied_page.add(Box.createVerticalStrut(10));
+        pied_page.add(new JLabel("FIN"));
+        pied_page.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+
+        JPanel PASDEBUGDEPOSITION = new JPanel();
+        PASDEBUGDEPOSITION.setLayout(new BoxLayout(PASDEBUGDEPOSITION, BoxLayout.Y_AXIS));
+        PASDEBUGDEPOSITION.add(titlePanel);
+        PASDEBUGDEPOSITION.add(panel_info);
+        PASDEBUGDEPOSITION.add(Box.createVerticalGlue());
+        PASDEBUGDEPOSITION.add(pied_page);
+
+        profil.add(PASDEBUGDEPOSITION, BorderLayout.CENTER);
     }
 
     /// Gestion des erreurs
@@ -979,5 +1026,23 @@ public class Fenetres extends Component
         ajout_article.add(inscrire_remise);
         ajout_article.add(decrire);
         ajout_article.add(ajout_article_button);
+    }
+
+    public void setPanier()
+    {
+        panier = new JFrame();
+        panier.setTitle("Catalogue");
+        panier.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        panier.setSize(1200, 800);
+        panier.setLocationRelativeTo(null);
+        panier.setLayout(new BorderLayout());
+
+        Titre();
+        Produits();
+        creerRetour();
+
+        panier.add(PTitre, BorderLayout.NORTH);
+        panier.add(Scroll, BorderLayout.CENTER);
+        panier.add(PannelRetour, BorderLayout.SOUTH);
     }
 }

@@ -70,7 +70,39 @@ public class ArticleDAOImpl implements ArticleDAO
     @Override
     public void modifierArticle(Article article)
     {
-        // Implémentation à venir
+        try {
+            // connexion
+            Connection connexion = daoFactory.getConnection();
+
+            /// récupération des informations saisies dans la page d'inscription
+            int id_article = article.getId();
+            String nom = article.getNom();
+            String description = article.getDescription();
+            double prix = article.getPrixUnitaire();
+            int stock = article.getStock();
+            int seuil_remise = article.getSeuil_remise();
+            String categroie = article.getCategorie();
+            String marque = article.getMarque();
+
+            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+            PreparedStatement preparedStatement = connexion.prepareStatement(
+                    "UPDATE article " +
+                            "SET (?, ?, ?, ?, ?, ?, ?, ?) WHERE id_article = '"+id_article+"'"
+            );
+            preparedStatement.setInt(1, id_article);
+            preparedStatement.setString(2, nom);
+            preparedStatement.setString(3, description);
+            preparedStatement.setDouble(4, prix);
+            preparedStatement.setInt(5, stock);
+            preparedStatement.setInt(6, seuil_remise);
+            preparedStatement.setString(7, categroie);
+            preparedStatement.setString(8, marque);
+            preparedStatement.executeUpdate();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Modification de l'article impossible");
+        }
     }
 
     @Override

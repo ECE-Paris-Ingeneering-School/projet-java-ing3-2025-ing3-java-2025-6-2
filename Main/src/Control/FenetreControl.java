@@ -159,6 +159,8 @@ public class FenetreControl extends JFrame implements ActionListener
                                 "Prix: " +    " €\n" +
                                 "Stock: " +   " unités");
                 break;
+            case "Panier":
+                break;
             case "Retour":
                 if(fenetre.inscrire.isVisible())
                     fenetre.connecter.setVisible(true);
@@ -167,6 +169,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.ajout_article.setVisible(false);
                 fenetre.event.setVisible(false);
                 fenetre.catalogue.setVisible(false);
+                fenetre.panier.setVisible(false);
                 break;
         }
     }

@@ -5,7 +5,7 @@ import java.util.Map;
 public class Commande {
     private Client client;
     private Map<Article, Integer> articles; // Model.Article et quantité
-    private double prixTotal;
+    private float prixTotal;
     private String date;
 
     public Commande(Client client, Map<Article, Integer> articles) {
@@ -15,10 +15,10 @@ public class Commande {
         this.date = new java.util.Date().toString();
     }
 
-    public double calculerPrixTotal() {
-        double total = 0;
+    public float calculerPrixTotal() {
+        float total = 0;
         for (Map.Entry<Article, Integer> entry : articles.entrySet()) {
-            total += entry.getKey().getPrixUnitaire() * entry.getValue();
+            total += (float) (entry.getKey().getPrixUnitaire() * entry.getValue());
         }
         return total;
     }
@@ -31,9 +31,6 @@ public class Commande {
     public Client getClient() { return client; }
     public void setClient(Client client) { this.client = client; }
     public Map<Article, Integer> getArticles() { return articles; }
-    public void setArticles(Map<Article, Integer> articles) { this.articles = articles; }
-    public double getPrixTotal() { return prixTotal; }
-    public void setPrixTotal(double prixTotal) { this.prixTotal = prixTotal; }
+    public float getPrixTotal() { return prixTotal; }
     public String getDate() { return date; }
-    public void setDate(String date) { this.date = date; }
 }
