@@ -1,10 +1,8 @@
 package Control;
 
-import Dao.ArticleDAOImpl;
-import Dao.CommandeDAOImpl;
-import Dao.DaoFactory;
-import Dao.UtilisateurDAOImpl;
+import Dao.*;
 import Model.*;
+import View.VueArticle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -59,6 +57,7 @@ public class FenetreControl extends JFrame implements ActionListener
                     else
                     {
                         fenetre.setProfil();
+                        fenetre.setPanier();
                         fenetre.accueil.setVisible(true);
                         fenetre.connecter.setVisible(false);
                     }
@@ -141,6 +140,46 @@ public class FenetreControl extends JFrame implements ActionListener
             case "Articles":
                 fenetre.articles.setVisible(true);
                 break;
+            case "Détails":
+                ArticleDAOImpl articleDAO = new ArticleDAOImpl(dao);
+                String cmd = e.getActionCommand();
+
+                if (cmd.startsWith("Détails"))
+                {
+                    try {
+                        String idStr = cmd.substring("Détails".length());
+                        System.out.println(idStr); // OK ici
+                        int id = Integer.parseInt(idStr);
+                        Article article = articleDAO.getArticle(id);
+                        new VueArticle().afficherDetails(article);
+                    } catch (NumberFormatException ex) {
+                        System.err.println("ID invalide dans la commande : " + cmd);
+                    }
+                }
+                break;
+            case "Ajouter":
+                articleDAO = new ArticleDAOImpl(dao);
+                cmd = e.getActionCommand();
+                if (cmd.startsWith("Ajouter"))
+                {
+                    try {
+                        String idStr = cmd.substring("Ajouter".length());
+                        System.out.println(idStr); // OK ici
+                        int id = Integer.parseInt(idStr);
+                        Article article = articleDAO.getArticle(id);
+                        PanierDAOImpl panierDAO = new PanierDAOImpl(dao);
+                        Utilisateurs user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
+                        Utilisateurs connect = userdao.connexionUtilisateur(user);
+                        Client client = new Client(connect.getIdentifiant(), connect.getNom(), connect.getPrenom(), connect.getEmail(), connect.getMotDePasse(), connect.getType_utilisateur());
+                        panierDAO.nouveauPanier(client);
+                        Panier panier = new Panier(panierDAO.getPanier(client).getId(), client);
+                        panierDAO.ajouterAuPanier(panier, article);
+                    } catch (NumberFormatException ex)
+                    {
+                        System.err.println("ID invalide dans la commande : " + cmd);
+                    }
+                }
+                break;
             case "Catalogue" :
                 fenetre.catalogue.setVisible(true);
                 break;
@@ -175,7 +214,25 @@ public class FenetreControl extends JFrame implements ActionListener
                 int cvv = Integer.parseInt(fenetre.cvv.getText());
                 System.out.println("Paiement : " + paiement +" Numero de carte : " + numero_carte + " Date d'expiration : " + exp_date + " Numero CVV : " + cvv);
                 break;
-
+            case "Annuler":
+                comdao = new CommandeDAOImpl(dao);
+                user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
+                connect = userdao.connexionUtilisateur(user);
+                client = new Client(connect.getIdentifiant(), connect.getNom(), connect.getPrenom(), connect.getEmail(), connect.getMotDePasse(), connect.getType_utilisateur());
+                comdao.modifierCommande(client);
+                fenetre.paiement.setVisible(false);
+                fenetre.paiement.setVisible(true);
+                fenetre.event.getContentPane().removeAll();
+                fenetre.event.setTitle("Ajout article");
+                text = new JPanel();
+                label_event = new JLabel("Commande ajoutée");
+                text.add(label_event);
+                erreur_button = new JPanel();
+                fenetre.addButton(erreur_button, "Retour");
+                fenetre.event.add(text, BorderLayout.CENTER);
+                fenetre.event.add(erreur_button, BorderLayout.SOUTH);
+                fenetre.accueil.setVisible(true);
+                break;
             case "Voir":
                 JOptionPane.showMessageDialog(this,
                         "Détails du produit:\n" +

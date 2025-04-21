@@ -3,9 +3,11 @@ package Dao;
 import Model.Article;
 import Model.Client;
 import Model.Panier;
+import Model.Utilisateurs;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -16,6 +18,31 @@ public class PanierDAOImpl implements PanierDAO
     public PanierDAOImpl(DaoFactory daoFactory)
     {
         this.daoFactory = daoFactory;
+    }
+
+    public Panier getPanier(Client client) {
+        Panier panier = null;
+        try {
+            Connection connexion = daoFactory.getConnection();
+
+            PreparedStatement preparedStatementPanier = connexion.prepareStatement(
+                    "SELECT id_panier " +
+                            "FROM panier WHERE id_client = '" + client.getIdentifiant() + "'"
+            );
+            ResultSet resultSetPanier = preparedStatementPanier.executeQuery();
+            if(resultSetPanier.next())
+            {
+                int id_panier = resultSetPanier.getInt("id_panier");
+                panier = new Panier(id_panier, client);
+                return panier;
+            }
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+            System.out.println("Ajout d'une nouvelle commande impossible");
+        }
+        return panier;
     }
 
     @Override
@@ -104,5 +131,45 @@ public class PanierDAOImpl implements PanierDAO
             e.printStackTrace();
             System.out.println("Ajout d'une nouvelle commande impossible");
         }
+    }
+
+    public List<Article> panierArticles(Client client)
+    {
+        List<Article> articles = new ArrayList<>();
+        try {
+            Connection connexion = daoFactory.getConnection();
+
+            PreparedStatement preparedStatementPanier = connexion.prepareStatement(
+                    "SELECT id_panier " +
+                            "FROM panier WHERE id_client = '"+client.getIdentifiant()+"'"
+            );
+            ResultSet resultSetPanier = preparedStatementPanier.executeQuery();
+            while (resultSetPanier.next())
+            {
+                int id_panier = resultSetPanier.getInt("id_panier");
+                PreparedStatement preparedStatement = connexion.prepareStatement(
+                        "SELECT id_panier, id_article, quantite " +
+                                "FROM lignepanier WHERE id_panier = '"+id_panier+"'"
+                );
+                ResultSet resultSet = preparedStatement.executeQuery();
+
+                System.out.println("\n=== Articles dans la base de données ===");
+                while (resultSet.next()) {
+                    int id_article = resultSet.getInt("id_article");
+                    int quantite = resultSet.getInt("quantite");
+
+                    ArticleDAOImpl articleDAO = new ArticleDAOImpl(daoFactory);
+
+                    Article article = articleDAO.getArticle(id_article);
+                    articles.add(article);
+                }
+                System.out.println("=== Fin de la liste des articles ===\n");
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Erreur lors de la récupération des articles");
+        }
+        return articles;
     }
 }

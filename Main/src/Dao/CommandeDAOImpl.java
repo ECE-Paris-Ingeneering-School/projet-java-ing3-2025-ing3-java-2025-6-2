@@ -67,6 +67,29 @@ public class CommandeDAOImpl implements CommandeDAO
         }
     }
 
+    public void modifierCommande(Client client)
+    {
+        try {
+            // connexion
+            Connection connexion = daoFactory.getConnection();
+
+            /// récupération des informations saisies dans la page d'inscription
+            int id_client = client.getIdentifiant();
+
+            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+            PreparedStatement preparedStatement = connexion.prepareStatement(
+                    "UPDATE commande " +
+                            "SET (statut = 'annulée') WHERE id_client = '"+id_client+"'"
+            );
+
+            preparedStatement.executeUpdate();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Modification de l'article impossible");
+        }
+    }
+
     @Override
     public void paiementCommande(Commande commande)
     {

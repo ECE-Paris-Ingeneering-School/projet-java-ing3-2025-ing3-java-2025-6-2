@@ -11,6 +11,7 @@ public interface CommandeDAO
 {
     public void nouvelleCommande(Client client, Panier panier, String adresse);
     public void ajouterDansCommandeEnCours(Commande commande, Article article);
+    public void modifierCommande(Client client);
     public void paiementCommande(Commande commande);
     public List<Commande> getCommandes(int limit, int id_commande);
 }

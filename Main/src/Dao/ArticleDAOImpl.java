@@ -23,9 +23,42 @@ public class ArticleDAOImpl implements ArticleDAO
     }
 
     @Override
-    public ArticleDAOImpl getArticle()
+    public Article getArticle(int id)
     {
-        return this;
+        Article article = null;
+        try {
+            Connection connexion = daoFactory.getConnection();
+            PreparedStatement preparedStatement = connexion.prepareStatement(
+                    "SELECT *" +
+                            "FROM article WHERE id_article = '"+id+"'"
+            );
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            System.out.println("\n=== Articles dans la base de données ===");
+            while (resultSet.next()) {
+                int id_article = resultSet.getInt("id_article");
+                String nom = resultSet.getString("nom");
+                String marque = resultSet.getString("marque");
+                String categorie = resultSet.getString("categorie");
+                String description = resultSet.getString("description");
+                float prix = resultSet.getFloat("prix");
+                int stock = resultSet.getInt("stock");
+                int seuil_remise = resultSet.getInt("seuil_remise");
+
+                System.out.println("Article trouvé - Nom: '" + nom + "', Catégorie: '" + categorie + "'");
+
+                // Par défaut, on considère que l'article est disponible
+                boolean disponibilite = true;
+
+                article = new Article(id_article, stock, seuil_remise, nom, marque, categorie, description, prix, disponibilite);
+                return article;
+            }
+            System.out.println("=== Fin de la liste des articles ===\n");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Erreur lors de la récupération des articles");
+        }
+        return article;
     }
 
     @Override
@@ -126,9 +159,9 @@ public class ArticleDAOImpl implements ArticleDAO
                 float prix = resultSet.getFloat("prix");
                 int stock = resultSet.getInt("stock");
                 int seuil_remise = resultSet.getInt("seuil_remise");
-                
+
                 System.out.println("Article trouvé - Nom: '" + nom + "', Catégorie: '" + categorie + "'");
-                
+
                 // Par défaut, on considère que l'article est disponible
                 boolean disponibilite = true;
 
@@ -164,7 +197,7 @@ public class ArticleDAOImpl implements ArticleDAO
                 float prix = resultSet.getFloat("prix");
                 int stock = resultSet.getInt("stock");
                 int seuil_remise = resultSet.getInt("seuil_remise");
-                
+
                 boolean disponibilite = true;
                 Article article = new Article(id, stock, seuil_remise, nom, marque, categorie, description, prix, disponibilite);
                 articles.add(article);

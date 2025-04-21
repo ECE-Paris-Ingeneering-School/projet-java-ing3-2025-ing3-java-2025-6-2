@@ -10,6 +10,7 @@ import java.util.List;
 /// Gestion du panier dans la base de données
 public interface PanierDAO
 {
+    public Panier getPanier(Client client);
     /**Création d'un nouveau pannier
      */
     public void nouveauPanier(Client client);

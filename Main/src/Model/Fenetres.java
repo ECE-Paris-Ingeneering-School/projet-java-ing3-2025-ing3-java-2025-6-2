@@ -1,8 +1,5 @@
 package Model;
-import Dao.ArticleDAO;
-import Dao.ArticleDAOImpl;
-import Dao.DaoFactory;
-import Dao.UtilisateurDAOImpl;
+import Dao.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,6 +33,7 @@ public class Fenetres extends Component
 
     public ArticleDAO articleDao;
     private FenetreControl fenetreControl;
+    public Article article;
 
     /// Constructeur de chaque fenêtre
     public Fenetres()
@@ -581,6 +579,7 @@ public class Fenetres extends Component
         cvv_text.add(cvv);
         JPanel paiement_button = new JPanel();
         addButton(paiement_button, "Valider et payer");
+        addButton(paiement_button, "Annuler");
         paiement.add(paiement_text);
         paiement.add(num_carte);
         paiement.add(expiration);
@@ -682,20 +681,14 @@ public class Fenetres extends Component
             searchPanel.add(Box.createRigidArea(new Dimension(0, 10)));
             searchPanel.add(filterPanel);
 
-            //System.out.println("Tentative de connexion à la base de données...");
-            // Récupération des articles depuis la base de données
             DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
-            //System.out.println("DaoFactory créé avec succès");
             
             ArticleDAOImpl articleDAO = new ArticleDAOImpl(dao);
-            //System.out.println("ArticleDAOImpl créé avec succès");
             
             java.util.List<Article> articles = articleDAO.listerArticles();
-            //System.out.println("Nombre d'articles récupérés : " + articles.size());
 
-            // Affichage des articles
+            /// Affichage des articles
             for (Article article : articles) {
-                //System.out.println("Ajout de l'article : " + article.getNom());
                 JPanel articlePanel = CreerListe(article);
                 Liste.add(articlePanel);
             }
@@ -752,16 +745,16 @@ public class Fenetres extends Component
         ));
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 
-        // 1. Image du produit
+        /// 1. Image du produit
         JPanel imagePanel = new JPanel();
         imagePanel.setPreferredSize(new Dimension(250, 200));
         imagePanel.setBackground(Color.WHITE);
         imagePanel.setLayout(new BorderLayout());
         
-        // Chargement de l'image en fonction de la catégorie
+        /// Chargement de l'image en fonction de la catégorie
         String defaultImagePath = "Main/src/View/image/default_product.png";
         
-        // Convertir la catégorie en version sans accent pour le chemin du dossier
+        /// Convertir la catégorie en version sans accent pour le chemin du dossier
         String categorieDossier = article.getCategorie().toLowerCase()
             .replace("é", "e")
             .replace("è", "e")
@@ -772,7 +765,7 @@ public class Fenetres extends Component
             
         String imagePath = defaultImagePath;
 
-        // Obtenir le nom du fichier image en fonction de la catégorie
+        /// Obtenir le nom du fichier image en fonction de la catégorie
         String fileName = getImageFileName(article.getNom(), article.getCategorie());
         if (fileName != null) {
             // Utiliser la catégorie sans accent pour le chemin
@@ -822,7 +815,7 @@ public class Fenetres extends Component
         p.add(imagePanel);
         p.add(Box.createRigidArea(new Dimension(0, 15)));
 
-        // 2. Nom du produit
+        /// 2. Nom du produit
         JLabel nameLabel = new JLabel(article.getNom(), SwingConstants.CENTER);
         nameLabel.setFont(new Font("Arial", Font.BOLD, 16));
         nameLabel.setForeground(new Color(50, 50, 50));
@@ -830,34 +823,34 @@ public class Fenetres extends Component
         p.add(nameLabel);
         p.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // 3. Marque
+        /// 3. Marque
         JLabel brandLabel = new JLabel("Marque: " + article.getMarque());
         brandLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         brandLabel.setForeground(new Color(100, 100, 100));
         brandLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         p.add(brandLabel);
 
-        // 4. Catégorie
+        /// 4. Catégorie
         JLabel categoryLabel = new JLabel("Catégorie: " + article.getCategorie());
         categoryLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         categoryLabel.setForeground(new Color(100, 100, 100));
         categoryLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         p.add(categoryLabel);
 
-        // 5. Prix
+        /// 5. Prix
         JLabel priceLabel = new JLabel(String.format("%.2f €", article.getPrixUnitaire()));
         priceLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         priceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         p.add(priceLabel);
 
-        // 6. Stock
+        /// 6. Stock
         JLabel stockLabel = new JLabel("Stock: " + article.getStock() + " unités");
         stockLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         stockLabel.setForeground(new Color(100, 100, 100));
         stockLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         p.add(stockLabel);
 
-        // 7. Description (truncated)
+        /// 7. Description (truncated)
         String shortDescription = article.getDescription().length() > 100 ? 
             article.getDescription().substring(0, 100) + "..." : article.getDescription();
         JLabel descLabel = new JLabel("<html>" + shortDescription + "</html>");
@@ -868,8 +861,8 @@ public class Fenetres extends Component
 
         p.add(Box.createRigidArea(new Dimension(0, 15)));
 
-        // 8. Bouton Voir détails
-        JButton voirButton = new JButton("Voir détails");
+        /// 8. Bouton Voir détails
+        JButton voirButton = new JButton("Détails");
         voirButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         voirButton.setBackground(new Color(51, 122, 183));
         voirButton.setForeground(Color.WHITE);
@@ -877,11 +870,26 @@ public class Fenetres extends Component
         voirButton.setBorderPainted(false);
         voirButton.setFocusPainted(false);
         voirButton.setPreferredSize(new Dimension(120, 35));
+        voirButton.setActionCommand("Détails" + article.getId());
         voirButton.addActionListener(e -> {
-            VueArticle vueArticle = new VueArticle();
-            vueArticle.afficherDetails(article);
+            fenetreControl.actionPerformed(e);
         });
         p.add(voirButton);
+
+        /// 9. Ajout au panier
+        JButton panierButton = new JButton("Ajouter");
+        panierButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panierButton.setBackground(new Color(51, 122, 183));
+        panierButton.setForeground(Color.WHITE);
+        panierButton.setFont(new Font("Arial", Font.BOLD, 14));
+        panierButton.setBorderPainted(false);
+        panierButton.setFocusPainted(false);
+        panierButton.setPreferredSize(new Dimension(120, 35));
+        panierButton.setActionCommand("Ajouter" + article.getId());
+        panierButton.addActionListener(e -> {
+            fenetreControl.actionPerformed(e);
+        });
+        p.add(panierButton);
 
         return p;
     }
@@ -1047,25 +1055,23 @@ public class Fenetres extends Component
     private void ProduitsPanier()
     {
         try {
+            DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
+            UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
+            Utilisateurs user = new Utilisateurs(0, "", "", email, password, "");
+            Utilisateurs user_actuel = userdao.connexionUtilisateur(user);
+
+            Client client = new Client(user_actuel.getIdentifiant(), user_actuel.getNom(), user_actuel.getPrenom(), user_actuel.getEmail(), user_actuel.getMotDePasse(), user_actuel.getType_utilisateur());
             Liste = new JPanel();
             Liste.setBackground(Color.WHITE);
             Liste.setLayout(new GridLayout(0, 3, 20, 20));
 
-            //System.out.println("Tentative de connexion à la base de données...");
-            // Récupération des articles depuis la base de données
-            DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
-            //System.out.println("DaoFactory créé avec succès");
+            PanierDAOImpl panierDao = new PanierDAOImpl(dao);
 
-            ArticleDAOImpl articleDAO = new ArticleDAOImpl(dao);
-            //System.out.println("ArticleDAOImpl créé avec succès");
+            java.util.List<Article> articles = panierDao.panierArticles(client);
 
-            java.util.List<Article> articles = articleDAO.listerArticles();
-            //System.out.println("Nombre d'articles récupérés : " + articles.size());
-
-            // Affichage des articles
+            /// Affichage des articles
             for (Article article : articles) {
-                //System.out.println("Ajout de l'article : " + article.getNom());
-                JPanel articlePanel = CreerListe(article);
+                JPanel articlePanel = recapPanier(article);
                 Liste.add(articlePanel);
             }
 
@@ -1121,4 +1127,149 @@ public class Fenetres extends Component
         ajout_commande.add(inscrire_adresse);
         ajout_commande.add(ajout_article_button);
     }
+
+    private JPanel recapPanier(Article article)
+    {
+        JPanel p = new JPanel();
+        p.setBackground(Color.WHITE);
+        p.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+
+        /// 1. Image du produit
+        JPanel imagePanel = new JPanel();
+        imagePanel.setPreferredSize(new Dimension(250, 200));
+        imagePanel.setBackground(Color.WHITE);
+        imagePanel.setLayout(new BorderLayout());
+
+        /// Chargement de l'image en fonction de la catégorie
+        String defaultImagePath = "Main/src/View/image/default_product.png";
+
+        /// Convertir la catégorie en version sans accent pour le chemin du dossier
+        String categorieDossier = article.getCategorie().toLowerCase()
+                .replace("é", "e")
+                .replace("è", "e")
+                .replace("à", "a")
+                .replace("ù", "u")
+                .replace("ç", "c")
+                .replace("ê", "e");
+
+        String imagePath = defaultImagePath;
+
+        /// Obtenir le nom du fichier image en fonction de la catégorie
+        String fileName = getImageFileName(article.getNom(), article.getCategorie());
+        if (fileName != null) {
+            // Utiliser la catégorie sans accent pour le chemin
+            imagePath = String.format("Main/src/View/image/%s/%s", categorieDossier, fileName);
+            //System.out.println("Tentative de chargement de l'image: " + imagePath);
+        }
+
+        try {
+            File imageFile = new File(imagePath);
+            ImageIcon imageIcon;
+
+            if (imageFile.exists()) {
+                imageIcon = new ImageIcon(imagePath);
+                //System.out.println("Image trouvée et chargée: " + imagePath);
+            } else {
+                //System.out.println("Image non trouvée: " + imagePath + ", utilisation de l'image par défaut");
+                imageIcon = new ImageIcon(defaultImagePath);
+            }
+
+            // Redimensionner l'image
+            Image img = imageIcon.getImage();
+            int originalWidth = imageIcon.getIconWidth();
+            int originalHeight = imageIcon.getIconHeight();
+
+            if (originalWidth > 0 && originalHeight > 0) {
+                double ratio = Math.min(230.0 / originalWidth, 180.0 / originalHeight);
+                int newWidth = (int) (originalWidth * ratio);
+                int newHeight = (int) (originalHeight * ratio);
+
+                Image newImg = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+                JLabel imageLabel = new JLabel(new ImageIcon(newImg));
+                imageLabel.setHorizontalAlignment(JLabel.CENTER);
+                imagePanel.add(imageLabel, BorderLayout.CENTER);
+            } else {
+                throw new Exception("Image invalide");
+            }
+        } catch (Exception e) {
+            //System.out.println("Erreur lors du chargement de l'image pour " + article.getNom() + ": " + e.getMessage());
+            JLabel placeholder = new JLabel(article.getNom().substring(0, 1).toUpperCase());
+            placeholder.setFont(new Font("Arial", Font.BOLD, 48));
+            placeholder.setForeground(new Color(200, 200, 200));
+            placeholder.setHorizontalAlignment(JLabel.CENTER);
+            imagePanel.add(placeholder, BorderLayout.CENTER);
+        }
+
+        imagePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        p.add(imagePanel);
+        p.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        /// 2. Nom du produit
+        JLabel nameLabel = new JLabel(article.getNom(), SwingConstants.CENTER);
+        nameLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        nameLabel.setForeground(new Color(50, 50, 50));
+        nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        p.add(nameLabel);
+        p.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        /// 3. Marque
+        JLabel brandLabel = new JLabel("Marque: " + article.getMarque());
+        brandLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        brandLabel.setForeground(new Color(100, 100, 100));
+        brandLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.add(brandLabel);
+
+        /// 4. Catégorie
+        JLabel categoryLabel = new JLabel("Catégorie: " + article.getCategorie());
+        categoryLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        categoryLabel.setForeground(new Color(100, 100, 100));
+        categoryLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.add(categoryLabel);
+
+        /// 5. Prix
+        JLabel priceLabel = new JLabel(String.format("%.2f €", article.getPrixUnitaire()));
+        priceLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        priceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.add(priceLabel);
+
+        /// 6. Stock
+        JLabel stockLabel = new JLabel("Stock: " + article.getStock() + " unités");
+        stockLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        stockLabel.setForeground(new Color(100, 100, 100));
+        stockLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.add(stockLabel);
+
+        /// 7. Description (truncated)
+        String shortDescription = article.getDescription().length() > 100 ?
+                article.getDescription().substring(0, 100) + "..." : article.getDescription();
+        JLabel descLabel = new JLabel("<html>" + shortDescription + "</html>");
+        descLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        descLabel.setForeground(new Color(120, 120, 120));
+        descLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.add(descLabel);
+
+        p.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        /// 8. Bouton Voir détails
+        JButton voirButton = new JButton("Détails");
+        voirButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        voirButton.setBackground(new Color(51, 122, 183));
+        voirButton.setForeground(Color.WHITE);
+        voirButton.setFont(new Font("Arial", Font.BOLD, 14));
+        voirButton.setBorderPainted(false);
+        voirButton.setFocusPainted(false);
+        voirButton.setPreferredSize(new Dimension(120, 35));
+        voirButton.setActionCommand("Détails" + article.getId());
+        voirButton.addActionListener(e -> {
+            fenetreControl.actionPerformed(e);
+        });
+        p.add(voirButton);
+
+        return p;
+    }
+
 }
