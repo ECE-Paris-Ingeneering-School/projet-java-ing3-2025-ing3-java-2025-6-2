@@ -16,7 +16,9 @@ public class Main
         newFenetre.setPaiement();
         newFenetre.setNewArticle();
         newFenetre.setCatalogue();
+        newFenetre.setListeArticles();
         newFenetre.setPanier();
+        newFenetre.setNewCommande();
         newFenetre.connecter.setVisible(true);
     }
 }

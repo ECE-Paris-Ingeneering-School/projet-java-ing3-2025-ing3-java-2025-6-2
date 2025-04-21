@@ -1,18 +1,16 @@
 package Control;
 
 import Dao.ArticleDAOImpl;
+import Dao.CommandeDAOImpl;
 import Dao.DaoFactory;
 import Dao.UtilisateurDAOImpl;
-import Model.Article;
-import Model.Utilisateurs;
+import Model.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
-
-import Model.Fenetres;
 
 public class FenetreControl extends JFrame implements ActionListener
 {
@@ -141,10 +139,34 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.inscrire.setVisible(false);
                 break;
             case "Articles":
-                fenetre.catalogue.setVisible(true);
+                fenetre.articles.setVisible(true);
                 break;
             case "Catalogue" :
                 fenetre.catalogue.setVisible(true);
+                break;
+            case "Passer commande":
+                fenetre.ajout_commande.setVisible(true);
+                break;
+            case "Payer":
+                CommandeDAOImpl comdao = new CommandeDAOImpl(dao);
+                Utilisateurs user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
+                Utilisateurs connect = userdao.connexionUtilisateur(user);
+                Client client = new Client(connect.getIdentifiant(), connect.getNom(), connect.getPrenom(), connect.getEmail(), connect.getMotDePasse(), connect.getType_utilisateur());
+                Panier panier_en_cours = new Panier(0, client);
+                String adresse = fenetre.adresse.getText();
+                comdao.nouvelleCommande(client, panier_en_cours, adresse);
+                fenetre.paiement.setVisible(true);
+                fenetre.event.getContentPane().removeAll();
+                fenetre.event.setTitle("Ajout article");
+                text = new JPanel();
+                label_event = new JLabel("Commande ajoutée");
+                text.add(label_event);
+                erreur_button = new JPanel();
+                fenetre.addButton(erreur_button, "Retour");
+                fenetre.event.add(text, BorderLayout.CENTER);
+                fenetre.event.add(erreur_button, BorderLayout.SOUTH);
+                fenetre.ajout_commande.setVisible(false);
+                fenetre.panier.setVisible(false);
                 break;
             case "Valider et payer":
                 String paiement = (String) fenetre.payment_type.getSelectedItem();
@@ -174,6 +196,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.event.setVisible(false);
                 fenetre.catalogue.setVisible(false);
                 fenetre.panier.setVisible(false);
+                fenetre.articles.setVisible(false);
                 break;
         }
     }

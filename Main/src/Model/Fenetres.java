@@ -18,8 +18,9 @@ import View.VueArticle;
  */
 public class Fenetres extends Component
 {
-    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, panier; /// Fenêtres de navigation
+    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, panier, articles, ajout_commande; /// Fenêtres de navigation
     public TextField nom, prenom, mail, mdp, mail_id, mdp_id; /// Zones de saisie connexion et inscriptions
+    public TextField adresse; /// Zone de saisie de l'adresse pour commande (récupération des autres paramètres par le profil utilisé)
     public TextField numero_carte, expiration_carte, cvv; /// Zones de saisies paiement
     public String email, password; /// Inscription utilisateur dans la database
 
@@ -48,6 +49,8 @@ public class Fenetres extends Component
         paiement = new JFrame();
         catalogue = new JFrame();
         ajout_article = new JFrame();
+        articles = new JFrame();
+        panier = new JFrame();
 
         // Configuration des fenêtres
         inscrire.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -470,8 +473,8 @@ public class Fenetres extends Component
         profil.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         profil.setTitle("Profil");
         profil.setLayout(new BorderLayout());
-        String Nom = "FF";
-        String Prenom = "bebreb";
+        String Nom = user_actuel.getNom();
+        String Prenom = user_actuel.getPrenom();
         int Age = 19;
         double Thune = 1000;
 
@@ -605,7 +608,7 @@ public class Fenetres extends Component
         catalogue.setLocationRelativeTo(null);
         catalogue.setLayout(new BorderLayout());
 
-        Titre();
+        Titre("Catalogue");
         Produits();
         creerRetour();
 
@@ -614,11 +617,11 @@ public class Fenetres extends Component
         catalogue.add(PannelRetour, BorderLayout.SOUTH);
     }
 
-    private void Titre() {
+    private void Titre(String Titre) {
         PTitre = new JPanel();
         PTitre.setPreferredSize(new Dimension(getWidth(), 100));
         PTitre.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        titrre = new JLabel("Catalogue", SwingConstants.CENTER);
+        titrre = new JLabel(Titre, SwingConstants.CENTER);
         titrre.setFont(new Font("Arial", Font.BOLD, 32));
         PTitre.setLayout(new BorderLayout());
         PTitre.add(titrre, BorderLayout.CENTER);
@@ -956,6 +959,16 @@ public class Fenetres extends Component
         addButton(PannelRetour, "Retour");
     }
 
+    private void PanelPanier() {
+        PannelRetour = new JPanel();
+        PannelRetour.setBackground(new Color(240, 240, 240));
+        PannelRetour.setPreferredSize(new Dimension(getWidth(), 100));
+        PannelRetour.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        PannelRetour.setLayout(new GridBagLayout());
+        addButton(PannelRetour, "Passer commande");
+        addButton(PannelRetour, "Retour");
+    }
+
     public void setNewArticle()
     {
         ajout_article = new JFrame();
@@ -1013,21 +1026,99 @@ public class Fenetres extends Component
         ajout_article.add(ajout_article_button);
     }
 
+    public void setListeArticles()
+    {
+        articles = new JFrame();
+        articles.setTitle("Articles");
+        articles.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        articles.setSize(1200, 800);
+        articles.setLocationRelativeTo(null);
+        articles.setLayout(new BorderLayout());
+
+        Titre("Articles");
+        Produits();
+        creerRetour();
+
+        articles.add(PTitre, BorderLayout.NORTH);
+        articles.add(Scroll, BorderLayout.CENTER);
+        articles.add(PannelRetour, BorderLayout.SOUTH);
+    }
+
+    private void ProduitsPanier()
+    {
+        try {
+            Liste = new JPanel();
+            Liste.setBackground(Color.WHITE);
+            Liste.setLayout(new GridLayout(0, 3, 20, 20));
+
+            //System.out.println("Tentative de connexion à la base de données...");
+            // Récupération des articles depuis la base de données
+            DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
+            //System.out.println("DaoFactory créé avec succès");
+
+            ArticleDAOImpl articleDAO = new ArticleDAOImpl(dao);
+            //System.out.println("ArticleDAOImpl créé avec succès");
+
+            java.util.List<Article> articles = articleDAO.listerArticles();
+            //System.out.println("Nombre d'articles récupérés : " + articles.size());
+
+            // Affichage des articles
+            for (Article article : articles) {
+                //System.out.println("Ajout de l'article : " + article.getNom());
+                JPanel articlePanel = CreerListe(article);
+                Liste.add(articlePanel);
+            }
+
+            // Ajout des composants au catalogue
+            Scroll = new JScrollPane(Liste);
+            Scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            Scroll.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+            catalogue.add(Scroll, BorderLayout.CENTER);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            //System.out.println("Erreur lors du chargement du catalogue : " + e.getMessage());
+            // Afficher un message d'erreur à l'utilisateur
+            JOptionPane.showMessageDialog(this,
+                    "Erreur lors du chargement du catalogue : " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     public void setPanier()
     {
-        panier = new JFrame();
         panier.setTitle("Panier");
         panier.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         panier.setSize(1200, 800);
         panier.setLocationRelativeTo(null);
         panier.setLayout(new BorderLayout());
 
-        Titre();
-        Produits();
-        creerRetour();
+        Titre("Panier");
+        ProduitsPanier();
+        PanelPanier();
 
         panier.add(PTitre, BorderLayout.NORTH);
         panier.add(Scroll, BorderLayout.CENTER);
         panier.add(PannelRetour, BorderLayout.SOUTH);
+    }
+
+    public void setNewCommande()
+    {
+        ajout_commande = new JFrame();
+        ajout_commande.setSize(900, 700);
+        ajout_commande.setTitle("Commande");
+        ajout_commande.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        ajout_commande.setLayout(new BoxLayout(ajout_commande.getContentPane(), BoxLayout.Y_AXIS));
+        JPanel inscrire_adresse = new JPanel();
+        JLabel label3 = new JLabel("Nom");
+        inscrire_adresse.add(label3);
+        JPanel ajout_article_button = new JPanel();
+        adresse = new TextField(10);
+        inscrire_adresse.add(adresse);
+        addButton(ajout_article_button, "Payer");
+        addButton(ajout_article_button, "Retour");
+        ajout_commande.add(inscrire_adresse);
+        ajout_commande.add(ajout_article_button);
     }
 }

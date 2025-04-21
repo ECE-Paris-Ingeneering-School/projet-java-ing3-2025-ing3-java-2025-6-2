@@ -30,11 +30,9 @@ public class CommandeDAOImpl implements CommandeDAO
 
             /// récupération des informations saisies dans la page de commande
             int id_commande = new Random().nextInt();
-            int id_client = client.getIdentifiant();
-            float montant_total = panier.calculerPrixTotal();
 
             /// Exécution de la requête INSERT INTO de l'objet client en paramètre
-            PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO commande(id_commande, id_client, statut, adresse_livraison, montant_total) VALUES ('"+id_commande+"','"+id_client+"', 'non payé', '"+adresse+"', '"+montant_total+"')");
+            PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO commande(id_commande, id_client, statut, adresse_livraison, montant_total) VALUES ('"+id_commande+"','"+client.getIdentifiant()+"', 'en attente', '"+adresse+"', '"+panier.calculerPrixTotal()+"')");
             preparedStatement.executeUpdate();
         }
         catch (SQLException e) {
