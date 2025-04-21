@@ -6,20 +6,23 @@ import java.awt.*;
 import Model.Article;
 import java.io.File;
 
-public class VueArticleDetail extends JFrame {
+public class VueArticleDetail extends JFrame
+{
     private Article article;
     private JPanel mainPanel;
     private JPanel imagePanel;
     private JPanel infoPanel;
     private JPanel similarPanel;
 
-    public VueArticleDetail(Article article) {
+    public VueArticleDetail(Article article)
+    {
         this.article = article;
         setupFrame();
         createUI();
     }
 
-    private void setupFrame() {
+    private void setupFrame()
+    {
         setTitle("Détail du produit - " + article.getNom());
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -31,13 +34,15 @@ public class VueArticleDetail extends JFrame {
         setContentPane(mainPanel);
     }
 
-    private void createUI() {
+    private void createUI()
+    {
         createImageGallery();
         createProductInfo();
         createSimilarProducts();
     }
 
-    private void createImageGallery() {
+    private void createImageGallery()
+    {
         imagePanel = new JPanel();
         imagePanel.setPreferredSize(new Dimension(400, 400));
         imagePanel.setBorder(BorderFactory.createTitledBorder("Image du produit"));
@@ -61,7 +66,8 @@ public class VueArticleDetail extends JFrame {
         mainPanel.add(imagePanel, BorderLayout.WEST);
     }
 
-    private void createProductInfo() {
+    private void createProductInfo()
+    {
         infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setBorder(BorderFactory.createTitledBorder("Informations produit"));
@@ -106,7 +112,8 @@ public class VueArticleDetail extends JFrame {
         mainPanel.add(similarPanel, BorderLayout.SOUTH);
     }
 
-    private String getImagePath() {
+    private String getImagePath()
+    {
         String fileName = getImageFileName(article.getNom(), article.getCategorie());
         if (fileName == null) {
             return null;
@@ -116,7 +123,8 @@ public class VueArticleDetail extends JFrame {
         return imageFile.exists() ? imagePath : null;
     }
 
-    private String getImageFileName(String nomArticle, String categorie) {
+    private String getImageFileName(String nomArticle, String categorie)
+    {
         // Conversion en minuscules et normalisation
         String nom = nomArticle.toLowerCase()
             .replace("é", "e")
@@ -126,7 +134,8 @@ public class VueArticleDetail extends JFrame {
             .replace("ç", "c");
 
         // Pour chaque catégorie, retourner le nom exact du fichier
-        switch (categorie.toLowerCase()) {
+        switch (categorie.toLowerCase())
+        {
             case "nourriture":
                 if (nom.contains("cafe") || nom.contains("café")) return "cafe_bio.png";
                 if (nom.contains("chocolat")) return "chocolat_noir.png";

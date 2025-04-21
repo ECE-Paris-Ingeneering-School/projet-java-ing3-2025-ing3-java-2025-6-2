@@ -12,7 +12,7 @@ import java.util.Random;
 
 public class FenetreControl extends JFrame implements ActionListener
 {
-    private Fenetres fenetre;
+    private Fenetres fenetre; /// L'ensemble des fenêtres utilisées
 
     public FenetreControl(Fenetres fenetre)
     {
@@ -32,6 +32,9 @@ public class FenetreControl extends JFrame implements ActionListener
         JPanel erreur_text;
         switch(button.getText())
         {
+            /** Valider est utilisé pour la connexion et l'inscription
+             * (d'autres actions utilisent le même principe mais avec des noms différents pour éviter de surcharger ce cas précis)
+             */
             case "Valider":
                 if(fenetre.connecter.isVisible())
                 {
@@ -86,7 +89,9 @@ public class FenetreControl extends JFrame implements ActionListener
                     fenetre.event.setVisible(true);
                 }
                 break;
+            /// Valider l'ajout d'un article (seulement pour les administrateurs)
             case "Valider l'ajout":
+                /// Récupération des données saisies
                 int id_article = new Random().nextInt();
                 String nom = fenetre.nom_article.getText();
                 String descriptionText = fenetre.description.getText();
@@ -95,9 +100,11 @@ public class FenetreControl extends JFrame implements ActionListener
                 int seuil_remise = Integer.parseInt(fenetre.seuil_remise.getText());
                 String categorie = (String) fenetre.categorie.getSelectedItem();
                 String marque = (String) fenetre.marque.getSelectedItem();
+                /// Création d'un nouvel objet
                 Article new_article = new Article(id_article, stock, seuil_remise, nom, marque, categorie, descriptionText, prix, true);
-                artdao.ajouterArticle(new_article);
+                artdao.ajouterArticle(new_article); /// Ajout de l'objet
                 fenetre.ajout_article.setVisible(false);
+                /// Fenêtre pop-up mise à jour pour confirmer l'action
                 fenetre.event.getContentPane().removeAll();
                 fenetre.event.setTitle("Ajout article");
                 JPanel text = new JPanel();
@@ -140,33 +147,40 @@ public class FenetreControl extends JFrame implements ActionListener
             case "Articles":
                 fenetre.articles.setVisible(true);
                 break;
+            /// Consultez les détails d'un article (en vue conole)
             case "Détails":
+                /// On récupère la commande Ajouter avec l'id de l'article concerné
                 ArticleDAOImpl articleDAO = new ArticleDAOImpl(dao);
-                String cmd = e.getActionCommand();
-
+                String cmd = e.getActionCommand(); /// Récupère la commande + id de l'article
                 if (cmd.startsWith("Détails"))
                 {
-                    try {
+                    try
+                    {
                         String idStr = cmd.substring("Détails".length());
-                        System.out.println(idStr); // OK ici
+                        System.out.println(idStr); /// Correspond à l'id de l'article choisi (converti ensuite en entier pour les prochaines étapes)
                         int id = Integer.parseInt(idStr);
                         Article article = articleDAO.getArticle(id);
                         new VueArticle().afficherDetails(article);
-                    } catch (NumberFormatException ex) {
+                    } catch (NumberFormatException ex)
+                    {
                         System.err.println("ID invalide dans la commande : " + cmd);
                     }
                 }
                 break;
+            /// Ajouter permet d'ajouter un article dans le panier de l'utilisateur
             case "Ajouter":
+                /// On récupère la commande Ajouter avec l'id de l'article concerné
                 articleDAO = new ArticleDAOImpl(dao);
-                cmd = e.getActionCommand();
+                cmd = e.getActionCommand(); /// Récupère la commande + id de l'article
                 if (cmd.startsWith("Ajouter"))
                 {
-                    try {
+                    try
+                    {
                         String idStr = cmd.substring("Ajouter".length());
-                        System.out.println(idStr); // OK ici
+                        System.out.println(idStr); /// Correspond à l'id de l'article choisi (converti ensuite en entier pour les prochaines étapes)
                         int id = Integer.parseInt(idStr);
                         Article article = articleDAO.getArticle(id);
+                        /// Connexion à la base de données puis à la table panier + ligne panier pour traitement. On récupère l'id du client utilisé pour l'enregistrer dans la base (clé étrangère)
                         PanierDAOImpl panierDAO = new PanierDAOImpl(dao);
                         Utilisateurs user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
                         Utilisateurs connect = userdao.connexionUtilisateur(user);
@@ -174,7 +188,47 @@ public class FenetreControl extends JFrame implements ActionListener
                         panierDAO.nouveauPanier(client);
                         Panier panier = new Panier(panierDAO.getPanier(client).getId(), client);
                         panierDAO.ajouterAuPanier(panier, article);
-                    } catch (NumberFormatException ex)
+                        fenetre.event.getContentPane().removeAll();
+                        fenetre.event.setTitle("Article");
+                        text = new JPanel();
+                        label_event = new JLabel("Article ajouté au panier");
+                        text.add(label_event);
+                        erreur_button = new JPanel();
+                        fenetre.addButton(erreur_button, "Retour");
+                        fenetre.event.add(text, BorderLayout.CENTER);
+                        fenetre.event.add(erreur_button, BorderLayout.SOUTH);
+                    }
+                    catch (NumberFormatException ex)
+                    {
+                        System.err.println("ID invalide dans la commande : " + cmd);
+                    }
+                }
+                break;
+            /// Même principe que pour Ajouter  mais dans l'autre sens, et sans l'id du client
+            case "Retirer":
+                articleDAO = new ArticleDAOImpl(dao);
+                cmd = e.getActionCommand();
+                if (cmd.startsWith("Retirer"))
+                {
+                    try
+                    {
+                        String idStr = cmd.substring("Retirer".length());
+                        System.out.println(idStr);
+                        int id = Integer.parseInt(idStr);
+                        Article article = articleDAO.getArticle(id);
+                        PanierDAOImpl panierDAO = new PanierDAOImpl(dao);
+                        panierDAO.supprimerDuPanier(article);
+                        fenetre.event.getContentPane().removeAll();
+                        fenetre.event.setTitle("Article");
+                        text = new JPanel();
+                        label_event = new JLabel("Article retiré du panier");
+                        text.add(label_event);
+                        erreur_button = new JPanel();
+                        fenetre.addButton(erreur_button, "Retour");
+                        fenetre.event.add(text, BorderLayout.CENTER);
+                        fenetre.event.add(erreur_button, BorderLayout.SOUTH);
+                    }
+                    catch (NumberFormatException ex)
                     {
                         System.err.println("ID invalide dans la commande : " + cmd);
                     }
@@ -187,12 +241,14 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.ajout_commande.setVisible(true);
                 break;
             case "Payer":
+                /// Connexion pour récupérer l'utilisateur actuellement en ligne
                 CommandeDAOImpl comdao = new CommandeDAOImpl(dao);
                 Utilisateurs user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
                 Utilisateurs connect = userdao.connexionUtilisateur(user);
                 Client client = new Client(connect.getIdentifiant(), connect.getNom(), connect.getPrenom(), connect.getEmail(), connect.getMotDePasse(), connect.getType_utilisateur());
                 Panier panier_en_cours = new Panier(0, client);
                 String adresse = fenetre.adresse.getText();
+                /// Ajout d'une nouvelle commande
                 comdao.nouvelleCommande(client, panier_en_cours, adresse);
                 fenetre.paiement.setVisible(true);
                 fenetre.event.getContentPane().removeAll();

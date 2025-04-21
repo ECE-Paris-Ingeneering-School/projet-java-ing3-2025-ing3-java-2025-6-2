@@ -1,13 +1,15 @@
 package Model;
 
-public class Paiement {
+public class Paiement
+{
     private int id;
     private Commande commande;
     private double montant;
     private String statut; // en attente, payé, annulé
     private String date;
 
-    public Paiement(int id, Commande commande, double montant, String statut, String date) {
+    public Paiement(int id, Commande commande, double montant, String statut, String date)
+    {
         this.id = id;
         this.commande = commande;
         this.montant = montant;
@@ -24,10 +26,22 @@ public class Paiement {
     }
 
     // Getters et Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-    public Commande getCommande() { return commande; }
-    public void setCommande(Commande commande) { this.commande = commande; }
+    public int getId()
+    {
+        return id;
+    }
+    public void setId(int id)
+    {
+        this.id = id;
+    }
+    public Commande getCommande()
+    {
+        return commande;
+    }
+    public void setCommande(Commande commande)
+    {
+        this.commande = commande;
+    }
     public double getMontant() { return montant; }
     public void setMontant(double montant) { this.montant = montant; }
     public String getStatut() { return statut; }

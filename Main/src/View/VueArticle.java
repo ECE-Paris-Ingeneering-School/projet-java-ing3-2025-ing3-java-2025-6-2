@@ -6,7 +6,8 @@ import Model.ArticleEnVrac;
 
 public class VueArticle
 {
-    public void afficherDetails(Article article) {
+    public void afficherDetails(Article article)
+    {
         System.out.println("ID: " + article.getId() + ", Nom: " + article.getNom() + ", Marque: " + article.getMarque() + ", Catégorie: " + article.getCategorie() + ", Prix: " + article.getPrixUnitaire() + ", Disponibilité: " + article.getDisponibilite());
     }
 

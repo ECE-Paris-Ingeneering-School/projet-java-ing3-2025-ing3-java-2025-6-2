@@ -1,6 +1,7 @@
 package Model;
 
-public class Article {
+public class Article
+{
     private int id, stock, seuil_remise;
     private String nom, marque, categorie, description;
     private float prixUnitaire;

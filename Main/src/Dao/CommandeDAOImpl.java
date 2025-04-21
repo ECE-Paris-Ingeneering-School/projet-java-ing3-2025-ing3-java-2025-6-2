@@ -25,17 +25,18 @@ public class CommandeDAOImpl implements CommandeDAO
     {
         try
         {
-            // connexion
+            /// connexion
             Connection connexion = daoFactory.getConnection();
 
             /// récupération des informations saisies dans la page de commande
             int id_commande = new Random().nextInt();
 
-            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+            /// Exécution de la requête INSERT INTO de l'objet client, de son panier et de l'adresse en paramètre
             PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO commande(id_commande, id_client, statut, adresse_livraison, montant_total) VALUES ('"+id_commande+"','"+client.getIdentifiant()+"', 'en attente', '"+adresse+"', '"+panier.calculerPrixTotal()+"')");
             preparedStatement.executeUpdate();
         }
-        catch (SQLException e) {
+        catch (SQLException e)
+        {
             e.printStackTrace();
             System.out.println("Ajout d'une nouvelle commande impossible");
         }
@@ -46,7 +47,7 @@ public class CommandeDAOImpl implements CommandeDAO
     {
         try
         {
-            // connexion
+            /// connexion
             Connection connexion = daoFactory.getConnection();
 
             /// récupération des informations saisies dans la page de commande
@@ -57,11 +58,12 @@ public class CommandeDAOImpl implements CommandeDAO
             float prix_unitaire = article.getPrixUnitaire();
             float montant_total = commande.getPrixTotal();
 
-            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+            /// Exécution de la requête INSERT INTO de l'objet commande et de l'article en paramètre
             PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO lignecommande(id_ligne_pcommande, id_commande, id_article, quantite, prix_unitaire, prix_apres_remise) VALUES ('"+id_ligne_commande+"','"+id_commande+"', '"+id_article+"', '"+quantite+"', '"+prix_unitaire+"','"+montant_total+"')");
             preparedStatement.executeUpdate();
         }
-        catch (SQLException e) {
+        catch (SQLException e)
+        {
             e.printStackTrace();
             System.out.println("Ajout de l'article impossible");
         }
@@ -69,14 +71,15 @@ public class CommandeDAOImpl implements CommandeDAO
 
     public void modifierCommande(Client client)
     {
-        try {
-            // connexion
+        try
+        {
+            /// connexion
             Connection connexion = daoFactory.getConnection();
 
             /// récupération des informations saisies dans la page d'inscription
             int id_client = client.getIdentifiant();
 
-            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+            /// Mise à jour du statut de la commande en mode annulée
             PreparedStatement preparedStatement = connexion.prepareStatement(
                     "UPDATE commande " +
                             "SET (statut = 'annulée') WHERE id_client = '"+id_client+"'"
@@ -84,23 +87,25 @@ public class CommandeDAOImpl implements CommandeDAO
 
             preparedStatement.executeUpdate();
         }
-        catch (SQLException e) {
+        catch (SQLException e)
+        {
             e.printStackTrace();
-            System.out.println("Modification de l'article impossible");
+            System.out.println("Modification de la commande impossible");
         }
     }
 
     @Override
     public void paiementCommande(Commande commande)
     {
-        try {
+        try
+        {
             // connexion
             Connection connexion = daoFactory.getConnection();
 
             /// récupération des informations saisies dans la page de commande
             int id_commande = commande.getId();
 
-            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+            /// Mise à jour du statut en mode payé
             PreparedStatement preparedStatement = connexion.prepareStatement("UPDATE commande SET (statut = 'payé') WHERE id_commande = '"+id_commande+"'");
             preparedStatement.executeUpdate();
         }

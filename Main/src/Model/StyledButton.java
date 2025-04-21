@@ -3,7 +3,7 @@ package Model;
 import javax.swing.*;
 import java.awt.*;
 
-// Custom button style
+/// Création du style des boutons
 public class StyledButton extends JButton
 {
     public StyledButton(String text, boolean isPrimary) {

@@ -6,7 +6,8 @@ public class Réduction {
     private String dateDebut;
     private String dateFin;
 
-    public Réduction(int id, double pourcentage, String dateDebut, String dateFin) {
+    public Réduction(int id, double pourcentage, String dateDebut, String dateFin)
+    {
         this.id = id;
         this.pourcentage = pourcentage;
         this.dateDebut = dateDebut;

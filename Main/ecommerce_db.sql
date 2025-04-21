@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : sam. 19 avr. 2025 à 12:47
+-- Généré le : lun. 21 avr. 2025 à 13:27
 -- Version du serveur :  5.7.31
 -- Version de PHP : 7.3.21
 
@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS `article` (
 --
 
 INSERT INTO `article` (`id_article`, `nom`, `description`, `prix`, `stock`, `seuil_remise`, `categorie`, `marque`, `date_ajout`) VALUES
+(-592478948, 'cacao', 'du cacao', '12.00', 4, 7, 'Necessite', 'Nestlé', '2025-04-19 15:07:30'),
 (949478470, 'ae', 'ae', '12.00', 1, 5, 'Electromenager', 'Bosch', '2025-04-17 17:28:56'),
 (1768251590, 'lave-vaiselle', 'Un lave-vaiselle comme un autre', '1235.00', 145, 6, 'Electromenager', 'Bosch', '2025-04-19 14:41:04');
 
@@ -118,7 +119,7 @@ CREATE TABLE IF NOT EXISTS `lignepanier` (
   PRIMARY KEY (`id_ligne_panier`),
   KEY `id_panier` (`id_panier`),
   KEY `id_article` (`id_article`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=2072064186 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `lignepanier`
@@ -126,7 +127,8 @@ CREATE TABLE IF NOT EXISTS `lignepanier` (
 
 INSERT INTO `lignepanier` (`id_ligne_panier`, `id_panier`, `id_article`, `quantite`) VALUES
 (1, 1, 1, 1),
-(2, 1, 2, 3);
+(2, 1, 2, 3),
+(462321536, -1281593627, 949478470, 0);
 
 -- --------------------------------------------------------
 
@@ -142,13 +144,14 @@ CREATE TABLE IF NOT EXISTS `panier` (
   `date_modification` datetime DEFAULT NULL,
   PRIMARY KEY (`id_panier`),
   KEY `id_client` (`id_client`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=496968144 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `panier`
 --
 
 INSERT INTO `panier` (`id_panier`, `id_client`, `date_creation`, `date_modification`) VALUES
+(-1281593627, 1022904176, '2025-04-21 15:26:05', NULL),
 (1, 2, '2025-04-15 10:12:52', NULL);
 
 -- --------------------------------------------------------
@@ -228,7 +231,7 @@ INSERT INTO `utilisateur` (`id_utilisateur`, `nom`, `prenom`, `email`, `mot_de_p
 -- Contraintes pour la table `commande`
 --
 ALTER TABLE `commande`
-  ADD CONSTRAINT `commande_ibfk_1` FOREIGN KEY (`id_client`) REFERENCES `client` (`id_client`);
+  ADD CONSTRAINT `commande_ibfk_1` FOREIGN KEY (`id_client`) REFERENCES `utilisateur` (`id_utilisateur`);
 
 --
 -- Contraintes pour la table `lignecommande`
@@ -249,7 +252,7 @@ ALTER TABLE `lignepanier`
 -- Contraintes pour la table `panier`
 --
 ALTER TABLE `panier`
-  ADD CONSTRAINT `panier_ibfk_1` FOREIGN KEY (`id_client`) REFERENCES `client` (`id_client`);
+  ADD CONSTRAINT `panier_ibfk_1` FOREIGN KEY (`id_client`) REFERENCES `utilisateur` (`id_utilisateur`);
 
 --
 -- Contraintes pour la table `promotion`

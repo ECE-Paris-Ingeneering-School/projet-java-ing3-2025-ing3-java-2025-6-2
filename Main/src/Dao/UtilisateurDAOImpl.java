@@ -58,8 +58,9 @@ public class UtilisateurDAOImpl implements UtilisateurDAO
      */
     public void ajouterUtilisateur(Utilisateurs utilisateur)
     {
-        try {
-            // connexion
+        try
+        {
+            /// connexion
             Connection connexion = daoFactory.getConnection();
 
             /// récupération des informations saisies dans la page d'inscription
@@ -74,7 +75,8 @@ public class UtilisateurDAOImpl implements UtilisateurDAO
             PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO utilisateur(id_utilisateur, nom, prenom, email, mot_de_passe, type_utilisateur) VALUES ('"+id_utilisateur+"', '"+nom+"', '"+prenom+"', '"+mail+"', '"+mdp+"', '" +type_utilisateur+ "')");
             preparedStatement.executeUpdate();
         }
-        catch (SQLException e) {
+        catch (SQLException e)
+        {
             e.printStackTrace();
             System.out.println("Ajout du client impossible");
         }

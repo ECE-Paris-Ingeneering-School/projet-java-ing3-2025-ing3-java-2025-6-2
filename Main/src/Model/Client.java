@@ -3,7 +3,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class Client extends Utilisateurs {
+public class Client extends Utilisateurs
+{
     private boolean statut; // true: ancien, false: nouveau
     private final List<Commande> historiqueDesCommandes;
 

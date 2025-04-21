@@ -20,11 +20,13 @@ public class PanierDAOImpl implements PanierDAO
         this.daoFactory = daoFactory;
     }
 
-    public Panier getPanier(Client client) {
+    public Panier getPanier(Client client)
+    {
         Panier panier = null;
-        try {
+        try
+        {
             Connection connexion = daoFactory.getConnection();
-
+            /// Récupération de l'id du panier en fonction du client
             PreparedStatement preparedStatementPanier = connexion.prepareStatement(
                     "SELECT id_panier " +
                             "FROM panier WHERE id_client = '" + client.getIdentifiant() + "'"
@@ -50,7 +52,7 @@ public class PanierDAOImpl implements PanierDAO
     {
         try
         {
-            // connexion
+            /// connexion
             Connection connexion = daoFactory.getConnection();
 
             /// récupération des informations saisies dans la page de commande
@@ -61,7 +63,8 @@ public class PanierDAOImpl implements PanierDAO
             PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO panier(id_panier, id_client) VALUES ('"+id_panier+"','"+id_client+"')");
             preparedStatement.executeUpdate();
         }
-        catch (SQLException e) {
+        catch (SQLException e)
+        {
             e.printStackTrace();
             System.out.println("Ajout d'une nouvelle commande impossible");
         }
@@ -72,7 +75,7 @@ public class PanierDAOImpl implements PanierDAO
     {
         try
         {
-            // connexion
+            /// connexion
             Connection connexion = daoFactory.getConnection();
 
             /// récupération des informations saisies dans la page de commande
@@ -85,7 +88,8 @@ public class PanierDAOImpl implements PanierDAO
             PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO lignepanier(id_ligne_panier, id_panier, id_article, quantite) VALUES ('"+id_ligne_panier+"','"+id_panier+"', '"+id_article+"', '"+quantite+"')");
             preparedStatement.executeUpdate();
         }
-        catch (SQLException e) {
+        catch (SQLException e)
+        {
             e.printStackTrace();
             System.out.println("Ajout de l'article impossible");
         }
@@ -96,7 +100,7 @@ public class PanierDAOImpl implements PanierDAO
     {
         try
         {
-            // connexion
+            /// connexion
             Connection connexion = daoFactory.getConnection();
 
             /// récupération des informations saisies dans la page de commande
@@ -117,7 +121,7 @@ public class PanierDAOImpl implements PanierDAO
     {
         try
         {
-            // connexion
+            /// connexion
             Connection connexion = daoFactory.getConnection();
 
             /// récupération des informations saisies dans la page de commande
@@ -136,9 +140,10 @@ public class PanierDAOImpl implements PanierDAO
     public List<Article> panierArticles(Client client)
     {
         List<Article> articles = new ArrayList<>();
-        try {
+        try
+        {
             Connection connexion = daoFactory.getConnection();
-
+            /// On récupère l'id du panier à utiliser
             PreparedStatement preparedStatementPanier = connexion.prepareStatement(
                     "SELECT id_panier " +
                             "FROM panier WHERE id_client = '"+client.getIdentifiant()+"'"
@@ -147,6 +152,7 @@ public class PanierDAOImpl implements PanierDAO
             while (resultSetPanier.next())
             {
                 int id_panier = resultSetPanier.getInt("id_panier");
+                /// On récupère tous les articles du panier utilisé
                 PreparedStatement preparedStatement = connexion.prepareStatement(
                         "SELECT id_panier, id_article, quantite " +
                                 "FROM lignepanier WHERE id_panier = '"+id_panier+"'"
@@ -166,7 +172,8 @@ public class PanierDAOImpl implements PanierDAO
                 System.out.println("=== Fin de la liste des articles ===\n");
             }
         }
-        catch (SQLException e) {
+        catch (SQLException e)
+        {
             e.printStackTrace();
             System.out.println("Erreur lors de la récupération des articles");
         }

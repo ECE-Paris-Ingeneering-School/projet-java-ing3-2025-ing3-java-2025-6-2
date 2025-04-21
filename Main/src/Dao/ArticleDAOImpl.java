@@ -14,9 +14,7 @@ public class ArticleDAOImpl implements ArticleDAO
 
     private DaoFactory daoFactory;
 
-    // constructeur dépendant de la classe DaoFactory
-
-
+    /// constructeur dépendant de la classe DaoFactory
     public ArticleDAOImpl(DaoFactory daoFactory)
     {
         this.daoFactory = daoFactory;
@@ -26,8 +24,10 @@ public class ArticleDAOImpl implements ArticleDAO
     public Article getArticle(int id)
     {
         Article article = null;
-        try {
+        try
+        {
             Connection connexion = daoFactory.getConnection();
+            /// On récupère les informations de l'article à partir de son id
             PreparedStatement preparedStatement = connexion.prepareStatement(
                     "SELECT *" +
                             "FROM article WHERE id_article = '"+id+"'"
@@ -47,14 +47,16 @@ public class ArticleDAOImpl implements ArticleDAO
 
                 System.out.println("Article trouvé - Nom: '" + nom + "', Catégorie: '" + categorie + "'");
 
-                // Par défaut, on considère que l'article est disponible
+                /// Par défaut, on considère que l'article est disponible
                 boolean disponibilite = true;
 
                 article = new Article(id_article, stock, seuil_remise, nom, marque, categorie, description, prix, disponibilite);
                 return article;
             }
             System.out.println("=== Fin de la liste des articles ===\n");
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             e.printStackTrace();
             System.out.println("Erreur lors de la récupération des articles");
         }
@@ -64,7 +66,8 @@ public class ArticleDAOImpl implements ArticleDAO
     @Override
     public void ajouterArticle(Article article)
     {
-        try {
+        try
+        {
             // connexion
             Connection connexion = daoFactory.getConnection();
 
@@ -93,7 +96,8 @@ public class ArticleDAOImpl implements ArticleDAO
             preparedStatement.setString(8, marque);
             preparedStatement.executeUpdate();
         }
-        catch (SQLException e) {
+        catch (SQLException e)
+        {
             e.printStackTrace();
             System.out.println("Ajout de l'article impossible");
         }
@@ -131,7 +135,8 @@ public class ArticleDAOImpl implements ArticleDAO
             preparedStatement.setString(8, marque);
             preparedStatement.executeUpdate();
         }
-        catch (SQLException e) {
+        catch (SQLException e)
+        {
             e.printStackTrace();
             System.out.println("Modification de l'article impossible");
         }
@@ -141,8 +146,10 @@ public class ArticleDAOImpl implements ArticleDAO
     public List<Article> listerArticles()
     {
         List<Article> articles = new ArrayList<>();
-        try {
+        try
+        {
             Connection connexion = daoFactory.getConnection();
+            /// On récupère les informations de chaque article
             PreparedStatement preparedStatement = connexion.prepareStatement(
                 "SELECT id_article, nom, marque, categorie, description, prix, stock, seuil_remise " +
                 "FROM article"
@@ -162,14 +169,16 @@ public class ArticleDAOImpl implements ArticleDAO
 
                 System.out.println("Article trouvé - Nom: '" + nom + "', Catégorie: '" + categorie + "'");
 
-                // Par défaut, on considère que l'article est disponible
+                /// Par défaut, on considère que l'article est disponible
                 boolean disponibilite = true;
 
                 Article article = new Article(id, stock, seuil_remise, nom, marque, categorie, description, prix, disponibilite);
                 articles.add(article);
             }
             System.out.println("=== Fin de la liste des articles ===\n");
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             e.printStackTrace();
             System.out.println("Erreur lors de la récupération des articles");
         }
@@ -177,10 +186,13 @@ public class ArticleDAOImpl implements ArticleDAO
     }
 
     @Override
-    public List<Article> getNouveauxProduits(int limit) {
+    public List<Article> getNouveauxProduits(int limit)
+    {
         List<Article> articles = new ArrayList<>();
-        try {
+        try
+        {
             Connection connexion = daoFactory.getConnection();
+            /// On récupère les informations d'un article, regroupé par ordre croissant des id
             PreparedStatement preparedStatement = connexion.prepareStatement(
                 "SELECT id_article, nom, marque, categorie, description, prix, stock, seuil_remise " +
                 "FROM article ORDER BY id_article DESC LIMIT ?"
@@ -202,7 +214,9 @@ public class ArticleDAOImpl implements ArticleDAO
                 Article article = new Article(id, stock, seuil_remise, nom, marque, categorie, description, prix, disponibilite);
                 articles.add(article);
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             e.printStackTrace();
             System.out.println("Erreur lors de la récupération des nouveaux articles");
         }
@@ -210,14 +224,17 @@ public class ArticleDAOImpl implements ArticleDAO
     }
 
     @Override
-    public List<Article> getArticlesEnPromotion() {
+    public List<Article> getArticlesEnPromotion()
+    {
         List<Article> articles = new ArrayList<>();
         Connection connexion = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
 
-        try {
+        try
+        {
             connexion = daoFactory.getConnection();
+            /// On récupère les informations de chaque article si le seuil de remise est positif
             preparedStatement = connexion.prepareStatement(
                 "SELECT id_article, nom, marque, categorie, description, prix, stock, seuil_remise " +
                 "FROM article WHERE seuil_remise > 0"
@@ -237,14 +254,21 @@ public class ArticleDAOImpl implements ArticleDAO
                 Article article = new Article(id, stock, seuil_remise, nom, marque, categorie, description, prix, true);
                 articles.add(article);
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             e.printStackTrace();
-        } finally {
-            try {
+        }
+        finally
+        {
+            try
+            {
                 if (resultSet != null) resultSet.close();
                 if (preparedStatement != null) preparedStatement.close();
                 if (connexion != null) connexion.close();
-            } catch (SQLException e) {
+            }
+            catch (SQLException e)
+            {
                 e.printStackTrace();
             }
         }

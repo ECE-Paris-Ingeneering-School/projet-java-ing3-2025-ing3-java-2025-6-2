@@ -24,7 +24,8 @@ public class Panier
         articles.remove(article);
     }
 
-    public float calculerPrixTotal() {
+    public float calculerPrixTotal()
+    {
         float total = 0;
         for (Map.Entry<Article, Integer> entry : articles.entrySet()) {
             total += entry.getKey().getPrixUnitaire() * entry.getValue();
@@ -38,8 +39,17 @@ public class Panier
     {
         return id;
     }
-    public Client getClient() { return client; }
-    public void setClient(Client client) { this.client = client; }
-    public Map<Article, Integer> getArticles() { return articles; }
+    public Client getClient()
+    {
+        return client;
+    }
+    public void setClient(Client client)
+    {
+        this.client = client;
+    }
+    public Map<Article, Integer> getArticles()
+    {
+        return articles;
+    }
     public void setArticles(Map<Article, Integer> articles) { this.articles = articles; }
 }
