@@ -16,6 +16,8 @@ import View.VueArticle;
 /** Fenetres constitue l'ensemble des interfaces graphiques utilisées au cour du projet
  * @L'ensemble des liens entre elles sont effectuées ici
  */
+
+//test
 public class Fenetres extends Component
 {
     public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article; /// Fenêtres de navigation
