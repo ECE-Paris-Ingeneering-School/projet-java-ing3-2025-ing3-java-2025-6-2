@@ -75,7 +75,7 @@ public class ArticleDAOImpl implements ArticleDAO
             int id_article = article.getId();
             String nom = article.getNom();
             String description = article.getDescription();
-            double prix = article.getPrixUnitaire();
+            float prix = article.getPrixUnitaire();
             int stock = article.getStock();
             int seuil_remise = article.getSeuil_remise();
             String categroie = article.getCategorie();
@@ -114,7 +114,7 @@ public class ArticleDAOImpl implements ArticleDAO
             int id_article = article.getId();
             String nom = article.getNom();
             String description = article.getDescription();
-            double prix = article.getPrixUnitaire();
+            float prix = article.getPrixUnitaire();
             int stock = article.getStock();
             int seuil_remise = article.getSeuil_remise();
             String categroie = article.getCategorie();
@@ -123,16 +123,9 @@ public class ArticleDAOImpl implements ArticleDAO
             /// Exécution de la requête INSERT INTO de l'objet client en paramètre
             PreparedStatement preparedStatement = connexion.prepareStatement(
                     "UPDATE article " +
-                            "SET (?, ?, ?, ?, ?, ?, ?, ?) WHERE id_article = '"+id_article+"'"
+                            "SET nom = '"+nom+"', description = '"+description+"', prix = '"+prix+"', stock = '"+stock+"', seuil_remise = '"+seuil_remise+"', categorie = '"+categroie+"', marque = '"+marque+"' " +
+                            " WHERE id_article = '"+id_article+"'"
             );
-            preparedStatement.setInt(1, id_article);
-            preparedStatement.setString(2, nom);
-            preparedStatement.setString(3, description);
-            preparedStatement.setDouble(4, prix);
-            preparedStatement.setInt(5, stock);
-            preparedStatement.setInt(6, seuil_remise);
-            preparedStatement.setString(7, categroie);
-            preparedStatement.setString(8, marque);
             preparedStatement.executeUpdate();
         }
         catch (SQLException e)

@@ -157,7 +157,7 @@ public class FenetreControl extends JFrame implements ActionListener
                     }
                 }
                 break;
-            case "Mettre a jour":
+            case "Mettre à jour":
                 /// Récupération des données saisies
                 id_article = fenetre.id_article;
                 nom = fenetre.nom_article.getText();
@@ -170,7 +170,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 /// Création d'un nouvel objet
                 new_article = new Article(id_article, stock, seuil_remise, nom, marque, categorie, descriptionText, prix, true);
                 artdao.modifierArticle(new_article); /// Modification de l'objet
-                fenetre.ajout_article.setVisible(false);
+                fenetre.modif.setVisible(false);
                 /// Fenêtre pop-up mise à jour pour confirmer l'action
                 fenetre.event.getContentPane().removeAll();
                 fenetre.event.setTitle("Modification d'un article");

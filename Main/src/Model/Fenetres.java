@@ -1623,14 +1623,14 @@ public class Fenetres extends Component
         modif.add(label1);
         String[] type = {"Electromenager", "Nourriture", "Necessite"};
         categorie = new JComboBox<>(type); /// Liste associée
-        categorie.setSelectedIndex(Integer.parseInt(article.getCategorie()));
+        categorie.setSelectedIndex(0);
         categorie.setBounds(50, 50, 100, 20);
         modif.add(categorie);
         JLabel label2 = new JLabel("Marque");
         modif.add(label2);
         String[] type2 = {"Bosch", "Samsung", "Nestlé"};
         marque = new JComboBox<>(type2); /// Liste associée
-        marque.setSelectedIndex(Integer.parseInt(article.getMarque()));
+        marque.setSelectedIndex(0);
         marque.setBounds(50, 50, 100, 20);
         modif.add(marque);
         JPanel inscrire_nom = new JPanel();
