@@ -81,4 +81,27 @@ public class UtilisateurDAOImpl implements UtilisateurDAO
             System.out.println("Ajout du client impossible");
         }
     }
+
+    public int compteClients() {
+        int compte = 0;
+        try {
+            Connection connexion = daoFactory.getConnection();
+
+
+            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+            PreparedStatement preparedStatement = connexion.prepareStatement("SELECT COUNT(*) AS comptCli FROM utilisateur WHERE type_utilisateur = ?");
+            preparedStatement.setString(1, "client");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                compte = resultSet.getInt("comptCli");
+            }
+            resultSet.close();
+            preparedStatement.close();
+            connexion.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Erreur");
+        }
+        return compte;
+    }
 }

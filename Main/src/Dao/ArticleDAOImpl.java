@@ -267,4 +267,68 @@ public class ArticleDAOImpl implements ArticleDAO
         }
         return articles;
     }
+
+    public int compteArticle() {
+        int compte = 0;
+        try {
+            Connection connexion = daoFactory.getConnection();
+
+
+            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+            PreparedStatement preparedStatement = connexion.prepareStatement("SELECT COUNT(*) AS comptArt FROM article WHERE 1;");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                compte = resultSet.getInt("comptArt");
+            }
+            resultSet.close();
+            preparedStatement.close();
+            connexion.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Erreur");
+        }
+        return compte;
+    }
+    public int Articlemax() {
+        int p = 0;
+        try {
+            Connection connexion = daoFactory.getConnection();
+
+
+            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+            PreparedStatement preparedStatement = connexion.prepareStatement("SELECT MAX(prix) AS comptArt FROM article;");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                p = resultSet.getInt("comptArt");
+            }
+            resultSet.close();
+            preparedStatement.close();
+            connexion.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Erreur");
+        }
+        return p;
+    }
+    public int Articlemin() {
+        int p = 0;
+        try {
+            Connection connexion = daoFactory.getConnection();
+
+
+            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+            PreparedStatement preparedStatement = connexion.prepareStatement("SELECT MIN(prix) AS comptArt FROM article;");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                p = resultSet.getInt("comptArt");
+            }
+            resultSet.close();
+            preparedStatement.close();
+            connexion.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Erreur");
+        }
+        return p;
+    }
 }
