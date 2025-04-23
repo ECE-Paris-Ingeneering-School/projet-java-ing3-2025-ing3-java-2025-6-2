@@ -33,4 +33,10 @@ public interface ArticleDAO
      * @return La liste des articles en promotion
      */
     public List<Article> getArticlesEnPromotion();
+
+    public int compteArticle();
+
+    public int Articlemax();
+
+    public int Articlemin();
 }

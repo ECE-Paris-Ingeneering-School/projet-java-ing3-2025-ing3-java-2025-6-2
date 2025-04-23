@@ -350,6 +350,11 @@ public class FenetreControl extends JFrame implements ActionListener
             case "Panier":
                 fenetre.panier.setVisible(true);
                 break;
+            case "Statistiques":
+                fenetre.stats();
+                fenetre.stats.setVisible(true);
+                fenetre.profil.setVisible(false);
+                break;
             case "Retour":
                 if(fenetre.inscrire.isVisible())
                     fenetre.connecter.setVisible(true);

@@ -15,7 +15,7 @@ import Control.FenetreControl;
 public class Fenetres extends Component
 {
     /// Fenêtres de navigation
-    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, panier, articles, ajout_commande, modif, modif_article;
+    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, panier, articles, ajout_commande, modif, modif_article, stats;
     /// Zones de saisie connexion et inscriptions
     public TextField nom, prenom, mail, mdp, mail_id, mdp_id;
     /// Zone de saisie de l'adresse pour commande (récupération des autres paramètres par le profil utilisé)
@@ -56,6 +56,7 @@ public class Fenetres extends Component
         panier = new JFrame();
         modif = new JFrame();
         modif_article = new JFrame();
+        stats = new JFrame();
 
         /// Configuration des fenêtres
         inscrire.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -66,6 +67,7 @@ public class Fenetres extends Component
         paiement.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         catalogue.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ajout_article.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        stats.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         /// Initialisation des autres composants
         DaoFactory daoFactory = DaoFactory.getInstance("ecommerce_db", "root", "");
@@ -126,14 +128,14 @@ public class Fenetres extends Component
     {
         connecter.setSize(900, 700);
         connecter.setTitle("Connexion");
-        
+
         /// Set background color to a soft gray
         connecter.getContentPane().setBackground(new Color(245, 245, 245));
-        
+
         /// Use GridBagLayout for better control over component placement
         connecter.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        
+
         /// Fenetre principale
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -142,7 +144,7 @@ public class Fenetres extends Component
             BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
             BorderFactory.createEmptyBorder(40, 50, 40, 50)
         ));
-        
+
         /// Champ Titre
         JLabel titleLabel = new JLabel("Connexion");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
@@ -150,7 +152,7 @@ public class Fenetres extends Component
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(titleLabel);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 40)));
-        
+
         /// Champ Email
         JPanel emailPanel = new JPanel();
         emailPanel.setLayout(new BoxLayout(emailPanel, BoxLayout.Y_AXIS));
@@ -166,7 +168,7 @@ public class Fenetres extends Component
         emailPanel.add(mail_id);
         mainPanel.add(emailPanel);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        
+
         /// Champ Mot de Passe
         JPanel passwordPanel = new JPanel();
         passwordPanel.setLayout(new BoxLayout(passwordPanel, BoxLayout.Y_AXIS));
@@ -183,13 +185,13 @@ public class Fenetres extends Component
         passwordPanel.add(mdp_id);
         mainPanel.add(passwordPanel);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 35)));
-        
+
         /// Buttons panel with elegant styling
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setBackground(Color.WHITE);
         buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
         buttonsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
+
         JButton validerButton = new StyledButton("Valider", true);
         JButton inscrireButton = new StyledButton("Inscrire", false);
 
@@ -198,9 +200,9 @@ public class Fenetres extends Component
         buttonsPanel.add(Box.createRigidArea(new Dimension(15, 0)));
         inscrireButton.addActionListener(fenetreControl);
         buttonsPanel.add(inscrireButton);
-        
+
         mainPanel.add(buttonsPanel);
-        
+
         /// Add main panel to frame with proper sizing
         mainPanel.setMaximumSize(new Dimension(400, 450));
         gbc.gridx = 0;
@@ -293,32 +295,32 @@ public class Fenetres extends Component
         /// Logo et recherche (gauche)
         JPanel leftSection = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
         leftSection.setBackground(Color.WHITE);
-        
+
         /// Chargement et redimensionnement du logo
         ImageIcon originalIcon = new ImageIcon("Main/src/View/image/Logo.png");
         Image originalImage = originalIcon.getImage();
         Image resizedImage = originalImage.getScaledInstance(100, 40, Image.SCALE_SMOOTH);
         ImageIcon resizedIcon = new ImageIcon(resizedImage);
         JLabel logoLabel = new JLabel(resizedIcon);
-        
+
         JTextField searchField = new JTextField(30);
         searchField.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(new Color(200, 200, 200)),
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
-        
+
         leftSection.add(logoLabel);
         leftSection.add(searchField);
 
         /// Menu principal (centre)
         JPanel centerSection = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         centerSection.setBackground(Color.WHITE);
-        
+
         /// Création des boutons avec ActionListener
         JButton articlesButton = createNavButton("Articles", e -> fenetreControl.actionPerformed(e));
-        
+
         JButton promotionsButton = createNavButton("Promotions", e -> fenetreControl.actionPerformed(e));
-        
+
         JButton catalogueButton = createNavButton("Catalogue", e -> fenetreControl.actionPerformed(e));
 
         centerSection.add(articlesButton);
@@ -328,13 +330,13 @@ public class Fenetres extends Component
         /// Panier et login (droite)
         JPanel rightSection = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 0));
         rightSection.setBackground(Color.WHITE);
-        
+
         JButton profileButton = createNavButton("Profil", e -> fenetreControl.actionPerformed(e));
 
         JButton loginButton = createNavButton("Deconnexion", e -> fenetreControl.actionPerformed(e));
-        
+
         JButton cartButton = createNavButton("Panier", e -> fenetreControl.actionPerformed(e));
-        
+
         rightSection.add(cartButton);
         rightSection.add(loginButton);
         rightSection.add(profileButton);
@@ -382,7 +384,7 @@ public class Fenetres extends Component
         JPanel imagePanel = new JPanel();
         imagePanel.setPreferredSize(new Dimension(200, 200));
         imagePanel.setBackground(Color.WHITE);
-        
+
         try
         {
             String imagePath = getImageFileName(article.getNom(), article.getCategorie());
@@ -419,21 +421,21 @@ public class Fenetres extends Component
 
         JLabel nameLabel = new JLabel(article.getNom());
         nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        
+
         JLabel priceLabel = new JLabel(String.format("%.2f €", article.getPrixUnitaire()));
         priceLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        
+
         if (article.getSeuil_remise() > 0)
         {
             JLabel discountLabel = new JLabel("-" + article.getSeuil_remise() + "%");
             discountLabel.setForeground(Color.RED);
             infoPanel.add(discountLabel);
         }
-        
+
         infoPanel.add(nameLabel);
         infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         infoPanel.add(priceLabel);
-        
+
         card.add(infoPanel);
         return card;
     }
@@ -447,17 +449,17 @@ public class Fenetres extends Component
 
         JLabel promoTitle = new JLabel("Offres Spéciales");
         promoTitle.setFont(new Font("Arial", Font.BOLD, 24));
-        
+
         JLabel promoDesc = new JLabel("Jusqu'à 50% de réduction sur une sélection d'articles");
         promoDesc.setFont(new Font("Arial", Font.PLAIN, 16));
-        
+
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
         textPanel.setBackground(new Color(245, 245, 245));
         textPanel.add(promoTitle);
         textPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         textPanel.add(promoDesc);
-        
+
         promoPanel.add(textPanel, BorderLayout.CENTER);
 
         return promoPanel;
@@ -525,7 +527,10 @@ public class Fenetres extends Component
             addButton(pied_page, "Ajouter article");
             addButton(pied_page, "Editer un article");
             addButton(pied_page, "Gerer les dossiers clients");
-            addButton(pied_page, "Statistiques");
+            JButton S = createNavButton("Statistiques", e -> {
+                fenetreControl.actionPerformed(e);
+            });
+            pied_page.add(S);
         }
         pied_page.add(Box.createVerticalStrut(10));
         pied_page.add(new JLabel("FIN"));
@@ -650,7 +655,7 @@ public class Fenetres extends Component
             JPanel searchBarPanel = new JPanel();
             searchBarPanel.setLayout(new BoxLayout(searchBarPanel, BoxLayout.X_AXIS));
             searchBarPanel.setBackground(Color.WHITE);
-            
+
             JTextField searchField = new JTextField(20);
             searchField.setPreferredSize(new Dimension(300, 35));
             searchField.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -658,7 +663,7 @@ public class Fenetres extends Component
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)
             ));
-            
+
             JButton searchButton = new JButton("Rechercher");
             searchButton.setBackground(new Color(51, 122, 183));
             searchButton.setForeground(Color.WHITE);
@@ -666,7 +671,7 @@ public class Fenetres extends Component
             searchButton.setBorderPainted(false);
             searchButton.setFocusPainted(false);
             searchButton.setPreferredSize(new Dimension(120, 35));
-            
+
             searchBarPanel.add(searchField);
             searchBarPanel.add(Box.createRigidArea(new Dimension(10, 0)));
             searchBarPanel.add(searchButton);
@@ -675,12 +680,12 @@ public class Fenetres extends Component
             JPanel filterPanel = new JPanel();
             filterPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
             filterPanel.setBackground(Color.WHITE);
-            
+
             String[] categories = {"Tous", "Nourriture", "Vêtements", "Livres", "Décoration"};
             JComboBox<String> categoryFilter = new JComboBox<>(categories);
             categoryFilter.setFont(new Font("Arial", Font.PLAIN, 14));
             categoryFilter.setPreferredSize(new Dimension(150, 35));
-            
+
             filterPanel.add(new JLabel("Catégorie: "));
             filterPanel.add(categoryFilter);
 
@@ -689,9 +694,9 @@ public class Fenetres extends Component
             searchPanel.add(filterPanel);
 
             DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
-            
+
             ArticleDAOImpl articleDAO = new ArticleDAOImpl(dao);
-            
+
             java.util.List<Article> articles = articleDAO.listerArticles();
 
             /// Affichage des articles
@@ -712,15 +717,15 @@ public class Fenetres extends Component
             searchButton.addActionListener(e -> {
                 String searchText = searchField.getText().toLowerCase();
                 String selectedCategory = (String)categoryFilter.getSelectedItem();
-                
+
                 Liste.removeAll();
                 for (Article article : articles)
                 {
                     boolean matchesSearch = article.getNom().toLowerCase().contains(searchText) ||
                                           article.getDescription().toLowerCase().contains(searchText);
-                    boolean matchesCategory = selectedCategory.equals("Tous") || 
+                    boolean matchesCategory = selectedCategory.equals("Tous") ||
                                             article.getCategorie().equals(selectedCategory);
-                    
+
                     if (matchesSearch && matchesCategory)
                     {
                         JPanel articlePanel = CreerListe(article);
@@ -762,10 +767,10 @@ public class Fenetres extends Component
         imagePanel.setPreferredSize(new Dimension(250, 200));
         imagePanel.setBackground(Color.WHITE);
         imagePanel.setLayout(new BorderLayout());
-        
+
         /// Chargement de l'image en fonction de la catégorie
         String defaultImagePath = "Main/src/View/image/default_product.png";
-        
+
         /// Convertir la catégorie en version sans accent pour le chemin du dossier
         String categorieDossier = article.getCategorie().toLowerCase()
             .replace("é", "e")
@@ -774,7 +779,7 @@ public class Fenetres extends Component
             .replace("ù", "u")
             .replace("ç", "c")
             .replace("ê", "e");
-            
+
         String imagePath = defaultImagePath;
 
         /// Obtenir le nom du fichier image en fonction de la catégorie
@@ -785,12 +790,12 @@ public class Fenetres extends Component
             imagePath = String.format("Main/src/View/image/%s/%s", categorieDossier, fileName);
             //System.out.println("Tentative de chargement de l'image: " + imagePath);
         }
-        
+
         try
         {
             File imageFile = new File(imagePath);
             ImageIcon imageIcon;
-            
+
             if (imageFile.exists())
             {
                 imageIcon = new ImageIcon(imagePath);
@@ -801,17 +806,17 @@ public class Fenetres extends Component
                 //System.out.println("Image non trouvée: " + imagePath + ", utilisation de l'image par défaut");
                 imageIcon = new ImageIcon(defaultImagePath);
             }
-            
+
             /// Redimensionner l'image
             Image img = imageIcon.getImage();
             int originalWidth = imageIcon.getIconWidth();
             int originalHeight = imageIcon.getIconHeight();
-            
+
             if (originalWidth > 0 && originalHeight > 0) {
                 double ratio = Math.min(230.0 / originalWidth, 180.0 / originalHeight);
                 int newWidth = (int) (originalWidth * ratio);
                 int newHeight = (int) (originalHeight * ratio);
-                
+
                 Image newImg = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
                 JLabel imageLabel = new JLabel(new ImageIcon(newImg));
                 imageLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -829,7 +834,7 @@ public class Fenetres extends Component
             placeholder.setHorizontalAlignment(JLabel.CENTER);
             imagePanel.add(placeholder, BorderLayout.CENTER);
         }
-        
+
         imagePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         p.add(imagePanel);
         p.add(Box.createRigidArea(new Dimension(0, 15)));
@@ -870,7 +875,7 @@ public class Fenetres extends Component
         p.add(stockLabel);
 
         /// 7. Description (truncated)
-        String shortDescription = article.getDescription().length() > 100 ? 
+        String shortDescription = article.getDescription().length() > 100 ?
             article.getDescription().substring(0, 100) + "..." : article.getDescription();
         JLabel descLabel = new JLabel("<html>" + shortDescription + "</html>");
         descLabel.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -1674,6 +1679,60 @@ public class Fenetres extends Component
         modif.add(inscrire_remise);
         modif.add(decrire);
         modif.add(ajout_article_button);
+    }
+
+    public void stats(){
+        DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
+        UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
+        Utilisateurs user = new Utilisateurs(0, "", "", email, password, "");
+        Utilisateurs user_actuel = userdao.connexionUtilisateur(user);
+        stats = new JFrame();
+        stats.setSize(500, 400);
+        stats.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        stats.setTitle("Profil");
+        stats.setLayout(new BorderLayout());
+        float pmax, pmin = 0;
+        int nombreClients = 0;
+        int nbarticle = 0;
+
+        JPanel titre = new JPanel();
+        titre.setLayout(new FlowLayout(FlowLayout.CENTER));
+        titre.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+
+        JLabel Titre = new JLabel("STATISTIQUES", SwingConstants.CENTER);
+        Titre.setFont(new Font("Arial", Font.BOLD, 18));
+        titre.add(Titre);
+
+        stats.add(titre, BorderLayout.NORTH);
+
+
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+
+        centerPanel.add(new JLabel("Nombre de client : "));
+        UtilisateurDAOImpl utilisateurDAO = new UtilisateurDAOImpl(dao);
+        nombreClients = utilisateurDAO.compteClients();
+        centerPanel.add(new JLabel(String.valueOf(nombreClients)));
+        centerPanel.add(Box.createVerticalStrut(15));
+        centerPanel.add(new JLabel("Nombre de produits :"));
+        ArticleDAOImpl articleDAO = new ArticleDAOImpl(dao);
+        nbarticle = articleDAO.compteArticle();
+        centerPanel.add(new JLabel(String.valueOf(nbarticle)));
+        centerPanel.add(Box.createVerticalStrut(15));
+        centerPanel.add(new JLabel("Prix maximum : "));
+        pmax = articleDAO.compteArticle();
+        centerPanel.add(new JLabel(String.valueOf(pmax)));
+        centerPanel.add(Box.createVerticalStrut(15));
+        centerPanel.add(new JLabel("Prix minimum : "));
+        pmin = articleDAO.compteArticle();
+        centerPanel.add(new JLabel(String.valueOf(pmin)));
+        centerPanel.add(Box.createVerticalStrut(15));
+
+
+        // TODO Implementer Stats, voirs si il n'y a pas besoin de rajouter une valeur dans la table de donnée qui compte le nombre d'achat total.
+
     }
 
 }

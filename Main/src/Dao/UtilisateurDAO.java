@@ -22,4 +22,6 @@ public interface UtilisateurDAO
      * @Permet à un utilisateur de se connecter
      */
     public Utilisateurs connexionUtilisateur(Utilisateurs utilisateur);
+
+    public int compteClients();
 }
