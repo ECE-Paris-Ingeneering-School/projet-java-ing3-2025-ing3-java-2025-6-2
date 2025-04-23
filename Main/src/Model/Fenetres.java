@@ -20,7 +20,7 @@ import View.VueArticle;
 //test
 public class Fenetres extends Component
 {
-    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article; /// Fenêtres de navigation
+    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, stats; /// Fenêtres de navigation
     public TextField nom, prenom, mail, mdp, mail_id, mdp_id; /// Zones de saisie connexion et inscriptions
     public TextField numero_carte, expiration_carte, cvv; /// Zones de saisies paiement
     public String email, password; /// Inscription utilisateur dans la database
@@ -50,6 +50,7 @@ public class Fenetres extends Component
         paiement = new JFrame();
         catalogue = new JFrame();
         ajout_article = new JFrame();
+        stats = new JFrame();
 
         // Configuration des fenêtres
         inscrire.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -60,6 +61,7 @@ public class Fenetres extends Component
         paiement.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         catalogue.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ajout_article.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        stats.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Initialisation des autres composants
         DaoFactory daoFactory = DaoFactory.getInstance("ecommerce_db", "root", "");
@@ -538,7 +540,10 @@ public class Fenetres extends Component
                 addButton(pied_page, "Ajouter article");
                 addButton(pied_page, "Modifier un article");
                 addButton(pied_page, "Gerer les dossiers clients");
-                addButton(pied_page, "Statistiques");
+                JButton S = createNavButton("Statistiques", e -> {
+                    stats.setVisible(true);
+                    profil.setVisible(false);
+                });
             }
             pied_page.add(Box.createVerticalStrut(10));
             pied_page.add(new JLabel("FIN"));
@@ -554,6 +559,60 @@ public class Fenetres extends Component
             profil.add(PASDEBUGDEPOSITION, BorderLayout.CENTER);
         }
 
+        public void stats(){
+            DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
+            UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
+            Utilisateurs user = new Utilisateurs(0, "", "", email, password, "");
+            Utilisateurs user_actuel = userdao.connexionUtilisateur(user);
+            stats = new JFrame();
+            stats.setSize(500, 400);
+            stats.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            stats.setTitle("Profil");
+            stats.setLayout(new BorderLayout());
+            float pmax, pmin = 0;
+            int nombreClients = 0;
+            int nbarticle = 0;
+
+            JPanel titre = new JPanel();
+            titre.setLayout(new FlowLayout(FlowLayout.CENTER));
+            titre.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+
+            JLabel Titre = new JLabel("STATISTIQUES", SwingConstants.CENTER);
+            Titre.setFont(new Font("Arial", Font.BOLD, 18));
+            titre.add(Titre);
+
+            stats.add(titre, BorderLayout.NORTH);
+
+
+            JPanel centerPanel = new JPanel();
+            centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+            centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+
+            centerPanel.add(new JLabel("Nombre de client : "));
+            DaoFactory daoFactory = new DaoFactory("ecommerce_db", "root", ""); // ou DaoFactory.getInstance(), selon ton implémentation
+            UtilisateurDAOImpl utilisateurDAO = new UtilisateurDAOImpl(daoFactory);
+            nombreClients = utilisateurDAO.compteClients();
+            centerPanel.add(new JLabel(String.valueOf(nombreClients)));
+            centerPanel.add(Box.createVerticalStrut(15));
+            centerPanel.add(new JLabel("Nombre de produits :"));
+            ArticleDAOImpl articleDAO = new ArticleDAOImpl(daoFactory);
+            nbarticle = articleDAO.compteArticle();
+            centerPanel.add(new JLabel(String.valueOf(nbarticle)));
+            centerPanel.add(Box.createVerticalStrut(15));
+            centerPanel.add(new JLabel("Prix maximum : "));
+            pmax = articleDAO.compteArticle();
+            centerPanel.add(new JLabel(String.valueOf(pmax)));
+            centerPanel.add(Box.createVerticalStrut(15));
+            centerPanel.add(new JLabel("Prix minimum : "));
+            pmin = articleDAO.compteArticle();
+            centerPanel.add(new JLabel(String.valueOf(pmin)));
+            centerPanel.add(Box.createVerticalStrut(15));
+
+
+            // TODO Implementer Stats, voirs si il n'y a pas besoin de rajouter une valeur dans la table de donnée qui compte le nombre d'achat total.
+
+        }
 
     /// Gestion des erreurs
     public void setEvent()
