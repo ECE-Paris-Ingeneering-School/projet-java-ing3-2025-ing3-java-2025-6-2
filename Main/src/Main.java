@@ -15,6 +15,7 @@ public class Main
         newFenetre.setEvent();
         newFenetre.setPaiement();
         newFenetre.setNewArticle();
+        newFenetre.setModifArticle();
         newFenetre.setCatalogue();
         newFenetre.setListeArticles();
         newFenetre.setNewCommande();

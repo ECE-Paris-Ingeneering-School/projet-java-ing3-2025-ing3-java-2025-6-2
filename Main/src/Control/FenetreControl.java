@@ -67,7 +67,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 }
                 else if (fenetre.inscrire.isVisible())
                 {
-                    int id = new Random().nextInt();
+                    int id = new Random().nextInt(1_000_000_000);
                     String nom = fenetre.nom.getText();
                     String prenom = fenetre.prenom.getText();
                     String mail = fenetre.mail.getText();
@@ -92,7 +92,7 @@ public class FenetreControl extends JFrame implements ActionListener
             /// Valider l'ajout d'un article (seulement pour les administrateurs)
             case "Valider l'ajout":
                 /// Récupération des données saisies
-                int id_article = new Random().nextInt();
+                int id_article = new Random().nextInt(1_000_000_000);
                 String nom = fenetre.nom_article.getText();
                 String descriptionText = fenetre.description.getText();
                 float prix = Float.parseFloat(fenetre.prix.getText());
@@ -133,6 +133,57 @@ public class FenetreControl extends JFrame implements ActionListener
             case "Ajouter article":
                 fenetre.ajout_article.setVisible(true);
                 break;
+            case "Editer un article":
+                fenetre.modif_article.setVisible(true);
+                break;
+            case "Modifier":
+                /// On récupère la commande Modifier avec l'id de l'article concerné
+                ArticleDAOImpl articleDAO = new ArticleDAOImpl(dao);
+                String cmd = e.getActionCommand(); /// Récupère la commande + id de l'article
+                if (cmd.startsWith("Modifier"))
+                {
+                    try
+                    {
+                        String idStr = cmd.substring("Modifier".length());
+                        System.out.println(idStr); /// Correspond à l'id de l'article choisi (converti ensuite en entier pour les prochaines étapes)
+                        int id = Integer.parseInt(idStr);
+                        Article article = articleDAO.getArticle(id);
+                        fenetre.setModifierArticle(article);
+                        fenetre.modif.setVisible(true);
+                    }
+                    catch (NumberFormatException ex)
+                    {
+                        System.err.println("ID invalide dans la commande : " + cmd);
+                    }
+                }
+                break;
+            case "Mettre a jour":
+                /// Récupération des données saisies
+                id_article = fenetre.id_article;
+                nom = fenetre.nom_article.getText();
+                descriptionText = fenetre.description.getText();
+                prix = Float.parseFloat(fenetre.prix.getText());
+                stock = Integer.parseInt(fenetre.stock.getText());
+                seuil_remise = Integer.parseInt(fenetre.seuil_remise.getText());
+                categorie = (String) fenetre.categorie.getSelectedItem();
+                marque = (String) fenetre.marque.getSelectedItem();
+                /// Création d'un nouvel objet
+                new_article = new Article(id_article, stock, seuil_remise, nom, marque, categorie, descriptionText, prix, true);
+                artdao.modifierArticle(new_article); /// Modification de l'objet
+                fenetre.ajout_article.setVisible(false);
+                /// Fenêtre pop-up mise à jour pour confirmer l'action
+                fenetre.event.getContentPane().removeAll();
+                fenetre.event.setTitle("Modification d'un article");
+                text = new JPanel();
+                label_event = new JLabel("Modification effectué");
+                text.add(label_event);
+                erreur_button = new JPanel();
+                fenetre.addButton(erreur_button, "Retour");
+                fenetre.event.add(text, BorderLayout.CENTER);
+                fenetre.event.add(erreur_button, BorderLayout.SOUTH);
+                fenetre.profil.setVisible(true);
+                fenetre.event.setVisible(true);
+                break;
             case "Deconnexion":
                 fenetre.connecter.setVisible(true);
                 fenetre.accueil.setVisible(false);
@@ -147,11 +198,11 @@ public class FenetreControl extends JFrame implements ActionListener
             case "Articles":
                 fenetre.articles.setVisible(true);
                 break;
-            /// Consultez les détails d'un article (en vue conole)
+            /// Consultez les détails d'un article (en vue console)
             case "Détails":
                 /// On récupère la commande Ajouter avec l'id de l'article concerné
-                ArticleDAOImpl articleDAO = new ArticleDAOImpl(dao);
-                String cmd = e.getActionCommand(); /// Récupère la commande + id de l'article
+                articleDAO = new ArticleDAOImpl(dao);
+                cmd = e.getActionCommand(); /// Récupère la commande + id de l'article
                 if (cmd.startsWith("Détails"))
                 {
                     try
@@ -187,7 +238,7 @@ public class FenetreControl extends JFrame implements ActionListener
                         Client client = new Client(connect.getIdentifiant(), connect.getNom(), connect.getPrenom(), connect.getEmail(), connect.getMotDePasse(), connect.getType_utilisateur());
                         panierDAO.nouveauPanier(client);
                         Panier panier = new Panier(panierDAO.getPanier(client).getId(), client);
-                        panierDAO.ajouterAuPanier(panier, article);
+                        panierDAO.ajouterAuPanier(panier, client, article);
                         fenetre.event.getContentPane().removeAll();
                         fenetre.event.setTitle("Article");
                         text = new JPanel();
@@ -246,10 +297,9 @@ public class FenetreControl extends JFrame implements ActionListener
                 Utilisateurs user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
                 Utilisateurs connect = userdao.connexionUtilisateur(user);
                 Client client = new Client(connect.getIdentifiant(), connect.getNom(), connect.getPrenom(), connect.getEmail(), connect.getMotDePasse(), connect.getType_utilisateur());
-                Panier panier_en_cours = new Panier(0, client);
                 String adresse = fenetre.adresse.getText();
                 /// Ajout d'une nouvelle commande
-                comdao.nouvelleCommande(client, panier_en_cours, adresse);
+                comdao.nouvelleCommande(client, adresse);
                 fenetre.paiement.setVisible(true);
                 fenetre.event.getContentPane().removeAll();
                 fenetre.event.setTitle("Ajout article");
@@ -310,6 +360,8 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.catalogue.setVisible(false);
                 fenetre.panier.setVisible(false);
                 fenetre.articles.setVisible(false);
+                fenetre.modif.setVisible(false);
+                fenetre.modif_article.setVisible(false);
                 break;
         }
     }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : lun. 21 avr. 2025 à 13:27
+-- Généré le : mer. 23 avr. 2025 à 14:34
 -- Version du serveur :  5.7.31
 -- Version de PHP : 7.3.21
 
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `article` (
 --
 
 INSERT INTO `article` (`id_article`, `nom`, `description`, `prix`, `stock`, `seuil_remise`, `categorie`, `marque`, `date_ajout`) VALUES
-(-592478948, 'cacao', 'du cacao', '12.00', 4, 7, 'Necessite', 'Nestlé', '2025-04-19 15:07:30'),
+(832745446, 'y', 'Produit y', '14.00', 74, 8, 'Electromenager', 'Bosch', '2025-04-23 16:26:24'),
 (949478470, 'ae', 'ae', '12.00', 1, 5, 'Electromenager', 'Bosch', '2025-04-17 17:28:56'),
 (1768251590, 'lave-vaiselle', 'Un lave-vaiselle comme un autre', '1235.00', 145, 6, 'Electromenager', 'Bosch', '2025-04-19 14:41:04');
 
@@ -66,14 +66,7 @@ CREATE TABLE IF NOT EXISTS `commande` (
   `montant_total` decimal(10,2) NOT NULL,
   PRIMARY KEY (`id_commande`),
   KEY `id_client` (`id_client`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
-
---
--- Déchargement des données de la table `commande`
---
-
-INSERT INTO `commande` (`id_commande`, `id_client`, `date_commande`, `statut`, `adresse_livraison`, `montant_total`) VALUES
-(1, 2, '2025-03-31 10:12:52', 'livrée', '123 Rue de Test, 75000 Paris', '859.96');
+) ENGINE=InnoDB AUTO_INCREMENT=211287644 DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -96,14 +89,6 @@ CREATE TABLE IF NOT EXISTS `lignecommande` (
   KEY `id_promotion` (`id_promotion`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
---
--- Déchargement des données de la table `lignecommande`
---
-
-INSERT INTO `lignecommande` (`id_ligne_commande`, `id_commande`, `id_article`, `id_promotion`, `quantite`, `prix_unitaire`, `prix_apres_remise`) VALUES
-(1, 1, 1, NULL, 1, '799.99', '799.99'),
-(2, 1, 2, NULL, 2, '29.99', '26.99');
-
 -- --------------------------------------------------------
 
 --
@@ -119,16 +104,17 @@ CREATE TABLE IF NOT EXISTS `lignepanier` (
   PRIMARY KEY (`id_ligne_panier`),
   KEY `id_panier` (`id_panier`),
   KEY `id_article` (`id_article`)
-) ENGINE=InnoDB AUTO_INCREMENT=2072064186 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=803822224 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `lignepanier`
 --
 
 INSERT INTO `lignepanier` (`id_ligne_panier`, `id_panier`, `id_article`, `quantite`) VALUES
-(1, 1, 1, 1),
-(2, 1, 2, 3),
-(462321536, -1281593627, 949478470, 0);
+(56140221, 497446450, 1768251590, 0),
+(414996112, 113262446, 949478470, 0),
+(494345532, 497446450, 1768251590, 0),
+(803822223, 497446450, 832745446, 0);
 
 -- --------------------------------------------------------
 
@@ -144,15 +130,15 @@ CREATE TABLE IF NOT EXISTS `panier` (
   `date_modification` datetime DEFAULT NULL,
   PRIMARY KEY (`id_panier`),
   KEY `id_client` (`id_client`)
-) ENGINE=InnoDB AUTO_INCREMENT=496968144 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=598620436 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `panier`
 --
 
 INSERT INTO `panier` (`id_panier`, `id_client`, `date_creation`, `date_modification`) VALUES
-(-1281593627, 1022904176, '2025-04-21 15:26:05', NULL),
-(1, 2, '2025-04-15 10:12:52', NULL);
+(113262446, 1335405254, '2025-04-23 16:34:23', NULL),
+(497446450, 1022904176, '2025-04-23 16:27:14', NULL);
 
 -- --------------------------------------------------------
 
@@ -217,8 +203,6 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
 --
 
 INSERT INTO `utilisateur` (`id_utilisateur`, `nom`, `prenom`, `email`, `mot_de_passe`, `type_utilisateur`, `date_creation`, `date_derniere_connexion`) VALUES
-(1, '', '', 'admin@test.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', '2025-04-15 10:12:52', NULL),
-(2, '', '', 'client@test.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'client', '2025-04-15 10:12:52', NULL),
 (1022904176, 'Andria', 'Andy', 'andri@gmail.com', '123456', 'admin', '2025-04-17 11:47:16', NULL),
 (1335405254, 'ae', 'ae', 'ae@mail.com', 'ae', 'client', '2025-04-17 17:25:53', NULL),
 (2139289818, 'Andry', 'Andre', 'andry@mail.fr', 'sardine', 'client', '2025-04-17 14:56:27', NULL);

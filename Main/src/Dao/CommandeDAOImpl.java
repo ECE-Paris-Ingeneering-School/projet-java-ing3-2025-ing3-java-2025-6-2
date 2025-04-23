@@ -21,18 +21,20 @@ public class CommandeDAOImpl implements CommandeDAO
     }
 
     @Override
-    public void nouvelleCommande(Client client, Panier panier, String adresse)
+    public void nouvelleCommande(Client client, String adresse)
     {
         try
         {
+            PanierDAOImpl panier = new PanierDAOImpl(daoFactory);
+            Panier panier_client = panier.getPanier(client);
             /// connexion
             Connection connexion = daoFactory.getConnection();
 
             /// récupération des informations saisies dans la page de commande
-            int id_commande = new Random().nextInt();
+            int id_commande = new Random().nextInt(1_000_000_000);
 
             /// Exécution de la requête INSERT INTO de l'objet client, de son panier et de l'adresse en paramètre
-            PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO commande(id_commande, id_client, statut, adresse_livraison, montant_total) VALUES ('"+id_commande+"','"+client.getIdentifiant()+"', 'en attente', '"+adresse+"', '"+panier.calculerPrixTotal()+"')");
+            PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO commande(id_commande, id_client, statut, adresse_livraison, montant_total) VALUES ('"+id_commande+"','"+client.getIdentifiant()+"', 'en attente', '"+adresse+"', '"+panier_client.calculerPrixTotal()+"')");
             preparedStatement.executeUpdate();
         }
         catch (SQLException e)
@@ -51,7 +53,7 @@ public class CommandeDAOImpl implements CommandeDAO
             Connection connexion = daoFactory.getConnection();
 
             /// récupération des informations saisies dans la page de commande
-            int id_ligne_commande = new Random().nextInt();
+            int id_ligne_commande = new Random().nextInt(1_000_000_000);
             int id_commande = commande.getId();
             int id_article = article.getId();
             int quantite = commande.getArticles().size();
@@ -82,7 +84,7 @@ public class CommandeDAOImpl implements CommandeDAO
             /// Mise à jour du statut de la commande en mode annulée
             PreparedStatement preparedStatement = connexion.prepareStatement(
                     "UPDATE commande " +
-                            "SET (statut = 'annulée') WHERE id_client = '"+id_client+"'"
+                            "SET statut = 'annulée' WHERE id_client = '"+id_client+"'"
             );
 
             preparedStatement.executeUpdate();

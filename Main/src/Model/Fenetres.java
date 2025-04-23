@@ -15,7 +15,7 @@ import Control.FenetreControl;
 public class Fenetres extends Component
 {
     /// Fenêtres de navigation
-    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, panier, articles, ajout_commande;
+    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, panier, articles, ajout_commande, modif, modif_article;
     /// Zones de saisie connexion et inscriptions
     public TextField nom, prenom, mail, mdp, mail_id, mdp_id;
     /// Zone de saisie de l'adresse pour commande (récupération des autres paramètres par le profil utilisé)
@@ -28,6 +28,7 @@ public class Fenetres extends Component
     /// Gestion articles
     public TextField nom_article, description, prix, stock, seuil_remise; /// Zones de saisies article
     public JComboBox<String> type_compte, payment_type, categorie, marque; /// Choix du mode de paiement et du type de compte
+    public int id_article;
 
     /// Fenetre catalogue
     public JPanel PTitre, Liste, PannelRetour;
@@ -53,6 +54,8 @@ public class Fenetres extends Component
         ajout_article = new JFrame();
         articles = new JFrame();
         panier = new JFrame();
+        modif = new JFrame();
+        modif_article = new JFrame();
 
         /// Configuration des fenêtres
         inscrire.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -520,7 +523,7 @@ public class Fenetres extends Component
         if (user_actuel.getType_utilisateur().equals("admin"))
         {
             addButton(pied_page, "Ajouter article");
-            addButton(pied_page, "Modifier un article");
+            addButton(pied_page, "Editer un article");
             addButton(pied_page, "Gerer les dossiers clients");
             addButton(pied_page, "Statistiques");
         }
@@ -984,17 +987,6 @@ public class Fenetres extends Component
         addButton(PannelRetour, "Retour");
     }
 
-    /// Panier : Boutons du panier
-    private void PanelPanier() {
-        PannelRetour = new JPanel();
-        PannelRetour.setBackground(new Color(240, 240, 240));
-        PannelRetour.setPreferredSize(new Dimension(getWidth(), 100));
-        PannelRetour.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        PannelRetour.setLayout(new GridBagLayout());
-        addButton(PannelRetour, "Passer commande");
-        addButton(PannelRetour, "Retour");
-    }
-
     /// Ajout d'un nouvel article (seulement pour les admins)
     public void setNewArticle()
     {
@@ -1113,6 +1105,17 @@ public class Fenetres extends Component
                     "Erreur",
                     JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    /// Panier : Boutons du panier
+    private void PanelPanier() {
+        PannelRetour = new JPanel();
+        PannelRetour.setBackground(new Color(240, 240, 240));
+        PannelRetour.setPreferredSize(new Dimension(getWidth(), 100));
+        PannelRetour.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        PannelRetour.setLayout(new GridBagLayout());
+        addButton(PannelRetour, "Passer commande");
+        addButton(PannelRetour, "Retour");
     }
 
     /// Vue Panier
@@ -1311,6 +1314,366 @@ public class Fenetres extends Component
         p.add(retirerButton);
 
         return p;
+    }
+
+    /// Vue modif Article
+    public void setModifArticle()
+    {
+        modif_article.setTitle("Modifier un article");
+        modif_article.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        modif_article.setSize(1200, 800);
+        modif_article.setLocationRelativeTo(null);
+        modif_article.setLayout(new BorderLayout());
+
+        Titre("Sélectionnez l'article à modifier");
+        ProduitsModif();
+        creerRetour();
+
+        modif_article.add(PTitre, BorderLayout.NORTH);
+        modif_article.add(Scroll, BorderLayout.CENTER);
+        modif_article.add(PannelRetour, BorderLayout.SOUTH);
+    }
+
+    /// Vue Panier du client
+    private void ProduitsModif()
+    {
+        try
+        {
+            Liste = new JPanel();
+            Liste.setBackground(Color.WHITE);
+            Liste.setLayout(new GridLayout(0, 3, 20, 20));
+
+            /// Création du panneau de recherche et filtres
+            JPanel searchPanel = new JPanel();
+            searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.Y_AXIS));
+            searchPanel.setBackground(Color.WHITE);
+            searchPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+            /// Barre de recherche
+            JPanel searchBarPanel = new JPanel();
+            searchBarPanel.setLayout(new BoxLayout(searchBarPanel, BoxLayout.X_AXIS));
+            searchBarPanel.setBackground(Color.WHITE);
+
+            JTextField searchField = new JTextField(20);
+            searchField.setPreferredSize(new Dimension(300, 35));
+            searchField.setFont(new Font("Arial", Font.PLAIN, 14));
+            searchField.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                    BorderFactory.createEmptyBorder(5, 10, 5, 10)
+            ));
+
+            JButton searchButton = new JButton("Rechercher");
+            searchButton.setBackground(new Color(51, 122, 183));
+            searchButton.setForeground(Color.WHITE);
+            searchButton.setFont(new Font("Arial", Font.BOLD, 14));
+            searchButton.setBorderPainted(false);
+            searchButton.setFocusPainted(false);
+            searchButton.setPreferredSize(new Dimension(120, 35));
+
+            searchBarPanel.add(searchField);
+            searchBarPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+            searchBarPanel.add(searchButton);
+
+            /// Filtres par catégorie
+            JPanel filterPanel = new JPanel();
+            filterPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+            filterPanel.setBackground(Color.WHITE);
+
+            String[] categories = {"Tous", "Nourriture", "Vêtements", "Livres", "Décoration"};
+            JComboBox<String> categoryFilter = new JComboBox<>(categories);
+            categoryFilter.setFont(new Font("Arial", Font.PLAIN, 14));
+            categoryFilter.setPreferredSize(new Dimension(150, 35));
+
+            filterPanel.add(new JLabel("Catégorie: "));
+            filterPanel.add(categoryFilter);
+
+            searchPanel.add(searchBarPanel);
+            searchPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+            searchPanel.add(filterPanel);
+
+            DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
+
+            ArticleDAOImpl articleDAO = new ArticleDAOImpl(dao);
+
+            java.util.List<Article> articles = articleDAO.listerArticles();
+
+            /// Affichage des articles
+            for (Article article : articles)
+            {
+                JPanel articlePanel = modifArticle(article);
+                Liste.add(articlePanel);
+            }
+
+            /// Ajout des composants au catalogue
+            catalogue.add(searchPanel, BorderLayout.NORTH);
+            Scroll = new JScrollPane(Liste);
+            Scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            Scroll.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+            catalogue.add(Scroll, BorderLayout.CENTER);
+
+            /// Gestion des événements de recherche
+            searchButton.addActionListener(e -> {
+                String searchText = searchField.getText().toLowerCase();
+                String selectedCategory = (String)categoryFilter.getSelectedItem();
+
+                Liste.removeAll();
+                for (Article article : articles)
+                {
+                    boolean matchesSearch = article.getNom().toLowerCase().contains(searchText) ||
+                            article.getDescription().toLowerCase().contains(searchText);
+                    boolean matchesCategory = selectedCategory.equals("Tous") ||
+                            article.getCategorie().equals(selectedCategory);
+
+                    if (matchesSearch && matchesCategory)
+                    {
+                        JPanel articlePanel = modifArticle(article);
+                        Liste.add(articlePanel);
+                    }
+                }
+                Liste.revalidate();
+                Liste.repaint();
+            });
+
+            categoryFilter.addActionListener(e -> {
+                String selectedCategory = (String)categoryFilter.getSelectedItem();
+                searchButton.doClick();
+            });
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            /// Afficher un message d'erreur à l'utilisateur
+            JOptionPane.showMessageDialog(this,
+                    "Erreur lors du chargement du catalogue : " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /// Modifier un article (seulement pour les admins)
+    private JPanel modifArticle(Article article)
+    {
+        JPanel p = new JPanel();
+        p.setBackground(Color.WHITE);
+        p.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+
+        /// 1. Image du produit
+        JPanel imagePanel = new JPanel();
+        imagePanel.setPreferredSize(new Dimension(250, 200));
+        imagePanel.setBackground(Color.WHITE);
+        imagePanel.setLayout(new BorderLayout());
+
+        /// Chargement de l'image en fonction de la catégorie
+        String defaultImagePath = "Main/src/View/image/default_product.png";
+
+        /// Convertir la catégorie en version sans accent pour le chemin du dossier
+        String categorieDossier = article.getCategorie().toLowerCase()
+                .replace("é", "e")
+                .replace("è", "e")
+                .replace("à", "a")
+                .replace("ù", "u")
+                .replace("ç", "c")
+                .replace("ê", "e");
+
+        String imagePath = defaultImagePath;
+
+        /// Obtenir le nom du fichier image en fonction de la catégorie
+        String fileName = getImageFileName(article.getNom(), article.getCategorie());
+        if (fileName != null) {
+            /// Utiliser la catégorie sans accent pour le chemin
+            imagePath = String.format("Main/src/View/image/%s/%s", categorieDossier, fileName);
+            //System.out.println("Tentative de chargement de l'image: " + imagePath);
+        }
+
+        try {
+            File imageFile = new File(imagePath);
+            ImageIcon imageIcon;
+
+            if (imageFile.exists()) {
+                imageIcon = new ImageIcon(imagePath);
+                //System.out.println("Image trouvée et chargée: " + imagePath);
+            } else {
+                //System.out.println("Image non trouvée: " + imagePath + ", utilisation de l'image par défaut");
+                imageIcon = new ImageIcon(defaultImagePath);
+            }
+
+            // Redimensionner l'image
+            Image img = imageIcon.getImage();
+            int originalWidth = imageIcon.getIconWidth();
+            int originalHeight = imageIcon.getIconHeight();
+
+            if (originalWidth > 0 && originalHeight > 0) {
+                double ratio = Math.min(230.0 / originalWidth, 180.0 / originalHeight);
+                int newWidth = (int) (originalWidth * ratio);
+                int newHeight = (int) (originalHeight * ratio);
+
+                Image newImg = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+                JLabel imageLabel = new JLabel(new ImageIcon(newImg));
+                imageLabel.setHorizontalAlignment(JLabel.CENTER);
+                imagePanel.add(imageLabel, BorderLayout.CENTER);
+            } else {
+                throw new Exception("Image invalide");
+            }
+        } catch (Exception e) {
+            //System.out.println("Erreur lors du chargement de l'image pour " + article.getNom() + ": " + e.getMessage());
+            JLabel placeholder = new JLabel(article.getNom().substring(0, 1).toUpperCase());
+            placeholder.setFont(new Font("Arial", Font.BOLD, 48));
+            placeholder.setForeground(new Color(200, 200, 200));
+            placeholder.setHorizontalAlignment(JLabel.CENTER);
+            imagePanel.add(placeholder, BorderLayout.CENTER);
+        }
+
+        imagePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        p.add(imagePanel);
+        p.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        /// 2. Nom du produit
+        JLabel nameLabel = new JLabel(article.getNom(), SwingConstants.CENTER);
+        nameLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        nameLabel.setForeground(new Color(50, 50, 50));
+        nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        p.add(nameLabel);
+        p.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        /// 3. Marque
+        JLabel brandLabel = new JLabel("Marque: " + article.getMarque());
+        brandLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        brandLabel.setForeground(new Color(100, 100, 100));
+        brandLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.add(brandLabel);
+
+        /// 4. Catégorie
+        JLabel categoryLabel = new JLabel("Catégorie: " + article.getCategorie());
+        categoryLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        categoryLabel.setForeground(new Color(100, 100, 100));
+        categoryLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.add(categoryLabel);
+
+        /// 5. Prix
+        JLabel priceLabel = new JLabel(String.format("%.2f €", article.getPrixUnitaire()));
+        priceLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        priceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.add(priceLabel);
+
+        /// 6. Stock
+        JLabel stockLabel = new JLabel("Stock: " + article.getStock() + " unités");
+        stockLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        stockLabel.setForeground(new Color(100, 100, 100));
+        stockLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.add(stockLabel);
+
+        /// 7. Description (truncated)
+        String shortDescription = article.getDescription().length() > 100 ?
+                article.getDescription().substring(0, 100) + "..." : article.getDescription();
+        JLabel descLabel = new JLabel("<html>" + shortDescription + "</html>");
+        descLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        descLabel.setForeground(new Color(120, 120, 120));
+        descLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.add(descLabel);
+
+        p.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        /// 8. Bouton Voir détails
+        JButton voirButton = new JButton("Détails");
+        voirButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        voirButton.setBackground(new Color(51, 122, 183));
+        voirButton.setForeground(Color.WHITE);
+        voirButton.setFont(new Font("Arial", Font.BOLD, 14));
+        voirButton.setBorderPainted(false);
+        voirButton.setFocusPainted(false);
+        voirButton.setPreferredSize(new Dimension(120, 35));
+        voirButton.setActionCommand("Détails" + article.getId());
+        voirButton.addActionListener(e -> {
+            fenetreControl.actionPerformed(e);
+        });
+        p.add(voirButton);
+
+        /// 9. Modifier l'article
+        JButton modifierButton = new JButton("Modifier");
+        modifierButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        modifierButton.setBackground(new Color(51, 122, 183));
+        modifierButton.setForeground(Color.WHITE);
+        modifierButton.setFont(new Font("Arial", Font.BOLD, 14));
+        modifierButton.setBorderPainted(false);
+        modifierButton.setFocusPainted(false);
+        modifierButton.setPreferredSize(new Dimension(120, 35));
+        modifierButton.setActionCommand("Modifier" + article.getId()); /// Retourne Modifier + id de l'article
+        modifierButton.addActionListener(e -> {
+            fenetreControl.actionPerformed(e);
+        });
+        p.add(modifierButton);
+
+        return p;
+    }
+
+    /// Modification d'un article (seulement pour les admins), sur la même base que ajouter un article
+    public void setModifierArticle(Article article)
+    {
+        id_article = article.getId();
+        modif = new JFrame();
+        modif.setSize(900, 700);
+        modif.setTitle("Modification d'un article");
+        modif.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        modif.setLayout(new BoxLayout(modif.getContentPane(), BoxLayout.Y_AXIS));
+        JLabel label1 = new JLabel("Categorie");
+        modif.add(label1);
+        String[] type = {"Electromenager", "Nourriture", "Necessite"};
+        categorie = new JComboBox<>(type); /// Liste associée
+        categorie.setSelectedIndex(Integer.parseInt(article.getCategorie()));
+        categorie.setBounds(50, 50, 100, 20);
+        modif.add(categorie);
+        JLabel label2 = new JLabel("Marque");
+        modif.add(label2);
+        String[] type2 = {"Bosch", "Samsung", "Nestlé"};
+        marque = new JComboBox<>(type2); /// Liste associée
+        marque.setSelectedIndex(Integer.parseInt(article.getMarque()));
+        marque.setBounds(50, 50, 100, 20);
+        modif.add(marque);
+        JPanel inscrire_nom = new JPanel();
+        JLabel label3 = new JLabel("Nom");
+        inscrire_nom.add(label3);
+        JPanel ajout_article_button = new JPanel();
+        nom_article = new TextField(10);
+        prix = new TextField(10);
+        stock = new TextField(10);
+        description = new TextField(10);
+        seuil_remise = new TextField(10);
+        nom_article.setText(article.getNom());
+        description.setText(article.getDescription());
+        prix.setText(String.valueOf(article.getPrixUnitaire()));
+        stock.setText(String.valueOf(article.getStock()));
+        seuil_remise.setText(String.valueOf(article.getSeuil_remise()));
+        categorie.setSelectedItem(article.getCategorie());
+        marque.setSelectedItem(article.getMarque());
+        inscrire_nom.add(nom_article);
+        JPanel inscrire_prix = new JPanel();
+        JLabel label4 = new JLabel("Prix");
+        inscrire_prix.add(label4);
+        inscrire_prix.add(prix);
+        JLabel label5 = new JLabel("Stock");
+        JPanel inscrire_stock = new JPanel();
+        inscrire_stock.add(label5);
+        inscrire_stock.add(stock);
+        JLabel label6 = new JLabel("Seuil de remise");
+        JPanel inscrire_remise = new JPanel();
+        inscrire_remise.add(label6);
+        inscrire_remise.add(seuil_remise);
+        JPanel decrire = new JPanel();
+        JLabel label7 = new JLabel("Description");
+        decrire.add(label7);
+        decrire.add(description);
+        addButton(ajout_article_button, "Mettre à jour");
+        addButton(ajout_article_button, "Retour");
+        modif.add(inscrire_nom);
+        modif.add(inscrire_prix);
+        modif.add(inscrire_stock);
+        modif.add(inscrire_remise);
+        modif.add(decrire);
+        modif.add(ajout_article_button);
     }
 
 }

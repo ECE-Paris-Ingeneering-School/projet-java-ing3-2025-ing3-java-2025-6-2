@@ -21,7 +21,7 @@ public interface PanierDAO
     /**Ajoute un article au panier concerné
      * @Utilise le client concerné et son panier actuel
      */
-    public void ajouterAuPanier(Panier panier, Article article);
+    public void ajouterAuPanier(Panier panier, Client client, Article article);
     /**Retire un article au panier concerné
      * @Utilise l'article à retirer
      */

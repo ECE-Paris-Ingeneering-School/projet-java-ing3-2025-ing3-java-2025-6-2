@@ -52,16 +52,24 @@ public class PanierDAOImpl implements PanierDAO
     {
         try
         {
-            /// connexion
-            Connection connexion = daoFactory.getConnection();
+            PanierDAOImpl panierDAO = new PanierDAOImpl(daoFactory);
+            if(panierDAO.getPanier(client) != null)
+            {
+                System.out.println("Ajout d'un nouveau panier impossible");
+            }
+            else
+            {
+                /// connexion
+                Connection connexion = daoFactory.getConnection();
 
-            /// récupération des informations saisies dans la page de commande
-            int id_panier = new Random().nextInt();
-            int id_client = client.getIdentifiant();
+                /// récupération des informations saisies dans la page de commande
+                int id_panier = new Random().nextInt(1_000_000_000);
+                int id_client = client.getIdentifiant();
 
-            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
-            PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO panier(id_panier, id_client) VALUES ('"+id_panier+"','"+id_client+"')");
-            preparedStatement.executeUpdate();
+                /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+                PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO panier(id_panier, id_client) VALUES ('"+id_panier+"','"+id_client+"')");
+                preparedStatement.executeUpdate();
+            }
         }
         catch (SQLException e)
         {
@@ -71,22 +79,30 @@ public class PanierDAOImpl implements PanierDAO
     }
 
     @Override
-    public void ajouterAuPanier(Panier panier, Article article)
+    public void ajouterAuPanier(Panier panier, Client client, Article article)
     {
         try
         {
-            /// connexion
-            Connection connexion = daoFactory.getConnection();
+            PanierDAOImpl panierDAO = new PanierDAOImpl(daoFactory);
+            if(panierDAO.getPanier(client) == null)
+            {
+                System.out.println("Ajout d'un nouvel article impossible");
+            }
+            else
+            {
+                /// connexion
+                Connection connexion = daoFactory.getConnection();
 
-            /// récupération des informations saisies dans la page de commande
-            int id_ligne_panier = new Random().nextInt();
-            int id_panier = panier.getId();
-            int id_article = article.getId();
-            int quantite = panier.getArticles().size();
+                /// récupération des informations saisies dans la page de commande
+                int id_ligne_panier = new Random().nextInt(1_000_000_000);
+                int id_panier = panier.getId();
+                int id_article = article.getId();
+                int quantite = panier.getArticles().size();
 
-            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
-            PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO lignepanier(id_ligne_panier, id_panier, id_article, quantite) VALUES ('"+id_ligne_panier+"','"+id_panier+"', '"+id_article+"', '"+quantite+"')");
-            preparedStatement.executeUpdate();
+                /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+                PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO lignepanier(id_ligne_panier, id_panier, id_article, quantite) VALUES ('" + id_ligne_panier + "','" + id_panier + "', '" + id_article + "', '" + quantite + "')");
+                preparedStatement.executeUpdate();
+            }
         }
         catch (SQLException e)
         {
