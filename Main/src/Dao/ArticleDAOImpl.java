@@ -270,65 +270,64 @@ public class ArticleDAOImpl implements ArticleDAO
 
     public int compteArticle() {
         int compte = 0;
+        String query = "SELECT COUNT(*) AS comptArt FROM article WHERE 1;";
+        System.out.println("TEST1");
+        Connection connexion = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
         try {
-            Connection connexion = daoFactory.getConnection();
-
-
-            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
-            PreparedStatement preparedStatement = connexion.prepareStatement("SELECT COUNT(*) AS comptArt FROM article WHERE 1;");
-            ResultSet resultSet = preparedStatement.executeQuery();
+            connexion = daoFactory.getConnection();
+            preparedStatement = connexion.prepareStatement(query);
+            resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 compte = resultSet.getInt("comptArt");
             }
             resultSet.close();
             preparedStatement.close();
             connexion.close();
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             e.printStackTrace();
-            System.out.println("Erreur");
+            System.out.println("Erreur lors du comptage des articles.");
+        }
+        finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (preparedStatement != null) preparedStatement.close();
+                if (connexion != null) connexion.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return compte;
     }
-    public int Articlemax() {
-        int p = 0;
-        try {
+    public int getPrixMinMax(String operation) {
+        int price = 0;
+        String query = "SELECT " + operation + "(prix) AS comptArt FROM article;";
+
+        try
+        {
             Connection connexion = daoFactory.getConnection();
-
-
-            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
-            PreparedStatement preparedStatement = connexion.prepareStatement("SELECT MAX(prix) AS comptArt FROM article;");
+            PreparedStatement preparedStatement = connexion.prepareStatement(query);
             ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                p = resultSet.getInt("comptArt");
+
+            if (resultSet.next())
+            {
+                price = resultSet.getInt("comptArt");
             }
-            resultSet.close();
-            preparedStatement.close();
-            connexion.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Erreur");
+            System.out.println("Erreur lors de la récupération du prix " + operation);
         }
-        return p;
+        return price;
     }
+
+    public int Articlemax() {
+        return getPrixMinMax("MAX");
+    }
+
     public int Articlemin() {
-        int p = 0;
-        try {
-            Connection connexion = daoFactory.getConnection();
-
-
-            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
-            PreparedStatement preparedStatement = connexion.prepareStatement("SELECT MIN(prix) AS comptArt FROM article;");
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                p = resultSet.getInt("comptArt");
-            }
-            resultSet.close();
-            preparedStatement.close();
-            connexion.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Erreur");
-        }
-        return p;
+        return getPrixMinMax("MIN");
     }
 }

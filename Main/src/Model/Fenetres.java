@@ -525,10 +525,9 @@ public class Fenetres extends Component
             addButton(pied_page, "Ajouter article");
             addButton(pied_page, "Editer un article");
             addButton(pied_page, "Gerer les dossiers clients");
-            JButton S = createNavButton("Statistiques", e -> {
-                fenetreControl.actionPerformed(e);
-            });
-            pied_page.add(S);
+            JButton boutSta = new JButton("Statistiques");
+            boutSta.addActionListener(e -> fenetreControl.actionPerformed(e));
+            pied_page.add(boutSta);
         }
         pied_page.add(Box.createVerticalStrut(10));
         pied_page.add(new JLabel("FIN"));
@@ -1724,14 +1723,26 @@ public class Fenetres extends Component
         centerPanel.add(new JLabel(String.valueOf(nbarticle)));
         centerPanel.add(Box.createVerticalStrut(15));
         centerPanel.add(new JLabel("Prix maximum : "));
-        pmax = articleDAO.compteArticle();
+        pmax = articleDAO.Articlemax();
         centerPanel.add(new JLabel(String.valueOf(pmax)));
         centerPanel.add(Box.createVerticalStrut(15));
         centerPanel.add(new JLabel("Prix minimum : "));
-        pmin = articleDAO.compteArticle();
+        pmin = articleDAO.Articlemin();
         centerPanel.add(new JLabel(String.valueOf(pmin)));
         centerPanel.add(Box.createVerticalStrut(15));
+        stats.add(centerPanel, BorderLayout.CENTER);
 
+        JPanel pied_page = new JPanel();
+        pied_page.setLayout(new FlowLayout(FlowLayout.CENTER));
+        pied_page.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+
+        JButton retour = new JButton("Retour");
+        retour.addActionListener(e -> fenetreControl.actionPerformed(e));
+        pied_page.add(retour);
+        stats.add(pied_page, BorderLayout.SOUTH);
+
+        stats.revalidate();
+        stats.repaint();
 
         // TODO Implementer Stats, voirs si il n'y a pas besoin de rajouter une valeur dans la table de donnée qui compte le nombre d'achat total.
 

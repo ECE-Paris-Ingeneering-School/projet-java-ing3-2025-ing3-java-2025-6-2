@@ -72,6 +72,12 @@ public class FenetreControl extends JFrame implements ActionListener
                     fenetre.connecter.setVisible(true);
                     fenetre.event.setVisible(true);
                 }
+                else if (fenetre.profil.isVisible())
+                {
+                    fenetre.stats();
+                    fenetre.stats.setVisible(true);
+                    fenetre.profil.setVisible(false);
+                }
                 break;
             /// Valider l'ajout d'un article (seulement pour les administrateurs)
             case "Valider l'ajout":
@@ -307,6 +313,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.articles.setVisible(false);
                 fenetre.modif.setVisible(false);
                 fenetre.modif_article.setVisible(false);
+                fenetre.stats.setVisible(false);
                 break;
         }
     }

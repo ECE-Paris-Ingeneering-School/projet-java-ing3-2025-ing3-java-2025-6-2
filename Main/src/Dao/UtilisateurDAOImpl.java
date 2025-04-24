@@ -84,23 +84,32 @@ public class UtilisateurDAOImpl implements UtilisateurDAO
 
     public int compteClients() {
         int compte = 0;
+        Connection connexion = null;
+        ResultSet resultSet = null;
+        PreparedStatement preparedStatement = null;
         try {
-            Connection connexion = daoFactory.getConnection();
-
+            connexion = daoFactory.getConnection();
 
             /// Exécution de la requête INSERT INTO de l'objet client en paramètre
-            PreparedStatement preparedStatement = connexion.prepareStatement("SELECT COUNT(*) AS comptCli FROM utilisateur WHERE type_utilisateur = ?");
+            preparedStatement = connexion.prepareStatement("SELECT COUNT(*) AS comptCli FROM utilisateur WHERE type_utilisateur = ?");
             preparedStatement.setString(1, "client");
-            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 compte = resultSet.getInt("comptCli");
             }
-            resultSet.close();
-            preparedStatement.close();
-            connexion.close();
+
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Erreur");
+            System.out.println("Erreur pour trouver Client");
+        }
+        finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (preparedStatement != null) preparedStatement.close();
+                if (connexion != null) connexion.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return compte;
     }
