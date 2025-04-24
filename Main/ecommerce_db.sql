@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : mer. 23 avr. 2025 à 14:34
+-- Généré le : jeu. 24 avr. 2025 à 13:58
 -- Version du serveur :  5.7.31
 -- Version de PHP : 7.3.21
 
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `article` (
 --
 
 INSERT INTO `article` (`id_article`, `nom`, `description`, `prix`, `stock`, `seuil_remise`, `categorie`, `marque`, `date_ajout`) VALUES
-(832745446, 'y', 'Produit y', '14.00', 74, 8, 'Electromenager', 'Bosch', '2025-04-23 16:26:24'),
+(832745446, 'y', 'Produit y', '14.00', 74, 8, 'Nourriture', 'Samsung', '2025-04-23 16:26:24'),
 (949478470, 'ae', 'ae', '12.00', 1, 5, 'Electromenager', 'Bosch', '2025-04-17 17:28:56'),
 (1768251590, 'lave-vaiselle', 'Un lave-vaiselle comme un autre', '1235.00', 145, 6, 'Electromenager', 'Bosch', '2025-04-19 14:41:04');
 
@@ -104,17 +104,14 @@ CREATE TABLE IF NOT EXISTS `lignepanier` (
   PRIMARY KEY (`id_ligne_panier`),
   KEY `id_panier` (`id_panier`),
   KEY `id_article` (`id_article`)
-) ENGINE=InnoDB AUTO_INCREMENT=803822224 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=926781262 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `lignepanier`
 --
 
 INSERT INTO `lignepanier` (`id_ligne_panier`, `id_panier`, `id_article`, `quantite`) VALUES
-(56140221, 497446450, 1768251590, 0),
-(414996112, 113262446, 949478470, 0),
-(494345532, 497446450, 1768251590, 0),
-(803822223, 497446450, 832745446, 0);
+(414996112, 113262446, 949478470, 0);
 
 -- --------------------------------------------------------
 

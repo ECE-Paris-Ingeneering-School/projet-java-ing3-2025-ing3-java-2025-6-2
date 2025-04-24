@@ -26,7 +26,7 @@ public class Fenetres extends Component
     public String email, password;
 
     /// Gestion articles
-    public TextField nom_article, description, prix, stock, seuil_remise; /// Zones de saisies article
+    public TextField nom_article, description, prix, stock, seuil_remise, quantite; /// Zones de saisies article
     public JComboBox<String> type_compte, payment_type, categorie, marque; /// Choix du mode de paiement et du type de compte
     public int id_article;
 
@@ -262,9 +262,7 @@ public class Fenetres extends Component
             categoryButton.setFont(new Font("Arial", Font.PLAIN, 16));
             categoryButton.setBackground(new Color(240, 240, 240));
             categoryButton.setBorderPainted(false);
-            categoryButton.addActionListener(e -> {
-                catalogue.setVisible(true);
-            });
+            categoryButton.addActionListener(e -> catalogue.setVisible(true));
             categoriesPanel.add(categoryButton);
         }
 
@@ -547,11 +545,18 @@ public class Fenetres extends Component
     }
 
     /// Gestion des erreurs
-    public void setEvent()
+    public void setEvent(String titre, String description)
     {
-        event = new JFrame();
         event.setSize(300, 100);
-        event.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        event.getContentPane().removeAll();
+        event.setTitle(titre);
+        JPanel text = new JPanel();
+        JLabel label_event = new JLabel(description);
+        text.add(label_event);
+        JPanel erreur_button = new JPanel();
+        addButton(erreur_button, "Retour");
+        event.add(text, BorderLayout.CENTER);
+        event.add(erreur_button, BorderLayout.SOUTH);
     }
 
     /// Paiement d'un article
@@ -895,12 +900,19 @@ public class Fenetres extends Component
         voirButton.setFocusPainted(false);
         voirButton.setPreferredSize(new Dimension(120, 35));
         voirButton.setActionCommand("Détails" + article.getId()); /// Retourne Détails + id de l'article sélectionné
-        voirButton.addActionListener(e -> {
-            fenetreControl.actionPerformed(e);
-        });
+        voirButton.addActionListener(e -> fenetreControl.actionPerformed(e));
         p.add(voirButton);
 
-        /// 9. Ajout au panier
+        /// 9. Quantité désiré
+        JPanel panel_quantite = new JPanel();
+        JLabel label_quantite = new JLabel("Quantité");
+        panel_quantite.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel_quantite.add(label_quantite);
+        quantite = new TextField(10);
+        panel_quantite.add(quantite);
+        p.add(panel_quantite);
+
+        /// 10. Ajout au panier
         JButton panierButton = new JButton("Ajouter");
         panierButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         panierButton.setBackground(new Color(51, 122, 183));
@@ -910,9 +922,7 @@ public class Fenetres extends Component
         panierButton.setFocusPainted(false);
         panierButton.setPreferredSize(new Dimension(120, 35));
         panierButton.setActionCommand("Ajouter" + article.getId()); /// Retourne Ajouter + id de l'article sélectionné
-        panierButton.addActionListener(e -> {
-            fenetreControl.actionPerformed(e);
-        });
+        panierButton.addActionListener(e -> fenetreControl.actionPerformed(e));
         p.add(panierButton);
 
         return p;
@@ -1298,9 +1308,7 @@ public class Fenetres extends Component
         voirButton.setFocusPainted(false);
         voirButton.setPreferredSize(new Dimension(120, 35));
         voirButton.setActionCommand("Détails" + article.getId());
-        voirButton.addActionListener(e -> {
-            fenetreControl.actionPerformed(e);
-        });
+        voirButton.addActionListener(e -> fenetreControl.actionPerformed(e));
         p.add(voirButton);
 
         /// 9. Retirer du panier
@@ -1313,9 +1321,7 @@ public class Fenetres extends Component
         retirerButton.setFocusPainted(false);
         retirerButton.setPreferredSize(new Dimension(120, 35));
         retirerButton.setActionCommand("Retirer" + article.getId()); /// Retourne Retirer + id de l'article
-        retirerButton.addActionListener(e -> {
-            fenetreControl.actionPerformed(e);
-        });
+        retirerButton.addActionListener(e -> fenetreControl.actionPerformed(e));
         p.add(retirerButton);
 
         return p;
@@ -1592,9 +1598,7 @@ public class Fenetres extends Component
         voirButton.setFocusPainted(false);
         voirButton.setPreferredSize(new Dimension(120, 35));
         voirButton.setActionCommand("Détails" + article.getId());
-        voirButton.addActionListener(e -> {
-            fenetreControl.actionPerformed(e);
-        });
+        voirButton.addActionListener(e -> fenetreControl.actionPerformed(e));
         p.add(voirButton);
 
         /// 9. Modifier l'article
@@ -1607,9 +1611,7 @@ public class Fenetres extends Component
         modifierButton.setFocusPainted(false);
         modifierButton.setPreferredSize(new Dimension(120, 35));
         modifierButton.setActionCommand("Modifier" + article.getId()); /// Retourne Modifier + id de l'article
-        modifierButton.addActionListener(e -> {
-            fenetreControl.actionPerformed(e);
-        });
+        modifierButton.addActionListener(e -> fenetreControl.actionPerformed(e));
         p.add(modifierButton);
 
         return p;

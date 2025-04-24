@@ -12,7 +12,6 @@ public class Main
         newFenetre.setIdentification();
         newFenetre.setInscrire();
         newFenetre.setAccueil();
-        newFenetre.setEvent();
         newFenetre.setPaiement();
         newFenetre.setNewArticle();
         newFenetre.setModifArticle();

@@ -46,15 +46,7 @@ public class FenetreControl extends JFrame implements ActionListener
                     Utilisateurs connect = userdao.connexionUtilisateur(user);
                     if (connect == null)
                     {
-                        fenetre.event.getContentPane().removeAll(); /// Retire le contenu de la page event
-                        erreur_text = new JPanel();
-                        fenetre.event.setTitle("Erreur");
-                        label_event = new JLabel("Erreur pendant la tentative de connexion");
-                        erreur_text.add(label_event);
-                        JPanel erreur_button = new JPanel();
-                        fenetre.addButton(erreur_button, "Retour");
-                        fenetre.event.add(erreur_text, BorderLayout.CENTER);
-                        fenetre.event.add(erreur_button, BorderLayout.SOUTH);
+                        fenetre.setEvent("Erreur", "Erreur pendant la tentative de connexion");
                         fenetre.event.setVisible(true);
                     }
                     else
@@ -76,15 +68,7 @@ public class FenetreControl extends JFrame implements ActionListener
                     Utilisateurs new_user = new Utilisateurs(id, nom, prenom, mail, mot_de_passe, type_compte);
                     userdao.ajouterUtilisateur(new_user);
                     fenetre.inscrire.setVisible(false);
-                    fenetre.event.getContentPane().removeAll();
-                    fenetre.event.setTitle("Inscription");
-                    JPanel text = new JPanel();
-                    label_event = new JLabel("Inscription terminee");
-                    text.add(label_event);
-                    JPanel erreur_button = new JPanel();
-                    fenetre.addButton(erreur_button, "Retour");
-                    fenetre.event.add(text, BorderLayout.CENTER);
-                    fenetre.event.add(erreur_button, BorderLayout.SOUTH);
+                    fenetre.setEvent("Inscription", "Inscription terminee");
                     fenetre.connecter.setVisible(true);
                     fenetre.event.setVisible(true);
                 }
@@ -105,15 +89,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 artdao.ajouterArticle(new_article); /// Ajout de l'objet
                 fenetre.ajout_article.setVisible(false);
                 /// Fenêtre pop-up mise à jour pour confirmer l'action
-                fenetre.event.getContentPane().removeAll();
-                fenetre.event.setTitle("Ajout article");
-                JPanel text = new JPanel();
-                label_event = new JLabel("Ajout effectué");
-                text.add(label_event);
-                JPanel erreur_button = new JPanel();
-                fenetre.addButton(erreur_button, "Retour");
-                fenetre.event.add(text, BorderLayout.CENTER);
-                fenetre.event.add(erreur_button, BorderLayout.SOUTH);
+                fenetre.setEvent("Ajout article", "Ajout d'un article effectué");
                 fenetre.profil.setVisible(true);
                 fenetre.event.setVisible(true);
                 break;
@@ -172,15 +148,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 artdao.modifierArticle(new_article); /// Modification de l'objet
                 fenetre.modif.setVisible(false);
                 /// Fenêtre pop-up mise à jour pour confirmer l'action
-                fenetre.event.getContentPane().removeAll();
-                fenetre.event.setTitle("Modification d'un article");
-                text = new JPanel();
-                label_event = new JLabel("Modification effectué");
-                text.add(label_event);
-                erreur_button = new JPanel();
-                fenetre.addButton(erreur_button, "Retour");
-                fenetre.event.add(text, BorderLayout.CENTER);
-                fenetre.event.add(erreur_button, BorderLayout.SOUTH);
+                fenetre.setEvent("Modification d'un article", "Modification effectuée");
                 fenetre.profil.setVisible(true);
                 fenetre.event.setVisible(true);
                 break;
@@ -220,41 +188,34 @@ public class FenetreControl extends JFrame implements ActionListener
                 break;
             /// Ajouter permet d'ajouter un article dans le panier de l'utilisateur
             case "Ajouter":
-                /// On récupère la commande Ajouter avec l'id de l'article concerné
                 articleDAO = new ArticleDAOImpl(dao);
-                cmd = e.getActionCommand(); /// Récupère la commande + id de l'article
-                if (cmd.startsWith("Ajouter"))
-                {
+                cmd = e.getActionCommand();
+
+                if (cmd.startsWith("Ajouter")) {
+                    String idStr = cmd.substring("Ajouter".length()).trim();
                     try
                     {
-                        String idStr = cmd.substring("Ajouter".length());
-                        System.out.println(idStr); /// Correspond à l'id de l'article choisi (converti ensuite en entier pour les prochaines étapes)
                         int id = Integer.parseInt(idStr);
                         Article article = articleDAO.getArticle(id);
-                        /// Connexion à la base de données puis à la table panier + ligne panier pour traitement. On récupère l'id du client utilisé pour l'enregistrer dans la base (clé étrangère)
-                        PanierDAOImpl panierDAO = new PanierDAOImpl(dao);
                         Utilisateurs user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
                         Utilisateurs connect = userdao.connexionUtilisateur(user);
                         Client client = new Client(connect.getIdentifiant(), connect.getNom(), connect.getPrenom(), connect.getEmail(), connect.getMotDePasse(), connect.getType_utilisateur());
+                        int quantite_voulu = Integer.parseInt(fenetre.quantite.getText());
+                        PanierDAOImpl panierDAO = new PanierDAOImpl(dao);
                         panierDAO.nouveauPanier(client);
-                        Panier panier = new Panier(panierDAO.getPanier(client).getId(), client);
-                        panierDAO.ajouterAuPanier(panier, client, article);
-                        fenetre.event.getContentPane().removeAll();
-                        fenetre.event.setTitle("Article");
-                        text = new JPanel();
-                        label_event = new JLabel("Article ajouté au panier");
-                        text.add(label_event);
-                        erreur_button = new JPanel();
-                        fenetre.addButton(erreur_button, "Retour");
-                        fenetre.event.add(text, BorderLayout.CENTER);
-                        fenetre.event.add(erreur_button, BorderLayout.SOUTH);
+                        Panier panier = panierDAO.getPanier(client);
+                        panierDAO.ajouterAuPanier(panier, client, article, quantite_voulu);
+                        fenetre.setEvent("Article", "Article ajouté au panier");
+                        fenetre.event.setVisible(true);
                     }
-                    catch (NumberFormatException ex)
+                    catch (Exception ex)
                     {
-                        System.err.println("ID invalide dans la commande : " + cmd);
+                        System.err.println("Une erreur est survenue lors de l’ajout au panier : " + ex.getMessage());
+                        ex.printStackTrace();
                     }
                 }
                 break;
+
             /// Même principe que pour Ajouter  mais dans l'autre sens, et sans l'id du client
             case "Retirer":
                 articleDAO = new ArticleDAOImpl(dao);
@@ -269,15 +230,8 @@ public class FenetreControl extends JFrame implements ActionListener
                         Article article = articleDAO.getArticle(id);
                         PanierDAOImpl panierDAO = new PanierDAOImpl(dao);
                         panierDAO.supprimerDuPanier(article);
-                        fenetre.event.getContentPane().removeAll();
-                        fenetre.event.setTitle("Article");
-                        text = new JPanel();
-                        label_event = new JLabel("Article retiré du panier");
-                        text.add(label_event);
-                        erreur_button = new JPanel();
-                        fenetre.addButton(erreur_button, "Retour");
-                        fenetre.event.add(text, BorderLayout.CENTER);
-                        fenetre.event.add(erreur_button, BorderLayout.SOUTH);
+                        fenetre.setEvent("Article", "Article retiré du panier");
+                        fenetre.event.setVisible(true);
                     }
                     catch (NumberFormatException ex)
                     {
@@ -301,15 +255,8 @@ public class FenetreControl extends JFrame implements ActionListener
                 /// Ajout d'une nouvelle commande
                 comdao.nouvelleCommande(client, adresse);
                 fenetre.paiement.setVisible(true);
-                fenetre.event.getContentPane().removeAll();
-                fenetre.event.setTitle("Ajout article");
-                text = new JPanel();
-                label_event = new JLabel("Commande ajoutée");
-                text.add(label_event);
-                erreur_button = new JPanel();
-                fenetre.addButton(erreur_button, "Retour");
-                fenetre.event.add(text, BorderLayout.CENTER);
-                fenetre.event.add(erreur_button, BorderLayout.SOUTH);
+                fenetre.setEvent("Ajout commande", "Commande ajoutée");
+                fenetre.event.setVisible(true);
                 fenetre.ajout_commande.setVisible(false);
                 fenetre.panier.setVisible(false);
                 break;
@@ -328,15 +275,8 @@ public class FenetreControl extends JFrame implements ActionListener
                 comdao.modifierCommande(client);
                 fenetre.paiement.setVisible(false);
                 fenetre.paiement.setVisible(true);
-                fenetre.event.getContentPane().removeAll();
-                fenetre.event.setTitle("Ajout article");
-                text = new JPanel();
-                label_event = new JLabel("Commande ajoutée");
-                text.add(label_event);
-                erreur_button = new JPanel();
-                fenetre.addButton(erreur_button, "Retour");
-                fenetre.event.add(text, BorderLayout.CENTER);
-                fenetre.event.add(erreur_button, BorderLayout.SOUTH);
+                fenetre.setEvent("Commande", "Commande annulée");
+                fenetre.event.setVisible(false);
                 fenetre.accueil.setVisible(true);
                 break;
             case "Voir":

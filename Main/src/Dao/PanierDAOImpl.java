@@ -79,12 +79,14 @@ public class PanierDAOImpl implements PanierDAO
     }
 
     @Override
-    public void ajouterAuPanier(Panier panier, Client client, Article article)
+    public void ajouterAuPanier(Panier panier, Client client, Article article, int quantite)
     {
         try
         {
             PanierDAOImpl panierDAO = new PanierDAOImpl(daoFactory);
-            if(panierDAO.getPanier(client) == null)
+            ArticleDAOImpl articleDAO = new ArticleDAOImpl(daoFactory);
+            /// Vérifier si le panier existe ou si le stock d'un article est suffisant
+            if(panierDAO.getPanier(client) == null || articleDAO.getArticle(article.getId()).getStock() < 1)
             {
                 System.out.println("Ajout d'un nouvel article impossible");
             }
@@ -97,10 +99,13 @@ public class PanierDAOImpl implements PanierDAO
                 int id_ligne_panier = new Random().nextInt(1_000_000_000);
                 int id_panier = panier.getId();
                 int id_article = article.getId();
-                int quantite = panier.getArticles().size();
 
                 /// Exécution de la requête INSERT INTO de l'objet client en paramètre
                 PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO lignepanier(id_ligne_panier, id_panier, id_article, quantite) VALUES ('" + id_ligne_panier + "','" + id_panier + "', '" + id_article + "', '" + quantite + "')");
+                preparedStatement.executeUpdate();
+
+                /// Mise à jour de l'article
+                preparedStatement = connexion.prepareStatement("UPDATE article SET stock = stock - '"+quantite+"' WHERE id_article = '" + id_article + "'");
                 preparedStatement.executeUpdate();
             }
         }
@@ -114,19 +119,30 @@ public class PanierDAOImpl implements PanierDAO
     @Override
     public void supprimerDuPanier(Article article)
     {
+        int quantite;
         try
         {
             /// connexion
+            int id_article = article.getId();
             Connection connexion = daoFactory.getConnection();
 
-            /// récupération des informations saisies dans la page de commande
-            int id_article = article.getId();
+            PreparedStatement preparedStatement = connexion.prepareStatement("SELECT quantite FROM lignepanier WHERE id_article = '"+id_article+"'");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if(resultSet.next())
+            {
+                quantite = resultSet.getInt("quantite");
 
-            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
-            PreparedStatement preparedStatement = connexion.prepareStatement("DELETE FROM lignepanier WHERE id_article = '"+id_article+"'");
-            preparedStatement.executeUpdate();
+                /// Exécution de la requête DELETE FROM de l'objet client en paramètre
+                preparedStatement = connexion.prepareStatement("DELETE FROM lignepanier WHERE id_article = '"+id_article+"'");
+                preparedStatement.executeUpdate();
+
+                /// Mise à jour du stock de l'article
+                preparedStatement = connexion.prepareStatement("UPDATE article SET stock = stock + '"+quantite+"' WHERE id_article = '"+id_article+"'");
+                preparedStatement.executeUpdate();
+            }
         }
-        catch (SQLException e) {
+        catch (SQLException e)
+        {
             e.printStackTrace();
             System.out.println("Ajout de l'article impossible");
         }
