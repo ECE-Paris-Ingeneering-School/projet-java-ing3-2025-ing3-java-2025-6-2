@@ -127,7 +127,7 @@ public class CommandeDAOImpl implements CommandeDAO
             int id_commande = commande.getId();
 
             /// Mise à jour du statut en mode payé
-            PreparedStatement preparedStatement = connexion.prepareStatement("UPDATE commande SET (statut = 'payé') WHERE id_commande = '"+id_commande+"'");
+            PreparedStatement preparedStatement = connexion.prepareStatement("UPDATE commande SET statut = 'payée' WHERE id_commande = '"+id_commande+"'");
             preparedStatement.executeUpdate();
         }
         catch (SQLException e) {

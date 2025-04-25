@@ -267,6 +267,17 @@ public class FenetreControl extends JFrame implements ActionListener
                 String exp_date = fenetre.expiration_carte.getText();
                 int cvv = Integer.parseInt(fenetre.cvv.getText());
                 System.out.println("Paiement : " + paiement +" Numero de carte : " + numero_carte + " Date d'expiration : " + exp_date + " Numero CVV : " + cvv);
+                comdao = new CommandeDAOImpl(dao);
+                panierDAO = new PanierDAOImpl(dao);
+                user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
+                connect = userdao.connexionUtilisateur(user);
+                client = new Client(connect.getIdentifiant(), connect.getNom(), connect.getPrenom(), connect.getEmail(), connect.getMotDePasse(), connect.getType_utilisateur());
+                Commande commande1 = comdao.getCommande(client);
+                comdao.paiementCommande(commande1);
+                panierDAO.supprimerPanier(client);
+                fenetre.setEvent("Paiement commande", "Paiement effectué");
+                fenetre.event.setVisible(true);
+                fenetre.paiement.setVisible(false);
                 break;
             case "Annuler":
                 comdao = new CommandeDAOImpl(dao);
@@ -275,7 +286,6 @@ public class FenetreControl extends JFrame implements ActionListener
                 client = new Client(connect.getIdentifiant(), connect.getNom(), connect.getPrenom(), connect.getEmail(), connect.getMotDePasse(), connect.getType_utilisateur());
                 comdao.modifierCommande(client);
                 fenetre.paiement.setVisible(false);
-                fenetre.paiement.setVisible(true);
                 fenetre.setEvent("Commande", "Commande annulée");
                 fenetre.event.setVisible(false);
                 fenetre.accueil.setVisible(true);
@@ -309,6 +319,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.modif.setVisible(false);
                 fenetre.modif_article.setVisible(false);
                 fenetre.stats.setVisible(false);
+                fenetre.profil.setVisible(false);
                 break;
         }
     }

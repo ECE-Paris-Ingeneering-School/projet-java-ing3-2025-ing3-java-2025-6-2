@@ -12,6 +12,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.io.File;
 
@@ -1078,31 +1079,32 @@ public int id_article;
         panierFrame.setLayout(new BorderLayout());
         panierFrame.getContentPane().setBackground(BACKGROUND_COLOR);
 
-        // Barre de navigation
+        /// Barre de navigation
         JPanel navBar = createNavigationBar();
         panierFrame.add(navBar, BorderLayout.NORTH);
 
-        // Panel principal avec fond bordeaux
+        /// Panel principal avec fond bordeaux
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(BACKGROUND_COLOR);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Panel du contenu avec fond blanc
+        /// Panel du contenu avec fond blanc
         JPanel contentPanel = new JPanel(new BorderLayout());
         contentPanel.setBackground(Color.WHITE);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Panel gauche pour les articles du panier
+        /// Panel gauche pour les articles du panier
         JPanel cartItemsPanel = new JPanel();
         cartItemsPanel.setLayout(new BoxLayout(cartItemsPanel, BoxLayout.Y_AXIS));
         cartItemsPanel.setBackground(Color.WHITE);
 
-        // Titre "Cart"
+        /// Titre "Cart"
         JLabel cartTitle = new JLabel("Panier");
         cartTitle.setFont(new Font("Arial", Font.BOLD, 24));
         cartTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         cartItemsPanel.add(cartTitle);
 
+        /// Chargement du panier
         try {
             DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
             UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
@@ -1113,25 +1115,35 @@ public int id_article;
                     user_actuel.getMotDePasse(), user_actuel.getType_utilisateur());
 
             PanierDAOImpl panierDao = new PanierDAOImpl(dao);
-            java.util.List<Article> articles = panierDao.panierArticles(client);
+            Map<Article, Integer> articles_liste = panierDao.panierArticles(client);
+            List<Article> articles = new ArrayList<>();
+            List<Integer> liste_quantite = new ArrayList<>();
+            /// Regrouper Article avec sa quantité utilisé par l'utilisateur
+            for(int i = 0 ; i < articles_liste.size() ; i++)
+            {
+                articles.add(articles_liste.keySet().iterator().next());
+                liste_quantite.add(articles_liste.get(articles_liste.keySet().iterator().next()));
+            }
 
+            System.out.println();
             double total = 0.0;
 
-            for (Article article : articles) {
+            for (Article article : articles)
+            {
                 JPanel itemPanel = createCartItemPanel(article);
                 cartItemsPanel.add(itemPanel);
                 cartItemsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-                total += article.getPrixUnitaire();
+                total += article.getPrixUnitaire()*liste_quantite.get(liste_quantite.size()-1); /// Prix unitaire * quantité voulue par l'utilisateur
             }
 
-            // Panel droit pour le résumé
+            /// Panel droit pour le résumé
             JPanel summaryPanel = new JPanel();
             summaryPanel.setLayout(new BoxLayout(summaryPanel, BoxLayout.Y_AXIS));
             summaryPanel.setBackground(Color.WHITE);
             summaryPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
             summaryPanel.setPreferredSize(new Dimension(300, 0));
 
-            // Sous-total
+            /// Sous-total
             JPanel subtotalPanel = new JPanel(new BorderLayout());
             subtotalPanel.setBackground(Color.WHITE);
             subtotalPanel.add(new JLabel("Sous-total"), BorderLayout.WEST);
@@ -1139,7 +1151,7 @@ public int id_article;
             summaryPanel.add(subtotalPanel);
             summaryPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-            // Livraison
+            /// Livraison
             JPanel shippingPanel = new JPanel(new BorderLayout());
             shippingPanel.setBackground(Color.WHITE);
             shippingPanel.add(new JLabel("Livraison"), BorderLayout.WEST);
@@ -1147,7 +1159,7 @@ public int id_article;
             summaryPanel.add(shippingPanel);
             summaryPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-            // Total
+            /// Total
             JPanel totalPanel = new JPanel(new BorderLayout());
             totalPanel.setBackground(Color.WHITE);
             JLabel totalLabel = new JLabel("Total");
@@ -1159,7 +1171,7 @@ public int id_article;
             summaryPanel.add(totalPanel);
             summaryPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-            // Bouton Commander
+            /// Bouton Commander
             JButton checkoutButton = new JButton("Commander");
             checkoutButton.setBackground(new Color(0, 123, 255));
             checkoutButton.setForeground(Color.WHITE);
@@ -1169,7 +1181,7 @@ public int id_article;
             checkoutButton.setPreferredSize(new Dimension(200, 40));
             checkoutButton.addActionListener(fenetreControl);
 
-            // Bouton Retour
+            /// Bouton Retour
             JButton returnButton = new JButton("Retour");
             returnButton.setBackground(new Color(0, 123, 255));
             returnButton.setForeground(Color.WHITE);
@@ -1189,7 +1201,7 @@ public int id_article;
 
             summaryPanel.add(buttonPanel);
 
-            // Ajout des panels au contentPanel
+            /// Ajout des panels au contentPanel
             contentPanel.add(new JScrollPane(cartItemsPanel), BorderLayout.CENTER);
             contentPanel.add(summaryPanel, BorderLayout.EAST);
 
@@ -1328,18 +1340,18 @@ public int id_article;
         modif_article.setLayout(new BorderLayout());
         modif_article.getContentPane().setBackground(BACKGROUND_COLOR);
 
-        // Ajout de la barre de navigation
+        /// Ajout de la barre de navigation
         JPanel navBar = createNavigationBar();
         modif_article.add(navBar, BorderLayout.NORTH);
 
-        // Panel principal
+        /// Panel principal
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
 
-        // Titre
+        /// Titre
         mainPanel.add(createTitlePanel("Sélectionnez l'article à modifier"), BorderLayout.NORTH);
 
-        // Contenu
+        /// Contenu
         ProduitsModif();
         creerRetour();
 
@@ -1348,7 +1360,7 @@ public int id_article;
         modif_article.add(mainPanel);
     }
 
-    /// Vue Panier du client
+    /// Vue Modification d'un produit (pour admin)
     private void ProduitsModif()
     {
         try
@@ -1589,9 +1601,15 @@ public int id_article;
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        addButton(buttonPanel, "Détails");
-        addButton(buttonPanel, "Modifier");
+        JButton detailsButton = new JButton("Détails");
+        detailsButton.setActionCommand("Détails" + article.getId());
+        detailsButton.addActionListener(fenetreControl);
 
+        JButton modifierButton = new JButton("Modifier");
+        modifierButton.setActionCommand("Modifier" + article.getId());
+        modifierButton.addActionListener(fenetreControl);
+        buttonPanel.add(detailsButton);
+        buttonPanel.add(modifierButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
 
         infoPanel.add(Box.createRigidArea(new Dimension(0, 10)));

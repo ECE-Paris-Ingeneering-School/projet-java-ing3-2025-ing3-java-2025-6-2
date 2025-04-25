@@ -6,6 +6,7 @@ import Model.Commande;
 import Model.Panier;
 
 import java.util.List;
+import java.util.Map;
 
 /// Gestion du panier dans la base de données
 public interface PanierDAO
@@ -30,6 +31,7 @@ public interface PanierDAO
     public void supprimerPanier(Client client);
     /**Récupère les articles dans le panier d'un client
      * @Utilise le client concerné
+     * @Récupération sous forme Article avec quantité voulu par le client concerné
      */
-    public List<Article> panierArticles(Client client);
+    public Map<Article, Integer> panierArticles(Client client);
 }

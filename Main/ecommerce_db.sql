@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : ven. 25 avr. 2025 à 13:42
+-- Généré le : ven. 25 avr. 2025 à 16:34
 -- Version du serveur :  5.7.31
 -- Version de PHP : 7.3.21
 
@@ -46,9 +46,9 @@ CREATE TABLE IF NOT EXISTS `article` (
 --
 
 INSERT INTO `article` (`id_article`, `nom`, `description`, `prix`, `stock`, `seuil_remise`, `categorie`, `marque`, `date_ajout`) VALUES
-(832745446, 'y', 'Produit y', '14.00', 74, 8, 'Nourriture', 'Samsung', '2025-04-23 16:26:24'),
-(949478470, 'ae', 'ae', '12.00', 1, 5, 'Electromenager', 'Bosch', '2025-04-17 17:28:56'),
-(1768251590, 'lave-vaiselle', 'Un lave-vaiselle comme un autre', '1235.00', 128, 6, 'Electromenager', 'Bosch', '2025-04-19 14:41:04');
+(832745446, 'y', 'Produit y', '14.00', 62, 8, 'Nourriture', 'Samsung', '2025-04-23 16:26:24'),
+(949478470, 'ae', 'ae', '12.00', 120, 5, 'Electromenager', 'Bosch', '2025-04-17 17:28:56'),
+(1768251590, 'lave-vaiselle', 'Un lave-vaiselle comme un autre', '1235.00', 142, 6, 'Electromenager', 'Bosch', '2025-04-19 14:41:04');
 
 -- --------------------------------------------------------
 
@@ -66,15 +66,14 @@ CREATE TABLE IF NOT EXISTS `commande` (
   `montant_total` decimal(10,2) NOT NULL,
   PRIMARY KEY (`id_commande`),
   KEY `id_client` (`id_client`)
-) ENGINE=InnoDB AUTO_INCREMENT=576241272 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=607121032 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `commande`
 --
 
 INSERT INTO `commande` (`id_commande`, `id_client`, `date_commande`, `statut`, `adresse_livraison`, `montant_total`) VALUES
-(435249161, 1022904176, '2025-04-25 15:29:39', 'annulée', '1 Rue', '17290.00'),
-(576241271, 1335405254, '2025-04-25 15:38:43', 'annulée', '1 Rue', '20995.00');
+(396664024, 1022904176, '2025-04-25 18:21:47', 'payée', 'wagram', '14820.00');
 
 -- --------------------------------------------------------
 
@@ -95,15 +94,14 @@ CREATE TABLE IF NOT EXISTS `lignecommande` (
   KEY `id_commande` (`id_commande`),
   KEY `id_article` (`id_article`),
   KEY `id_promotion` (`id_promotion`)
-) ENGINE=InnoDB AUTO_INCREMENT=892886782 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=917018431 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `lignecommande`
 --
 
 INSERT INTO `lignecommande` (`id_ligne_commande`, `id_commande`, `id_article`, `id_promotion`, `quantite`, `prix_unitaire`, `prix_apres_remise`) VALUES
-(850061078, 435249161, 1768251590, NULL, 14, '1235.00', '17290.00'),
-(892886781, 576241271, 1768251590, NULL, 17, '1235.00', '20995.00');
+(645139410, 396664024, 1768251590, NULL, 12, '1235.00', '14820.00');
 
 -- --------------------------------------------------------
 
@@ -122,13 +120,6 @@ CREATE TABLE IF NOT EXISTS `lignepanier` (
   KEY `id_article` (`id_article`)
 ) ENGINE=InnoDB AUTO_INCREMENT=916152086 DEFAULT CHARSET=utf8mb4;
 
---
--- Déchargement des données de la table `lignepanier`
---
-
-INSERT INTO `lignepanier` (`id_ligne_panier`, `id_panier`, `id_article`, `quantite`) VALUES
-(653022736, 113262446, 1768251590, 17);
-
 -- --------------------------------------------------------
 
 --
@@ -143,15 +134,7 @@ CREATE TABLE IF NOT EXISTS `panier` (
   `date_modification` datetime DEFAULT NULL,
   PRIMARY KEY (`id_panier`),
   KEY `id_client` (`id_client`)
-) ENGINE=InnoDB AUTO_INCREMENT=497446451 DEFAULT CHARSET=utf8mb4;
-
---
--- Déchargement des données de la table `panier`
---
-
-INSERT INTO `panier` (`id_panier`, `id_client`, `date_creation`, `date_modification`) VALUES
-(113262446, 1335405254, '2025-04-23 16:34:23', NULL),
-(497446450, 1022904176, '2025-04-23 16:27:14', NULL);
+) ENGINE=InnoDB AUTO_INCREMENT=871985519 DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 

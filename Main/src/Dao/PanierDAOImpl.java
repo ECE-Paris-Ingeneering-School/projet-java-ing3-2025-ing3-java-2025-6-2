@@ -169,9 +169,9 @@ public class PanierDAOImpl implements PanierDAO
         }
     }
 
-    public List<Article> panierArticles(Client client)
+    public Map<Article, Integer> panierArticles(Client client)
     {
-        List<Article> articles = new ArrayList<>();
+        Map<Article, Integer> articles = new HashMap<>();
         try
         {
             Connection connexion = daoFactory.getConnection();
@@ -199,7 +199,7 @@ public class PanierDAOImpl implements PanierDAO
                     ArticleDAOImpl articleDAO = new ArticleDAOImpl(daoFactory);
 
                     Article article = articleDAO.getArticle(id_article);
-                    articles.add(article);
+                    articles.put(article, quantite);
                 }
                 System.out.println("=== Fin de la liste des articles ===\n");
             }
