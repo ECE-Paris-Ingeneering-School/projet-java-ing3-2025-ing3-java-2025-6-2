@@ -45,29 +45,48 @@ public class CommandeDAOImpl implements CommandeDAO
     }
 
     @Override
-    public void ajouterDansCommandeEnCours(Commande commande, Article article)
+    public void ajouterDansCommandeEnCours(Commande commande, Panier panier)
     {
+        Map<Article, Integer> articlesEnCours = new LinkedHashMap<>();
         try
         {
             /// connexion
             Connection connexion = daoFactory.getConnection();
+            ArticleDAOImpl articleDAO = new ArticleDAOImpl(daoFactory);
+            PreparedStatement preparedStatement = connexion.prepareStatement("SELECT * from lignepanier WHERE id_panier = '"+panier.getId()+"'");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next())
+            {
+                int id_article = resultSet.getInt("id_article");
+                Article article = articleDAO.getArticle(id_article);
+                int quantite = resultSet.getInt("quantite");
+                articlesEnCours.put(article, quantite);
 
-            /// récupération des informations saisies dans la page de commande
-            int id_ligne_commande = new Random().nextInt(1_000_000_000);
-            int id_commande = commande.getId();
-            int id_article = article.getId();
-            int quantite = commande.getArticles().size();
-            float prix_unitaire = article.getPrixUnitaire();
-            float montant_total = commande.getPrixTotal();
+                Article article_a_ajouter = articlesEnCours.keySet().iterator().next();
+                int quantite_ajouter = articlesEnCours.get(article);
+                PreparedStatement statement = connexion.prepareStatement("SELECT prix FROM article WHERE id_article = '"+article_a_ajouter.getId()+"'");
+                ResultSet resultSet1 = statement.executeQuery();
+                if (resultSet1.next())
+                {
+                    int prix = resultSet1.getInt("prix");
+                    int id_ligne_commande = new Random().nextInt(1_000_000_000);
 
-            /// Exécution de la requête INSERT INTO de l'objet commande et de l'article en paramètre
-            PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO lignecommande(id_ligne_pcommande, id_commande, id_article, quantite, prix_unitaire, prix_apres_remise) VALUES ('"+id_ligne_commande+"','"+id_commande+"', '"+id_article+"', '"+quantite+"', '"+prix_unitaire+"','"+montant_total+"')");
-            preparedStatement.executeUpdate();
+                    /// Exécution de la requête INSERT INTO de l'objet commande en paramètre
+                    preparedStatement = connexion.prepareStatement("INSERT INTO lignecommande(id_ligne_commande, id_commande, id_article, quantite, prix_unitaire, prix_apres_remise) VALUES ('" + id_ligne_commande + "','" + commande.getId() + "', '" + id_article + "', '" + quantite_ajouter + "', '" + prix + "', '" + quantite_ajouter*prix + "')");
+                    preparedStatement.executeUpdate();
+
+                    /// Mise à jour
+                    preparedStatement = connexion.prepareStatement("UPDATE commande SET montant_total = '"+quantite_ajouter*prix+"' WHERE id_commande = '"+commande.getId()+"'");
+                    preparedStatement.executeUpdate();
+
+                }
+                /// récupération des informations saisies dans la page de commande
+            }
         }
         catch (SQLException e)
         {
             e.printStackTrace();
-            System.out.println("Ajout de l'article impossible");
+            System.out.println("Ajout de l'article dans la commande impossible");
         }
     }
 
@@ -163,10 +182,8 @@ public class CommandeDAOImpl implements CommandeDAO
                     String mot_de_passe = resultSetClient.getString(4);
                     String type_utilisateur = resultSetClient.getString(5);
                     Client client = new Client(id_client, Nom, Prenom, email, mot_de_passe, type_utilisateur);
-                    String date_commande = resultSet.getString("date_commande");
-                    float prix = resultSet.getFloat("montant_total");
-                    //Commande nextCommmande = new Commande(client, liste);
-                    //articles.add(nextCommmande);
+                    Commande nextCommmande = new Commande(id_commande, client, liste);
+                    articles.add(nextCommmande);
                 }
             }
         } catch (SQLException e) {
@@ -174,5 +191,48 @@ public class CommandeDAOImpl implements CommandeDAO
             System.out.println("Erreur lors de la récupération des nouveaux articles");
         }
         return articles;
+    }
+
+    public Commande getCommande(Client client)
+    {
+        Commande commande = null;
+        Map<Article, Integer> liste = new HashMap<>();
+        try
+        {
+            Connection connexion = daoFactory.getConnection();
+            PanierDAOImpl panierDAO = new PanierDAOImpl(daoFactory);
+            ArticleDAOImpl articleDAO = new ArticleDAOImpl(daoFactory);
+            /// Récupération de l'id du panier en fonction du client
+            PreparedStatement preparedStatementCom = connexion.prepareStatement(
+                    "SELECT * " +
+                            "FROM commande WHERE id_client = '" + client.getIdentifiant() + "'"
+            );
+            ResultSet resultSetPanier = preparedStatementCom.executeQuery();
+            if(resultSetPanier.next())
+            {
+                Panier panier = panierDAO.getPanier(client);
+                int id_commande = resultSetPanier.getInt("id_commande");
+                PreparedStatement preparedStatementPanier = connexion.prepareStatement(
+                        "SELECT * " +
+                                "FROM lignepanier WHERE id_panier = '" + panier.getId() + "'"
+                );
+                ResultSet resultSetPanier2 = preparedStatementPanier.executeQuery();
+                while(resultSetPanier2.next())
+                {
+                    int id_article = resultSetPanier2.getInt("id_article");
+                    Article article = articleDAO.getArticle(id_article);
+                    int quantite = resultSetPanier2.getInt("quantite");
+                    liste.put(article, quantite);
+                }
+                commande = new Commande(id_commande, client, liste);
+                return commande;
+            }
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+            System.out.println("Ajout d'une nouvelle commande impossible");
+        }
+        return commande;
     }
 }

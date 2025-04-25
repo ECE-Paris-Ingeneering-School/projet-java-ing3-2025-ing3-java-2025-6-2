@@ -1747,5 +1747,4 @@ public class Fenetres extends Component
         // TODO Implementer Stats, voirs si il n'y a pas besoin de rajouter une valeur dans la table de donnée qui compte le nombre d'achat total.
 
     }
-
 }

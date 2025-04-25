@@ -254,12 +254,16 @@ public class FenetreControl extends JFrame implements ActionListener
             case "Payer":
                 /// Connexion pour récupérer l'utilisateur actuellement en ligne
                 CommandeDAOImpl comdao = new CommandeDAOImpl(dao);
+                PanierDAOImpl panierDAO = new PanierDAOImpl(dao);
                 Utilisateurs user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
                 Utilisateurs connect = userdao.connexionUtilisateur(user);
                 Client client = new Client(connect.getIdentifiant(), connect.getNom(), connect.getPrenom(), connect.getEmail(), connect.getMotDePasse(), connect.getType_utilisateur());
                 String adresse = fenetre.adresse.getText();
+                Panier panier = panierDAO.getPanier(client);
                 /// Ajout d'une nouvelle commande
                 comdao.nouvelleCommande(client, adresse);
+                Commande commande = comdao.getCommande(client);
+                comdao.ajouterDansCommandeEnCours(commande, panier);
                 fenetre.paiement.setVisible(true);
                 fenetre.setEvent("Ajout commande", "Commande ajoutée");
                 fenetre.event.setVisible(true);

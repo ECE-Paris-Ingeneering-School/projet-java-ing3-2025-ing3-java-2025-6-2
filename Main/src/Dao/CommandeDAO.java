@@ -13,11 +13,12 @@ public interface CommandeDAO
      * @A partir du client, de son panier er de l'adresse saisie
      */
     public void nouvelleCommande(Client client, String adresse);
-    public void ajouterDansCommandeEnCours(Commande commande, Article article);
+    public void ajouterDansCommandeEnCours(Commande commande, Panier panier);
     /** Modifie les informations de la commande (généralement son statut)
      * @Utilise le client concerné
      */
     public void modifierCommande(Client client);
     public void paiementCommande(Commande commande);
+    public Commande getCommande(Client client);
     public List<Commande> getCommandes(int limit, int id_commande);
 }
