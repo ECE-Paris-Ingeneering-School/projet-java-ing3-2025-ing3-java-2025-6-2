@@ -1,21 +1,35 @@
 package Model;
-import Dao.*;
+
+import Dao.DaoFactory;
+import Dao.ArticleDAO;
+import Dao.ArticleDAOImpl;
+import Dao.UtilisateurDAOImpl;
+import Dao.PanierDAOImpl;
+import Control.FenetreControl;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.io.File;
 
-import Control.FenetreControl;
+import Util.ImageManager;
+import Exception.ApplicationException;
+import Exception.ErrorType;
 
 /** Fenetres constitue l'ensemble des interfaces graphiques utilisées au cour du projet
  * @L'ensemble des liens entre elles sont effectuées ici
  */
-public class Fenetres extends Component
+public class Fenetres extends JFrame
 {
+    /// Constante pour la couleur de fond
+    private static final Color BACKGROUND_COLOR = new Color(128, 20, 41); // Rouge bordeaux
+
     /// Fenêtres de navigation
-    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, panier, articles, ajout_commande, modif, modif_article, stats;
+    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, articles, ajout_commande, modif, modif_article, stats;
+    public JFrame panierFrame; // Renamed from panier to avoid conflict
     /// Zones de saisie connexion et inscriptions
     public TextField nom, prenom, mail, mdp, mail_id, mdp_id;
     /// Zone de saisie de l'adresse pour commande (récupération des autres paramètres par le profil utilisé)
@@ -27,18 +41,19 @@ public class Fenetres extends Component
 
     /// Gestion articles
     public TextField nom_article, description, prix, stock, seuil_remise, quantite; /// Zones de saisies article
-    public JComboBox<String> type_compte, payment_type, categorie, marque; /// Choix du mode de paiement et du type de compte
-    public int id_article;
+public JComboBox<String> type_compte, payment_type, categorie, marque; /// Choix du mode de paiement et du type de compte
+public int id_article;
 
     /// Fenetre catalogue
-    public JPanel PTitre, Liste, PannelRetour;
-    public JLabel titrre;
+    public JPanel Liste, PannelRetour;
     public JScrollPane Scroll;
-    public Random random = new Random();
 
     public ArticleDAO articleDao;
     private FenetreControl fenetreControl; /// Controleur des fenêtres (gestion des boutons dans FenetreControl)
     public Article article;
+
+    public List<LigneCommande> panier; // Changed to public
+    public JLabel panierLabel;
 
     /// Constructeur de chaque fenêtre
     public Fenetres()
@@ -53,7 +68,9 @@ public class Fenetres extends Component
         catalogue = new JFrame();
         ajout_article = new JFrame();
         articles = new JFrame();
-        panier = new JFrame();
+        panier = new ArrayList<>();
+        panierLabel = new JLabel("Panier (0)");
+        panierFrame = new JFrame(); // Initialize panierFrame
         modif = new JFrame();
         modif_article = new JFrame();
         stats = new JFrame();
@@ -72,6 +89,21 @@ public class Fenetres extends Component
         /// Initialisation des autres composants
         DaoFactory daoFactory = DaoFactory.getInstance("ecommerce_db", "root", "");
         articleDao = new ArticleDAOImpl(daoFactory);
+
+        // Application de la couleur de fond à toutes les fenêtres
+        inscrire.getContentPane().setBackground(BACKGROUND_COLOR);
+        connecter.getContentPane().setBackground(BACKGROUND_COLOR);
+        accueil.getContentPane().setBackground(BACKGROUND_COLOR);
+        profil.getContentPane().setBackground(BACKGROUND_COLOR);
+        event.getContentPane().setBackground(BACKGROUND_COLOR);
+        paiement.getContentPane().setBackground(BACKGROUND_COLOR);
+        catalogue.getContentPane().setBackground(BACKGROUND_COLOR);
+        ajout_article.getContentPane().setBackground(BACKGROUND_COLOR);
+        articles.getContentPane().setBackground(BACKGROUND_COLOR);
+        panierFrame.getContentPane().setBackground(BACKGROUND_COLOR);
+        modif.getContentPane().setBackground(BACKGROUND_COLOR);
+        modif_article.getContentPane().setBackground(BACKGROUND_COLOR);
+        stats.getContentPane().setBackground(BACKGROUND_COLOR);
     }
 
     /// Mise en place du controleur
@@ -85,42 +117,140 @@ public class Fenetres extends Component
     {
         inscrire.setSize(900, 700);
         inscrire.setTitle("Inscription");
-        inscrire.setLayout(new BoxLayout(inscrire.getContentPane(), BoxLayout.Y_AXIS));
-        JLabel label1 = new JLabel("Type de compte");
-        inscrire.add(label1);
-        String[] type = {"admin", "client"};
-        type_compte = new JComboBox<>(type); /// Liste associée
-        type_compte.setSelectedIndex(0);
-        type_compte.setBounds(50, 50, 100, 20);
-        inscrire.add(type_compte);
-        JPanel inscrire_nom = new JPanel();
-        JLabel label2 = new JLabel("Nom");
-        inscrire_nom.add(label2);
-        JPanel inscrire_button = new JPanel();
-        nom = new TextField(10);
-        prenom = new TextField(10);
-        mail = new TextField(10);
-        mdp = new TextField(10);
-        inscrire_nom.add(nom);
-        JPanel inscrire_prenom = new JPanel();
-        JLabel label3 = new JLabel("Prenom");
-        inscrire_prenom.add(label3);
-        inscrire_prenom.add(prenom);
-        JLabel label4 = new JLabel("Mail");
-        JPanel inscrire_mail = new JPanel();
-        inscrire_mail.add(label4);
-        inscrire_mail.add(mail);
-        JLabel label5 = new JLabel("Mot de passe");
-        JPanel inscrire_mdp = new JPanel();
-        inscrire_mdp.add(label5);
-        inscrire_mdp.add(mdp);
-        addButton(inscrire_button, "Valider");
-        addButton(inscrire_button, "Connexion");
-        inscrire.add(inscrire_nom);
-        inscrire.add(inscrire_prenom);
-        inscrire.add(inscrire_mail);
-        inscrire.add(inscrire_mdp);
-        inscrire.add(inscrire_button);
+        inscrire.setLayout(new GridBagLayout());
+        inscrire.getContentPane().setBackground(BACKGROUND_COLOR);
+
+        /// Panel principal blanc
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBackground(Color.WHITE);
+        mainPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
+                BorderFactory.createEmptyBorder(40, 50, 40, 50)
+        ));
+        mainPanel.setMaximumSize(new Dimension(400, 600));
+
+        /// Logo
+        try {
+            ImageIcon logoIcon = new ImageIcon("Main/src/View/image/Logo.png");
+            Image img = logoIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+            JLabel logoLabel = new JLabel(new ImageIcon(img));
+            logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            mainPanel.add(logoLabel);
+            mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        } catch (Exception e) {
+            System.err.println("Erreur de chargement du logo");
+        }
+
+        /// Titre Inscription
+        JLabel titleLabel = new JLabel("Inscription");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mainPanel.add(titleLabel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+
+        /// Type de compte
+        JPanel typePanel = new JPanel();
+        typePanel.setLayout(new BoxLayout(typePanel, BoxLayout.Y_AXIS));
+        typePanel.setBackground(Color.WHITE);
+        JLabel typeLabel = new JLabel("Type de compte");
+        typeLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        String[] type = {"client", "admin"};
+        type_compte = new JComboBox<>(type);
+        type_compte.setFont(new Font("Arial", Font.PLAIN, 14));
+        type_compte.setPreferredSize(new Dimension(300, 35));
+        type_compte.setBackground(Color.WHITE);
+        typePanel.add(typeLabel);
+        typePanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        typePanel.add(type_compte);
+        mainPanel.add(typePanel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        /// Nom
+        JPanel nomPanel = new JPanel();
+        nomPanel.setLayout(new BoxLayout(nomPanel, BoxLayout.Y_AXIS));
+        nomPanel.setBackground(Color.WHITE);
+        JLabel nomLabel = new JLabel("Nom");
+        nomLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        nom = new TextField(20);
+        nom.setPreferredSize(new Dimension(300, 35));
+        nomPanel.add(nomLabel);
+        nomPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        nomPanel.add(nom);
+        mainPanel.add(nomPanel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        /// Prénom
+        JPanel prenomPanel = new JPanel();
+        prenomPanel.setLayout(new BoxLayout(prenomPanel, BoxLayout.Y_AXIS));
+        prenomPanel.setBackground(Color.WHITE);
+        JLabel prenomLabel = new JLabel("Prénom");
+        prenomLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        prenom = new TextField(20);
+        prenom.setPreferredSize(new Dimension(300, 35));
+        prenomPanel.add(prenomLabel);
+        prenomPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        prenomPanel.add(prenom);
+        mainPanel.add(prenomPanel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        /// Email
+        JPanel emailPanel = new JPanel();
+        emailPanel.setLayout(new BoxLayout(emailPanel, BoxLayout.Y_AXIS));
+        emailPanel.setBackground(Color.WHITE);
+        JLabel emailLabel = new JLabel("Email");
+        emailLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        mail = new TextField(20);
+        mail.setPreferredSize(new Dimension(300, 35));
+        emailPanel.add(emailLabel);
+        emailPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        emailPanel.add(mail);
+        mainPanel.add(emailPanel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        /// Mot de passe
+        JPanel mdpPanel = new JPanel();
+        mdpPanel.setLayout(new BoxLayout(mdpPanel, BoxLayout.Y_AXIS));
+        mdpPanel.setBackground(Color.WHITE);
+        JLabel mdpLabel = new JLabel("Password");
+        mdpLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        mdp = new TextField(20);
+        mdp.setEchoChar('•');
+        mdp.setPreferredSize(new Dimension(300, 35));
+        mdpPanel.add(mdpLabel);
+        mdpPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        mdpPanel.add(mdp);
+        mainPanel.add(mdpPanel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+
+        /// Boutons
+        JPanel buttonsPanel = new JPanel();
+        buttonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        buttonsPanel.setBackground(Color.WHITE);
+
+        JButton validerButton = new JButton("Valider");
+        validerButton.setBackground(Color.BLACK);
+        validerButton.setForeground(Color.WHITE);
+        validerButton.setFont(new Font("Arial", Font.BOLD, 14));
+        validerButton.setPreferredSize(new Dimension(120, 35));
+        validerButton.setBorderPainted(false);
+        validerButton.setFocusPainted(false);
+        validerButton.addActionListener(fenetreControl);
+
+        JButton retourButton = new JButton("Retour");
+        retourButton.setBackground(new Color(240, 240, 240));
+        retourButton.setForeground(Color.BLACK);
+        retourButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        retourButton.setPreferredSize(new Dimension(120, 35));
+        retourButton.setBorderPainted(false);
+        retourButton.setFocusPainted(false);
+        retourButton.addActionListener(fenetreControl);
+
+        buttonsPanel.add(validerButton);
+        buttonsPanel.add(retourButton);
+        mainPanel.add(buttonsPanel);
+
+        inscrire.add(mainPanel);
     }
 
     /// Fenêtre connexion utilisateur
@@ -128,9 +258,6 @@ public class Fenetres extends Component
     {
         connecter.setSize(900, 700);
         connecter.setTitle("Connexion");
-
-        /// Set background color to a soft gray
-        connecter.getContentPane().setBackground(new Color(245, 245, 245));
 
         /// Use GridBagLayout for better control over component placement
         connecter.setLayout(new GridBagLayout());
@@ -141,8 +268,8 @@ public class Fenetres extends Component
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBackground(Color.WHITE);
         mainPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
-            BorderFactory.createEmptyBorder(40, 50, 40, 50)
+                BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
+                BorderFactory.createEmptyBorder(40, 50, 40, 50)
         ));
 
         /// Champ Titre
@@ -192,8 +319,8 @@ public class Fenetres extends Component
         buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
         buttonsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton validerButton = new StyledButton("Valider", true);
-        JButton inscrireButton = new StyledButton("Inscrire", false);
+        JButton validerButton = new StyledButton("Se connecter", true);
+        JButton inscrireButton = new StyledButton("S'inscrire", false);
 
         validerButton.addActionListener(fenetreControl);
         buttonsPanel.add(validerButton);
@@ -220,6 +347,7 @@ public class Fenetres extends Component
         accueil.setTitle("Accueil - Maison Close");
         accueil.setLayout(new BorderLayout());
         accueil.getContentPane().removeAll();
+        accueil.getContentPane().setBackground(BACKGROUND_COLOR);
 
         /// Barre de navigation
         JPanel navBar = createNavigationBar();
@@ -228,21 +356,23 @@ public class Fenetres extends Component
         /// Panel principal
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBackground(Color.WHITE);
+        mainPanel.setBackground(BACKGROUND_COLOR);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         /// En-tête
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
-        headerPanel.setBackground(new Color(240, 240, 240));
+        headerPanel.setBackground(BACKGROUND_COLOR);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel titleLabel = new JLabel("Bienvenue sur Maison Close");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
+        titleLabel.setForeground(Color.WHITE);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel descLabel = new JLabel("Votre marketplace d'art en ligne");
         descLabel.setFont(new Font("Arial", Font.PLAIN, 18));
+        descLabel.setForeground(Color.WHITE);
         descLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         headerPanel.add(titleLabel);
@@ -273,6 +403,7 @@ public class Fenetres extends Component
         /// Ajout du panel principal à la fenêtre
         JScrollPane scrollPane = new JScrollPane(mainPanel);
         scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         accueil.add(scrollPane, BorderLayout.CENTER);
 
         /// Rafraîchir la fenêtre
@@ -286,8 +417,8 @@ public class Fenetres extends Component
         JPanel navBar = new JPanel(new BorderLayout());
         navBar.setBackground(Color.WHITE);
         navBar.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230)),
-            BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230)),
+                BorderFactory.createEmptyBorder(15, 20, 15, 20)
         ));
 
         /// Logo et recherche (gauche)
@@ -303,8 +434,8 @@ public class Fenetres extends Component
 
         JTextField searchField = new JTextField(30);
         searchField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(200, 200, 200)),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
 
         leftSection.add(logoLabel);
@@ -372,70 +503,66 @@ public class Fenetres extends Component
         return card;
     }
 
+    /// Méthode pour créer une carte de produit avec image
     private JPanel createProductCard(Article article) {
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        p.setBackground(Color.WHITE);
+        p.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+        p.setMaximumSize(new Dimension(200, 300));
 
-        /// Image du produit
-        JPanel imagePanel = new JPanel();
-        imagePanel.setPreferredSize(new Dimension(200, 200));
-        imagePanel.setBackground(Color.WHITE);
+        // Image
+        String imagePath = getImageFileName(article.getNom(), article.getCategorie());
+        ImageIcon imageIcon = new ImageIcon(imagePath);
+        Image image = imageIcon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH);
+        JLabel imageLabel = new JLabel(new ImageIcon(image));
+        imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        p.add(imageLabel);
+        p.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        try
-        {
-            String imagePath = getImageFileName(article.getNom(), article.getCategorie());
-            if (imagePath != null)
-            {
-                ImageIcon icon = new ImageIcon("Main/src/View/image/" + article.getCategorie().toLowerCase() + "/" + imagePath);
-                Image scaledImage = icon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH);
-                JLabel imageLabel = new JLabel(new ImageIcon(scaledImage));
-                imagePanel.add(imageLabel);
-            }
-            else
-            {
-                JLabel placeholderLabel = new JLabel("No Image");
-                placeholderLabel.setPreferredSize(new Dimension(180, 180));
-                placeholderLabel.setHorizontalAlignment(JLabel.CENTER);
-                imagePanel.add(placeholderLabel);
-            }
-        }
-        catch (Exception e)
-        {
-            JLabel errorLabel = new JLabel("Image Error");
-            errorLabel.setPreferredSize(new Dimension(180, 180));
-            errorLabel.setHorizontalAlignment(JLabel.CENTER);
-            imagePanel.add(errorLabel);
-        }
-
-        card.add(imagePanel);
-
-        /// Informations produit
+        // Panel d'informations
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setBackground(Color.WHITE);
-        infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // Nom de l'article
         JLabel nameLabel = new JLabel(article.getNom());
         nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
-
-        JLabel priceLabel = new JLabel(String.format("%.2f €", article.getPrixUnitaire()));
-        priceLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-
-        if (article.getSeuil_remise() > 0)
-        {
-            JLabel discountLabel = new JLabel("-" + article.getSeuil_remise() + "%");
-            discountLabel.setForeground(Color.RED);
-            infoPanel.add(discountLabel);
-        }
-
+        nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         infoPanel.add(nameLabel);
         infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        infoPanel.add(priceLabel);
 
-        card.add(infoPanel);
-        return card;
+        // Description
+        JLabel descLabel = new JLabel("<html><div style='width:150px'>" + article.getDescription() + "</div></html>");
+        descLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        descLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        infoPanel.add(descLabel);
+        infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+
+        p.add(infoPanel);
+        p.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // Boutons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.setBackground(Color.WHITE);
+
+        JButton detailsButton = new JButton("Détails");
+        detailsButton.setActionCommand("Détails" + article.getId());
+        detailsButton.addActionListener(fenetreControl);
+
+        JButton addButton = new JButton("Ajouter");
+        addButton.setActionCommand("Ajouter" + article.getId());
+        addButton.addActionListener(fenetreControl);
+
+        buttonPanel.add(detailsButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        buttonPanel.add(addButton);
+
+        p.add(buttonPanel);
+        p.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        return p;
     }
 
     private JPanel createPromoSection()
@@ -471,76 +598,157 @@ public class Fenetres extends Component
         UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
         Utilisateurs user = new Utilisateurs(0, "", "", email, password, "");
         Utilisateurs user_actuel = userdao.connexionUtilisateur(user);
-        /// Création de la page avec les informations correspondantes
 
-        profil = new JFrame();
-        profil.setSize(500, 400);
-        profil.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        profil.setTitle("Profil");
+        profil.setSize(1200, 800);
+        profil.setTitle("Profil - Maison Close");
         profil.setLayout(new BorderLayout());
-        String Nom = user_actuel.getNom();
-        String Prenom = user_actuel.getPrenom();
+        profil.getContentPane().setBackground(BACKGROUND_COLOR);
 
+        // Barre de navigation
+        JPanel navBar = createNavigationBar();
+        profil.add(navBar, BorderLayout.NORTH);
 
-        JPanel profil_button = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        addButton(profil_button, "Accueil");
-        addButton(profil_button, "Catalogue");
-        profil.add(profil_button, BorderLayout.NORTH);
+        // Panel principal avec fond bordeaux
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(BACKGROUND_COLOR);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        titlePanel.add(new JLabel("TITRE"));
-        profil.add(titlePanel, BorderLayout.PAGE_START);
+        // Panel du contenu avec fond blanc
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setBackground(Color.WHITE);
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        JPanel panel_info = new JPanel(new BorderLayout());
+        // Panel pour la photo et les informations
+        JPanel profileInfoPanel = new JPanel(new BorderLayout(30, 0));
+        profileInfoPanel.setBackground(Color.WHITE);
 
-        JPanel profil_photo = new JPanel() {
+        // Photo de profil
+        JPanel photoPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.setColor(Color.BLACK);
-                g.fillRect(20, 20, 175, 200);
+                g.setColor(new Color(240, 240, 240));
+                g.fillRect(0, 0, 200, 200);
             }
         };
-        profil_photo.setPreferredSize(new Dimension(175, 200));
-        JPanel profil_text = new JPanel();
-        profil_text.setLayout(new BoxLayout(profil_text, BoxLayout.Y_AXIS));
-        profil_text.setBorder(BorderFactory.createEmptyBorder(20, 50, 0, 0));
+        photoPanel.setPreferredSize(new Dimension(200, 200));
+        photoPanel.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
 
-        //A dynnamiser
+        // Informations du profil
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBackground(Color.WHITE);
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
 
-        profil_text.add(new JLabel("Nom: " + Nom));
-        profil_text.add(Box.createVerticalStrut(10));
-        profil_text.add(new JLabel("Prénom: " + Prenom));
-        profil_text.add(Box.createVerticalStrut(10));
-        panel_info.add(profil_photo, BorderLayout.WEST);
-        panel_info.add(profil_text, BorderLayout.CENTER);
+        // Style pour les labels
+        Font titleFont = new Font("Arial", Font.BOLD, 24);
+        Font labelFont = new Font("Arial", Font.BOLD, 16);
+        Font valueFont = new Font("Arial", Font.PLAIN, 16);
 
-        JPanel pied_page = new JPanel();
-        pied_page.setLayout(new BoxLayout(pied_page, BoxLayout.Y_AXIS));
-        pied_page.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        JLabel titleLabel = new JLabel("Informations du profil");
+        titleLabel.setFont(titleFont);
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        infoPanel.add(titleLabel);
+        infoPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
+        // Nom
+        JPanel nomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        nomPanel.setBackground(Color.WHITE);
+        JLabel nomLabel = new JLabel("Nom: ");
+        nomLabel.setFont(labelFont);
+        JLabel nomValue = new JLabel(user_actuel.getNom());
+        nomValue.setFont(valueFont);
+        nomPanel.add(nomLabel);
+        nomPanel.add(nomValue);
+        infoPanel.add(nomPanel);
 
-        if (user_actuel.getType_utilisateur().equals("admin"))
-        {
-            addButton(pied_page, "Ajouter article");
-            addButton(pied_page, "Editer un article");
-            addButton(pied_page, "Gerer les dossiers clients");
-            JButton boutSta = new JButton("Statistiques");
-            boutSta.addActionListener(e -> fenetreControl.actionPerformed(e));
-            pied_page.add(boutSta);
+        // Prénom
+        JPanel prenomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        prenomPanel.setBackground(Color.WHITE);
+        JLabel prenomLabel = new JLabel("Prénom: ");
+        prenomLabel.setFont(labelFont);
+        JLabel prenomValue = new JLabel(user_actuel.getPrenom());
+        prenomValue.setFont(valueFont);
+        prenomPanel.add(prenomLabel);
+        prenomPanel.add(prenomValue);
+        infoPanel.add(prenomPanel);
+
+        // Email
+        JPanel emailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        emailPanel.setBackground(Color.WHITE);
+        JLabel emailLabel = new JLabel("Email: ");
+        emailLabel.setFont(labelFont);
+        JLabel emailValue = new JLabel(user_actuel.getEmail());
+        emailValue.setFont(valueFont);
+        emailPanel.add(emailLabel);
+        emailPanel.add(emailValue);
+        infoPanel.add(emailPanel);
+
+        // Type de compte
+        JPanel typePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        typePanel.setBackground(Color.WHITE);
+        JLabel typeLabel = new JLabel("Type de compte: ");
+        typeLabel.setFont(labelFont);
+        JLabel typeValue = new JLabel(user_actuel.getType_utilisateur());
+        typeValue.setFont(valueFont);
+        typePanel.add(typeLabel);
+        typePanel.add(typeValue);
+        infoPanel.add(typePanel);
+
+        profileInfoPanel.add(photoPanel, BorderLayout.WEST);
+        profileInfoPanel.add(infoPanel, BorderLayout.CENTER);
+
+        contentPanel.add(profileInfoPanel, BorderLayout.NORTH);
+
+        // Panel pour les boutons d'action (uniquement pour les admins)
+        if (user_actuel.getType_utilisateur().equals("admin")) {
+            JPanel actionPanel = new JPanel();
+            actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
+            actionPanel.setBackground(Color.WHITE);
+            actionPanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
+
+            JLabel actionTitle = new JLabel("Actions administrateur");
+            actionTitle.setFont(titleFont);
+            actionTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+            actionPanel.add(actionTitle);
+            actionPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+            String[] adminActions = {
+                    "Ajouter article",
+                    "Editer un article",
+                    "Gerer les dossiers clients",
+                    "Statistiques"
+            };
+
+            JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+            buttonsPanel.setBackground(Color.WHITE);
+
+            for (String action : adminActions) {
+                JButton actionButton = new JButton(action);
+                actionButton.setFont(new Font("Arial", Font.PLAIN, 14));
+                actionButton.setBackground(new Color(51, 122, 183));
+                actionButton.setForeground(Color.WHITE);
+                actionButton.setBorderPainted(false);
+                actionButton.setFocusPainted(false);
+                actionButton.addActionListener(fenetreControl);
+                buttonsPanel.add(actionButton);
+            }
+
+            actionPanel.add(buttonsPanel);
+            contentPanel.add(actionPanel, BorderLayout.CENTER);
         }
-        pied_page.add(Box.createVerticalStrut(10));
-        pied_page.add(new JLabel("FIN"));
-        pied_page.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 
-        JPanel PASDEBUGDEPOSITION = new JPanel();
-        PASDEBUGDEPOSITION.setLayout(new BoxLayout(PASDEBUGDEPOSITION, BoxLayout.Y_AXIS));
-        PASDEBUGDEPOSITION.add(titlePanel);
-        PASDEBUGDEPOSITION.add(panel_info);
-        PASDEBUGDEPOSITION.add(Box.createVerticalGlue());
-        PASDEBUGDEPOSITION.add(pied_page);
+        mainPanel.add(contentPanel, BorderLayout.CENTER);
 
-        profil.add(PASDEBUGDEPOSITION, BorderLayout.CENTER);
+        // Bouton Retour en bas
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel.setBackground(Color.WHITE);
+        JButton returnButton = new JButton("Retour");
+        returnButton.addActionListener(fenetreControl);
+        bottomPanel.add(returnButton);
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+        profil.add(mainPanel);
     }
 
     /// Gestion des erreurs
@@ -610,335 +818,199 @@ public class Fenetres extends Component
         panel.add(button);
     }
 
-    /// Vue du catalogue
-    public void setCatalogue()
+    /// Vue Articles
+    public void setListeArticles()
     {
-        catalogue = new JFrame();
-        catalogue.setTitle("Catalogue");
-        catalogue.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        catalogue.setSize(1200, 800);
-        catalogue.setLocationRelativeTo(null);
-        catalogue.setLayout(new BorderLayout());
+        articles.setTitle("Articles");
+        articles.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        articles.setSize(1200, 800);
+        articles.setLocationRelativeTo(null);
+        articles.setLayout(new BorderLayout());
+        articles.getContentPane().setBackground(BACKGROUND_COLOR);
 
-        Titre("Catalogue");
-        Produits();
-        creerRetour();
+        // Barre de navigation
+        JPanel navBar = createNavigationBar();
+        articles.add(navBar, BorderLayout.NORTH);
 
-        catalogue.add(PTitre, BorderLayout.NORTH);
-        catalogue.add(Scroll, BorderLayout.CENTER);
-        catalogue.add(PannelRetour, BorderLayout.SOUTH);
-    }
+        // Panel principal avec fond bordeaux
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(BACKGROUND_COLOR);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-    private void Titre(String Titre)
-    {
-        PTitre = new JPanel();
-        PTitre.setPreferredSize(new Dimension(getWidth(), 100));
-        PTitre.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        titrre = new JLabel(Titre, SwingConstants.CENTER);
-        titrre.setFont(new Font("Arial", Font.BOLD, 32));
-        PTitre.setLayout(new BorderLayout());
-        PTitre.add(titrre, BorderLayout.CENTER);
-    }
+        // Panel pour la liste verticale des articles avec fond blanc
+        JPanel articlesList = new JPanel();
+        articlesList.setLayout(new BoxLayout(articlesList, BoxLayout.Y_AXIS));
+        articlesList.setBackground(Color.WHITE);
+        articlesList.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-    /// Catalogue : configuration
-    private void Produits()
-    {
-        try
-        {
-            Liste = new JPanel();
-            Liste.setBackground(Color.WHITE);
-            Liste.setLayout(new GridLayout(0, 3, 20, 20));
-
-            /// Création du panneau de recherche et filtres
-            JPanel searchPanel = new JPanel();
-            searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.Y_AXIS));
-            searchPanel.setBackground(Color.WHITE);
-            searchPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-            /// Barre de recherche
-            JPanel searchBarPanel = new JPanel();
-            searchBarPanel.setLayout(new BoxLayout(searchBarPanel, BoxLayout.X_AXIS));
-            searchBarPanel.setBackground(Color.WHITE);
-
-            JTextField searchField = new JTextField(20);
-            searchField.setPreferredSize(new Dimension(300, 35));
-            searchField.setFont(new Font("Arial", Font.PLAIN, 14));
-            searchField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                BorderFactory.createEmptyBorder(5, 10, 5, 10)
-            ));
-
-            JButton searchButton = new JButton("Rechercher");
-            searchButton.setBackground(new Color(51, 122, 183));
-            searchButton.setForeground(Color.WHITE);
-            searchButton.setFont(new Font("Arial", Font.BOLD, 14));
-            searchButton.setBorderPainted(false);
-            searchButton.setFocusPainted(false);
-            searchButton.setPreferredSize(new Dimension(120, 35));
-
-            searchBarPanel.add(searchField);
-            searchBarPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-            searchBarPanel.add(searchButton);
-
-            /// Filtres par catégorie
-            JPanel filterPanel = new JPanel();
-            filterPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-            filterPanel.setBackground(Color.WHITE);
-
-            String[] categories = {"Tous", "Nourriture", "Vêtements", "Livres", "Décoration"};
-            JComboBox<String> categoryFilter = new JComboBox<>(categories);
-            categoryFilter.setFont(new Font("Arial", Font.PLAIN, 14));
-            categoryFilter.setPreferredSize(new Dimension(150, 35));
-
-            filterPanel.add(new JLabel("Catégorie: "));
-            filterPanel.add(categoryFilter);
-
-            searchPanel.add(searchBarPanel);
-            searchPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-            searchPanel.add(filterPanel);
-
+        try {
             DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
-
             ArticleDAOImpl articleDAO = new ArticleDAOImpl(dao);
-
             java.util.List<Article> articles = articleDAO.listerArticles();
 
-            /// Affichage des articles
-            for (Article article : articles)
-            {
-                JPanel articlePanel = CreerListe(article);
-                Liste.add(articlePanel);
+            for (Article article : articles) {
+                JPanel articlePanel = createArticlePanel(article);
+                articlesList.add(articlePanel);
+                articlesList.add(Box.createRigidArea(new Dimension(0, 10))); // Espacement entre les articles
             }
-
-            /// Ajout des composants au catalogue
-            catalogue.add(searchPanel, BorderLayout.NORTH);
-            Scroll = new JScrollPane(Liste);
-            Scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            Scroll.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-            catalogue.add(Scroll, BorderLayout.CENTER);
-
-            /// Gestion des événements de recherche
-            searchButton.addActionListener(e -> {
-                String searchText = searchField.getText().toLowerCase();
-                String selectedCategory = (String)categoryFilter.getSelectedItem();
-
-                Liste.removeAll();
-                for (Article article : articles)
-                {
-                    boolean matchesSearch = article.getNom().toLowerCase().contains(searchText) ||
-                                          article.getDescription().toLowerCase().contains(searchText);
-                    boolean matchesCategory = selectedCategory.equals("Tous") ||
-                                            article.getCategorie().equals(selectedCategory);
-
-                    if (matchesSearch && matchesCategory)
-                    {
-                        JPanel articlePanel = CreerListe(article);
-                        Liste.add(articlePanel);
-                    }
-                }
-                Liste.revalidate();
-                Liste.repaint();
-            });
-
-            categoryFilter.addActionListener(e -> {
-                String selectedCategory = (String)categoryFilter.getSelectedItem();
-                searchButton.doClick();
-            });
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
-            /// Afficher un message d'erreur à l'utilisateur
             JOptionPane.showMessageDialog(this,
-                "Erreur lors du chargement du catalogue : " + e.getMessage(),
-                "Erreur",
-                JOptionPane.ERROR_MESSAGE);
+                    "Erreur lors du chargement des articles : " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
         }
+
+        JScrollPane scrollPane = new JScrollPane(articlesList);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+
+        // Bouton Retour en bas
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel.setBackground(Color.WHITE);
+        JButton returnButton = new JButton("Retour");
+        returnButton.addActionListener(fenetreControl);
+        bottomPanel.add(returnButton);
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+        articles.add(mainPanel);
     }
 
-    /// Articles : Vue article par article
-    private JPanel CreerListe(Article article) {
-        JPanel p = new JPanel();
-        p.setBackground(Color.WHITE);
-        p.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
-            BorderFactory.createEmptyBorder(15, 15, 15, 15)
+    private JPanel createArticlePanel(Article article) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 
-        /// 1. Image du produit
+        // Panel gauche pour l'image
         JPanel imagePanel = new JPanel();
-        imagePanel.setPreferredSize(new Dimension(250, 200));
+        imagePanel.setPreferredSize(new Dimension(200, 200));
         imagePanel.setBackground(Color.WHITE);
-        imagePanel.setLayout(new BorderLayout());
 
-        /// Chargement de l'image en fonction de la catégorie
+        String imagePath = getImageFileName(article.getNom(), article.getCategorie());
         String defaultImagePath = "Main/src/View/image/default_product.png";
 
-        /// Convertir la catégorie en version sans accent pour le chemin du dossier
-        String categorieDossier = article.getCategorie().toLowerCase()
-            .replace("é", "e")
-            .replace("è", "e")
-            .replace("à", "a")
-            .replace("ù", "u")
-            .replace("ç", "c")
-            .replace("ê", "e");
+        try {
+            // Construire le chemin complet de l'image
+            String fullImagePath = imagePath != null ?
+                    String.format("Main/src/View/image/%s/%s",
+                            article.getCategorie().toLowerCase()
+                                    .replace("é", "e")
+                                    .replace("è", "e")
+                                    .replace("à", "a")
+                                    .replace("ù", "u")
+                                    .replace("ç", "c"),
+                            imagePath) :
+                    defaultImagePath;
 
-        String imagePath = defaultImagePath;
-
-        /// Obtenir le nom du fichier image en fonction de la catégorie
-        String fileName = getImageFileName(article.getNom(), article.getCategorie());
-        if (fileName != null)
-        {
-            /// Utiliser la catégorie sans accent pour le chemin
-            imagePath = String.format("Main/src/View/image/%s/%s", categorieDossier, fileName);
-            //System.out.println("Tentative de chargement de l'image: " + imagePath);
-        }
-
-        try
-        {
-            File imageFile = new File(imagePath);
-            ImageIcon imageIcon;
-
-            if (imageFile.exists())
-            {
-                imageIcon = new ImageIcon(imagePath);
-                //System.out.println("Image trouvée et chargée: " + imagePath);
-            }
-            else
-            {
-                //System.out.println("Image non trouvée: " + imagePath + ", utilisation de l'image par défaut");
-                imageIcon = new ImageIcon(defaultImagePath);
+            // Vérifier si le fichier existe
+            File imageFile = new File(fullImagePath);
+            if (!imageFile.exists()) {
+                System.out.println("Image non trouvée: " + fullImagePath);
+                fullImagePath = defaultImagePath;
             }
 
-            /// Redimensionner l'image
-            Image img = imageIcon.getImage();
-            int originalWidth = imageIcon.getIconWidth();
-            int originalHeight = imageIcon.getIconHeight();
-
-            if (originalWidth > 0 && originalHeight > 0) {
-                double ratio = Math.min(230.0 / originalWidth, 180.0 / originalHeight);
-                int newWidth = (int) (originalWidth * ratio);
-                int newHeight = (int) (originalHeight * ratio);
-
-                Image newImg = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-                JLabel imageLabel = new JLabel(new ImageIcon(newImg));
-                imageLabel.setHorizontalAlignment(JLabel.CENTER);
-                imagePanel.add(imageLabel, BorderLayout.CENTER);
-            } else {
-                throw new Exception("Image invalide");
-            }
-        }
-        catch (Exception e)
-        {
-            //System.out.println("Erreur lors du chargement de l'image pour " + article.getNom() + ": " + e.getMessage());
-            JLabel placeholder = new JLabel(article.getNom().substring(0, 1).toUpperCase());
-            placeholder.setFont(new Font("Arial", Font.BOLD, 48));
-            placeholder.setForeground(new Color(200, 200, 200));
-            placeholder.setHorizontalAlignment(JLabel.CENTER);
-            imagePanel.add(placeholder, BorderLayout.CENTER);
+            // Charger et redimensionner l'image
+            ImageIcon imageIcon = new ImageIcon(fullImagePath);
+            Image image = imageIcon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH);
+            JLabel imageLabel = new JLabel(new ImageIcon(image));
+            imageLabel.setHorizontalAlignment(JLabel.CENTER);
+            imagePanel.add(imageLabel);
+        } catch (Exception e) {
+            System.err.println("Erreur lors du chargement de l'image pour " + article.getNom() + ": " + e.getMessage());
+            // Utiliser une image par défaut en cas d'erreur
+            ImageIcon defaultIcon = new ImageIcon(defaultImagePath);
+            Image defaultImage = defaultIcon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH);
+            JLabel defaultLabel = new JLabel(new ImageIcon(defaultImage));
+            defaultLabel.setHorizontalAlignment(JLabel.CENTER);
+            imagePanel.add(defaultLabel);
         }
 
-        imagePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        p.add(imagePanel);
-        p.add(Box.createRigidArea(new Dimension(0, 15)));
+        panel.add(imagePanel, BorderLayout.WEST);
 
-        /// 2. Nom du produit
-        JLabel nameLabel = new JLabel(article.getNom(), SwingConstants.CENTER);
+        // Panel central pour les informations
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBackground(Color.WHITE);
+
+        JLabel nameLabel = new JLabel(article.getNom());
         nameLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        nameLabel.setForeground(new Color(50, 50, 50));
-        nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        p.add(nameLabel);
-        p.add(Box.createRigidArea(new Dimension(0, 10)));
+        infoPanel.add(nameLabel);
+        infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
-        /// 3. Marque
-        JLabel brandLabel = new JLabel("Marque: " + article.getMarque());
-        brandLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        brandLabel.setForeground(new Color(100, 100, 100));
-        brandLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        p.add(brandLabel);
-
-        /// 4. Catégorie
-        JLabel categoryLabel = new JLabel("Catégorie: " + article.getCategorie());
-        categoryLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        categoryLabel.setForeground(new Color(100, 100, 100));
-        categoryLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        p.add(categoryLabel);
-
-        /// 5. Prix
-        JLabel priceLabel = new JLabel(String.format("%.2f €", article.getPrixUnitaire()));
-        priceLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        priceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        p.add(priceLabel);
-
-        /// 6. Stock
-        JLabel stockLabel = new JLabel("Stock: " + article.getStock() + " unités");
-        stockLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        stockLabel.setForeground(new Color(100, 100, 100));
-        stockLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        p.add(stockLabel);
-
-        /// 7. Description (truncated)
-        String shortDescription = article.getDescription().length() > 100 ?
-            article.getDescription().substring(0, 100) + "..." : article.getDescription();
-        JLabel descLabel = new JLabel("<html>" + shortDescription + "</html>");
+        JLabel descLabel = new JLabel("<html><div style='width:500px'>" + article.getDescription() + "</div></html>");
         descLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        descLabel.setForeground(new Color(120, 120, 120));
-        descLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        p.add(descLabel);
+        infoPanel.add(descLabel);
+        infoPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        p.add(Box.createRigidArea(new Dimension(0, 15)));
+        JLabel priceLabel = new JLabel("Prix : " + article.getPrixUnitaire() + " €");
+        priceLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        infoPanel.add(priceLabel);
+        infoPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        /// 8. Bouton Voir détails
-        JButton voirButton = new JButton("Détails");
-        voirButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        voirButton.setBackground(new Color(51, 122, 183));
-        voirButton.setForeground(Color.WHITE);
-        voirButton.setFont(new Font("Arial", Font.BOLD, 14));
-        voirButton.setBorderPainted(false);
-        voirButton.setFocusPainted(false);
-        voirButton.setPreferredSize(new Dimension(120, 35));
-        voirButton.setActionCommand("Détails" + article.getId()); /// Retourne Détails + id de l'article sélectionné
-        voirButton.addActionListener(e -> fenetreControl.actionPerformed(e));
-        p.add(voirButton);
+        JLabel stockLabel = new JLabel("Stock disponible : " + article.getStock());
+        stockLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        infoPanel.add(stockLabel);
 
-        /// 9. Quantité désiré
+        panel.add(infoPanel);
+
+        // Panel droit pour les boutons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.setBackground(Color.WHITE);
+
+        JButton detailsButton = new JButton("Détails");
+        detailsButton.setActionCommand("Détails" + article.getId());
+        detailsButton.addActionListener(fenetreControl);
+
         JPanel panel_quantite = new JPanel();
         JLabel label_quantite = new JLabel("Quantité");
         panel_quantite.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel_quantite.add(label_quantite);
         quantite = new TextField(10);
         panel_quantite.add(quantite);
-        p.add(panel_quantite);
+        buttonPanel.add(panel_quantite);
 
-        /// 10. Ajout au panier
-        JButton panierButton = new JButton("Ajouter");
-        panierButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panierButton.setBackground(new Color(51, 122, 183));
-        panierButton.setForeground(Color.WHITE);
-        panierButton.setFont(new Font("Arial", Font.BOLD, 14));
-        panierButton.setBorderPainted(false);
-        panierButton.setFocusPainted(false);
-        panierButton.setPreferredSize(new Dimension(120, 35));
-        panierButton.setActionCommand("Ajouter" + article.getId()); /// Retourne Ajouter + id de l'article sélectionné
-        panierButton.addActionListener(e -> fenetreControl.actionPerformed(e));
-        p.add(panierButton);
 
-        return p;
+        JButton addButton = new JButton("Ajouter au panier");
+        addButton.setActionCommand("Ajouter au panier" + article.getId());
+        addButton.addActionListener(fenetreControl);
+
+        buttonPanel.add(detailsButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        buttonPanel.add(addButton);
+
+        panel.add(buttonPanel, BorderLayout.EAST);
+
+        return panel;
     }
 
     /// Méthode pour obtenir le nom du fichier image correspondant
     private String getImageFileName(String nomArticle, String categorie) {
-        /// Conversion en minuscules et normalisation
-        String nom = nomArticle.toLowerCase()
-            .replace("é", "e")
-            .replace("è", "e")
-            .replace("à", "a")
-            .replace("ù", "u")
-            .replace("ç", "c");
+        // Normalisation de la catégorie
+        String categorieNormalisee = categorie.toLowerCase()
+                .replace("vêtements", "vetements")
+                .replace("vêtement", "vetements")
+                .replace("é", "e")
+                .replace("è", "e")
+                .replace("à", "a")
+                .replace("ù", "u")
+                .replace("ç", "c");
 
-        /// Pour chaque catégorie, retourner le nom exact du fichier
-        switch (categorie.toLowerCase()) {
+        // Normalisation du nom
+        String nom = nomArticle.toLowerCase()
+                .replace("é", "e")
+                .replace("è", "e")
+                .replace("à", "a")
+                .replace("ù", "u")
+                .replace("ç", "c");
+
+        // Pour chaque catégorie, retourner le nom exact du fichier
+        switch (categorieNormalisee) {
             case "nourriture":
                 if (nom.contains("cafe") || nom.contains("café")) return "cafe_bio.png";
                 if (nom.contains("chocolat")) return "chocolat_noir.png";
@@ -951,7 +1023,6 @@ public class Fenetres extends Component
                 break;
 
             case "vetements":
-            case "vêtements":
                 if (nom.contains("t-shirt") || nom.contains("tshirt")) return "tshirt_coton.png";
                 if (nom.contains("jean")) return "jean_slim.png";
                 if (nom.contains("robe")) return "robe_ete.png";
@@ -966,7 +1037,7 @@ public class Fenetres extends Component
                 if (nom.contains("petit prince")) return "petit_prince.png";
                 if (nom.contains("1984")) return "1984_livre.png";
                 if (nom.contains("art") && nom.contains("guerre")) return "art_guerre.png";
-                if (nom.contains("cuisine") || nom.contains("vegetarienne") || nom.contains("végétarienne")) return "cuisine_vegetarienne.png";
+                if (nom.contains("cuisine") || nom.contains("vegetarienne")) return "cuisine_vegetarienne.png";
                 if (nom.contains("guide") && nom.contains("japon")) return "guide_japon.png";
                 if (nom.contains("seigneur")) return "seigneur_anneaux.png";
                 if (nom.contains("astrophysics")) return "astrophysics.png";
@@ -974,21 +1045,18 @@ public class Fenetres extends Component
                 break;
 
             case "decoration":
-            case "décoration":
                 if (nom.contains("joconde")) return "joconde.png";
-                if (nom.contains("nuit") || nom.contains("etoilee") || nom.contains("étoilée")) return "nuit_etoilee.png";
-                if (nom.contains("liberte") || nom.contains("liberté")) return "liberte_peuple.png";
+                if (nom.contains("nuit") || nom.contains("etoilee")) return "nuit_etoilee.png";
+                if (nom.contains("liberte")) return "liberte_peuple.png";
                 if (nom.contains("guernica")) return "guernica.png";
-                if (nom.contains("napoleon") || nom.contains("napoléon")) return "napoleon.png";
+                if (nom.contains("napoleon")) return "napoleon.png";
                 if (nom.contains("jeanne")) return "jeanne_arc.png";
                 if (nom.contains("marie")) return "marie_antoinette.png";
-                if (nom.contains("sphere") || nom.contains("sphère")) return "sphere_armillaire.png";
+                if (nom.contains("sphere")) return "sphere_armillaire.png";
                 break;
         }
 
-        /// Si aucune correspondance n'est trouvée, retourner null pour utiliser l'image par défaut
-        //System.out.println("Aucune image trouvée pour l'article: " + nomArticle + " (catégorie: " + categorie + ")");
-        return null;
+        return "default_product.png";
     }
 
     /// Articles : Bouton retour
@@ -1001,153 +1069,232 @@ public class Fenetres extends Component
         addButton(PannelRetour, "Retour");
     }
 
-    /// Ajout d'un nouvel article (seulement pour les admins)
-    public void setNewArticle()
-    {
-        ajout_article = new JFrame();
-        ajout_article.setSize(900, 700);
-        ajout_article.setTitle("Ajout article");
-        ajout_article.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        ajout_article.setLayout(new BoxLayout(ajout_article.getContentPane(), BoxLayout.Y_AXIS));
-        JLabel label1 = new JLabel("Categorie");
-        ajout_article.add(label1);
-        String[] type = {"Electromenager", "Nourriture", "Necessite"};
-        categorie = new JComboBox<>(type); /// Liste associée
-        categorie.setSelectedIndex(0);
-        categorie.setBounds(50, 50, 100, 20);
-        ajout_article.add(categorie);
-        JLabel label2 = new JLabel("Marque");
-        ajout_article.add(label2);
-        String[] type2 = {"Bosch", "Samsung", "Nestlé"};
-        marque = new JComboBox<>(type2); /// Liste associée
-        marque.setSelectedIndex(0);
-        marque.setBounds(50, 50, 100, 20);
-        ajout_article.add(marque);
-        JPanel inscrire_nom = new JPanel();
-        JLabel label3 = new JLabel("Nom");
-        inscrire_nom.add(label3);
-        JPanel ajout_article_button = new JPanel();
-        nom_article = new TextField(10);
-        prix = new TextField(10);
-        stock = new TextField(10);
-        description = new TextField(10);
-        seuil_remise = new TextField(10);
-        inscrire_nom.add(nom_article);
-        JPanel inscrire_prix = new JPanel();
-        JLabel label4 = new JLabel("Prix");
-        inscrire_prix.add(label4);
-        inscrire_prix.add(prix);
-        JLabel label5 = new JLabel("Stock");
-        JPanel inscrire_stock = new JPanel();
-        inscrire_stock.add(label5);
-        inscrire_stock.add(stock);
-        JLabel label6 = new JLabel("Seuil de remise");
-        JPanel inscrire_remise = new JPanel();
-        inscrire_remise.add(label6);
-        inscrire_remise.add(seuil_remise);
-        JPanel decrire = new JPanel();
-        JLabel label7 = new JLabel("Description");
-        decrire.add(label7);
-        decrire.add(description);
-        addButton(ajout_article_button, "Valider l'ajout");
-        addButton(ajout_article_button, "Retour");
-        ajout_article.add(inscrire_nom);
-        ajout_article.add(inscrire_prix);
-        ajout_article.add(inscrire_stock);
-        ajout_article.add(inscrire_remise);
-        ajout_article.add(decrire);
-        ajout_article.add(ajout_article_button);
-    }
+    /// Vue Panier
+    public void setPanier() {
+        panierFrame.setTitle("Panier");
+        panierFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        panierFrame.setSize(1200, 800);
+        panierFrame.setLocationRelativeTo(null);
+        panierFrame.setLayout(new BorderLayout());
+        panierFrame.getContentPane().setBackground(BACKGROUND_COLOR);
 
-    /// Vue Articles
-    public void setListeArticles()
-    {
-        articles = new JFrame();
-        articles.setTitle("Articles");
-        articles.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        articles.setSize(1200, 800);
-        articles.setLocationRelativeTo(null);
-        articles.setLayout(new BorderLayout());
+        // Barre de navigation
+        JPanel navBar = createNavigationBar();
+        panierFrame.add(navBar, BorderLayout.NORTH);
 
-        Titre("Articles");
-        Produits();
-        creerRetour();
+        // Panel principal avec fond bordeaux
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(BACKGROUND_COLOR);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        articles.add(PTitre, BorderLayout.NORTH);
-        articles.add(Scroll, BorderLayout.CENTER);
-        articles.add(PannelRetour, BorderLayout.SOUTH);
-    }
+        // Panel du contenu avec fond blanc
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setBackground(Color.WHITE);
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-    /// Vue Panier du client
-    private void ProduitsPanier()
-    {
+        // Panel gauche pour les articles du panier
+        JPanel cartItemsPanel = new JPanel();
+        cartItemsPanel.setLayout(new BoxLayout(cartItemsPanel, BoxLayout.Y_AXIS));
+        cartItemsPanel.setBackground(Color.WHITE);
+
+        // Titre "Cart"
+        JLabel cartTitle = new JLabel("Panier");
+        cartTitle.setFont(new Font("Arial", Font.BOLD, 24));
+        cartTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+        cartItemsPanel.add(cartTitle);
+
         try {
             DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
             UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
             Utilisateurs user = new Utilisateurs(0, "", "", email, password, "");
             Utilisateurs user_actuel = userdao.connexionUtilisateur(user);
-
-            Client client = new Client(user_actuel.getIdentifiant(), user_actuel.getNom(), user_actuel.getPrenom(), user_actuel.getEmail(), user_actuel.getMotDePasse(), user_actuel.getType_utilisateur());
-            Liste = new JPanel();
-            Liste.setBackground(Color.WHITE);
-            Liste.setLayout(new GridLayout(0, 3, 20, 20));
+            Client client = new Client(user_actuel.getIdentifiant(), user_actuel.getNom(),
+                    user_actuel.getPrenom(), user_actuel.getEmail(),
+                    user_actuel.getMotDePasse(), user_actuel.getType_utilisateur());
 
             PanierDAOImpl panierDao = new PanierDAOImpl(dao);
-
             java.util.List<Article> articles = panierDao.panierArticles(client);
 
-            /// Affichage des articles
+            double total = 0.0;
+
             for (Article article : articles) {
-                JPanel articlePanel = recapPanier(article);
-                Liste.add(articlePanel);
+                JPanel itemPanel = createCartItemPanel(article);
+                cartItemsPanel.add(itemPanel);
+                cartItemsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+                total += article.getPrixUnitaire();
             }
 
-            /// Ajout des composants au catalogue
-            Scroll = new JScrollPane(Liste);
-            Scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            Scroll.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-            catalogue.add(Scroll, BorderLayout.CENTER);
+            // Panel droit pour le résumé
+            JPanel summaryPanel = new JPanel();
+            summaryPanel.setLayout(new BoxLayout(summaryPanel, BoxLayout.Y_AXIS));
+            summaryPanel.setBackground(Color.WHITE);
+            summaryPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
+            summaryPanel.setPreferredSize(new Dimension(300, 0));
 
-        }
-        catch (Exception e)
-        {
+            // Sous-total
+            JPanel subtotalPanel = new JPanel(new BorderLayout());
+            subtotalPanel.setBackground(Color.WHITE);
+            subtotalPanel.add(new JLabel("Sous-total"), BorderLayout.WEST);
+            subtotalPanel.add(new JLabel(String.format("%.2f €", total)), BorderLayout.EAST);
+            summaryPanel.add(subtotalPanel);
+            summaryPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+            // Livraison
+            JPanel shippingPanel = new JPanel(new BorderLayout());
+            shippingPanel.setBackground(Color.WHITE);
+            shippingPanel.add(new JLabel("Livraison"), BorderLayout.WEST);
+            shippingPanel.add(new JLabel("Gratuit"), BorderLayout.EAST);
+            summaryPanel.add(shippingPanel);
+            summaryPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+            // Total
+            JPanel totalPanel = new JPanel(new BorderLayout());
+            totalPanel.setBackground(Color.WHITE);
+            JLabel totalLabel = new JLabel("Total");
+            totalLabel.setFont(new Font("Arial", Font.BOLD, 16));
+            JLabel totalAmount = new JLabel(String.format("%.2f €", total));
+            totalAmount.setFont(new Font("Arial", Font.BOLD, 16));
+            totalPanel.add(totalLabel, BorderLayout.WEST);
+            totalPanel.add(totalAmount, BorderLayout.EAST);
+            summaryPanel.add(totalPanel);
+            summaryPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+            // Bouton Commander
+            JButton checkoutButton = new JButton("Commander");
+            checkoutButton.setBackground(new Color(0, 123, 255));
+            checkoutButton.setForeground(Color.WHITE);
+            checkoutButton.setFont(new Font("Arial", Font.BOLD, 14));
+            checkoutButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            checkoutButton.setBorderPainted(false);
+            checkoutButton.setPreferredSize(new Dimension(200, 40));
+            checkoutButton.addActionListener(fenetreControl);
+
+            // Bouton Retour
+            JButton returnButton = new JButton("Retour");
+            returnButton.setBackground(new Color(0, 123, 255));
+            returnButton.setForeground(Color.WHITE);
+            returnButton.setFont(new Font("Arial", Font.BOLD, 14));
+            returnButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            returnButton.setBorderPainted(false);
+            returnButton.setPreferredSize(new Dimension(200, 40));
+            returnButton.addActionListener(fenetreControl);
+
+            JPanel buttonPanel = new JPanel();
+            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+            buttonPanel.setBackground(Color.WHITE);
+
+            buttonPanel.add(checkoutButton);
+            buttonPanel.add(Box.createVerticalStrut(10));
+            buttonPanel.add(returnButton);
+
+            summaryPanel.add(buttonPanel);
+
+            // Ajout des panels au contentPanel
+            contentPanel.add(new JScrollPane(cartItemsPanel), BorderLayout.CENTER);
+            contentPanel.add(summaryPanel, BorderLayout.EAST);
+
+        } catch (Exception e) {
             e.printStackTrace();
-            //System.out.println("Erreur lors du chargement du catalogue : " + e.getMessage());
-            // Afficher un message d'erreur à l'utilisateur
             JOptionPane.showMessageDialog(this,
-                    "Erreur lors du chargement du catalogue : " + e.getMessage(),
+                    "Erreur lors du chargement du panier : " + e.getMessage(),
                     "Erreur",
                     JOptionPane.ERROR_MESSAGE);
         }
+
+        mainPanel.add(contentPanel, BorderLayout.CENTER);
+        panierFrame.add(mainPanel);
     }
 
-    /// Panier : Boutons du panier
-    private void PanelPanier() {
-        PannelRetour = new JPanel();
-        PannelRetour.setBackground(new Color(240, 240, 240));
-        PannelRetour.setPreferredSize(new Dimension(getWidth(), 100));
-        PannelRetour.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        PannelRetour.setLayout(new GridBagLayout());
-        addButton(PannelRetour, "Passer commande");
-        addButton(PannelRetour, "Retour");
-    }
+    private JPanel createCartItemPanel(Article article) {
+        JPanel itemPanel = new JPanel(new BorderLayout(15, 0));
+        itemPanel.setBackground(Color.WHITE);
+        itemPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230)),
+                BorderFactory.createEmptyBorder(10, 0, 10, 0)
+        ));
 
-    /// Vue Panier
-    public void setPanier()
-    {
-        panier.setTitle("Panier");
-        panier.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        panier.setSize(1200, 800);
-        panier.setLocationRelativeTo(null);
-        panier.setLayout(new BorderLayout());
+        // Image du produit
+        JPanel imagePanel = new JPanel(new BorderLayout());
+        imagePanel.setBackground(Color.WHITE);
+        imagePanel.setPreferredSize(new Dimension(100, 100));
 
-        Titre("Panier");
-        ProduitsPanier();
-        PanelPanier();
+        String defaultImagePath = "Main/src/View/image/default_product.png";
 
-        panier.add(PTitre, BorderLayout.NORTH);
-        panier.add(Scroll, BorderLayout.CENTER);
-        panier.add(PannelRetour, BorderLayout.SOUTH);
+        try {
+            // Normaliser la catégorie pour le chemin du dossier
+            String categorieDossier = article.getCategorie().toLowerCase()
+                    .replace("vêtements", "vetements")
+                    .replace("vêtement", "vetements")
+                    .replace("é", "e")
+                    .replace("è", "e")
+                    .replace("à", "a")
+                    .replace("ù", "u")
+                    .replace("ç", "c")
+                    .replace("ê", "e");
+
+            // Obtenir le nom du fichier image
+            String imageFileName = getImageFileName(article.getNom(), article.getCategorie());
+
+            // Construire le chemin complet
+            String fullImagePath;
+            if (imageFileName.equals("default_product.png")) {
+                fullImagePath = defaultImagePath;
+            } else {
+                fullImagePath = String.format("Main/src/View/image/%s/%s", categorieDossier, imageFileName);
+            }
+
+            // Vérifier si le fichier existe
+            File imageFile = new File(fullImagePath);
+            if (!imageFile.exists()) {
+                System.out.println("Image non trouvée: " + fullImagePath + ", utilisation de l'image par défaut");
+                fullImagePath = defaultImagePath;
+            }
+
+            ImageIcon imageIcon = new ImageIcon(fullImagePath);
+            Image image = imageIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+            JLabel imageLabel = new JLabel(new ImageIcon(image));
+            imageLabel.setHorizontalAlignment(JLabel.CENTER);
+            imagePanel.add(imageLabel, BorderLayout.CENTER);
+        } catch (Exception e) {
+            System.err.println("Erreur lors du chargement de l'image: " + e.getMessage());
+            ImageIcon defaultIcon = new ImageIcon(defaultImagePath);
+            Image defaultImage = defaultIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+            JLabel defaultLabel = new JLabel(new ImageIcon(defaultImage));
+            defaultLabel.setHorizontalAlignment(JLabel.CENTER);
+            imagePanel.add(defaultLabel, BorderLayout.CENTER);
+        }
+
+        // Informations de l'article
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBackground(Color.WHITE);
+
+        JLabel nameLabel = new JLabel(article.getNom());
+        nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
+
+        // Sélecteur de quantité
+        JPanel quantityPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        quantityPanel.setBackground(Color.WHITE);
+        JComboBox<Integer> quantitySelector = new JComboBox<>(new Integer[]{1, 2, 3, 4, 5});
+        quantitySelector.setPreferredSize(new Dimension(60, 25));
+        quantityPanel.add(quantitySelector);
+
+        infoPanel.add(nameLabel);
+        infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        infoPanel.add(quantityPanel);
+
+        // Prix
+        JPanel pricePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        pricePanel.setBackground(Color.WHITE);
+        JLabel priceLabel = new JLabel(String.format("%.2f €", article.getPrixUnitaire()));
+        priceLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        pricePanel.add(priceLabel);
+
+        itemPanel.add(imagePanel, BorderLayout.WEST);
+        itemPanel.add(infoPanel, BorderLayout.CENTER);
+        itemPanel.add(pricePanel, BorderLayout.EAST);
+
+        return itemPanel;
     }
 
     /// Vue nouvelle commande (adresse à renseigner, le reste est récupéré)
@@ -1157,6 +1304,7 @@ public class Fenetres extends Component
         ajout_commande.setSize(900, 700);
         ajout_commande.setTitle("Commande");
         ajout_commande.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        ajout_commande.getContentPane().setBackground(BACKGROUND_COLOR);
         ajout_commande.setLayout(new BoxLayout(ajout_commande.getContentPane(), BoxLayout.Y_AXIS));
         JPanel inscrire_adresse = new JPanel();
         JLabel label3 = new JLabel("Nom");
@@ -1170,162 +1318,6 @@ public class Fenetres extends Component
         ajout_commande.add(ajout_article_button);
     }
 
-    /// Panier : sur le même modèle que Articles, cette fois spécifique au client connecté
-    private JPanel recapPanier(Article article)
-    {
-        JPanel p = new JPanel();
-        p.setBackground(Color.WHITE);
-        p.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
-                BorderFactory.createEmptyBorder(15, 15, 15, 15)
-        ));
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-
-        /// 1. Image du produit
-        JPanel imagePanel = new JPanel();
-        imagePanel.setPreferredSize(new Dimension(250, 200));
-        imagePanel.setBackground(Color.WHITE);
-        imagePanel.setLayout(new BorderLayout());
-
-        /// Chargement de l'image en fonction de la catégorie
-        String defaultImagePath = "Main/src/View/image/default_product.png";
-
-        /// Convertir la catégorie en version sans accent pour le chemin du dossier
-        String categorieDossier = article.getCategorie().toLowerCase()
-                .replace("é", "e")
-                .replace("è", "e")
-                .replace("à", "a")
-                .replace("ù", "u")
-                .replace("ç", "c")
-                .replace("ê", "e");
-
-        String imagePath = defaultImagePath;
-
-        /// Obtenir le nom du fichier image en fonction de la catégorie
-        String fileName = getImageFileName(article.getNom(), article.getCategorie());
-        if (fileName != null) {
-            /// Utiliser la catégorie sans accent pour le chemin
-            imagePath = String.format("Main/src/View/image/%s/%s", categorieDossier, fileName);
-            //System.out.println("Tentative de chargement de l'image: " + imagePath);
-        }
-
-        try {
-            File imageFile = new File(imagePath);
-            ImageIcon imageIcon;
-
-            if (imageFile.exists()) {
-                imageIcon = new ImageIcon(imagePath);
-                //System.out.println("Image trouvée et chargée: " + imagePath);
-            } else {
-                //System.out.println("Image non trouvée: " + imagePath + ", utilisation de l'image par défaut");
-                imageIcon = new ImageIcon(defaultImagePath);
-            }
-
-            // Redimensionner l'image
-            Image img = imageIcon.getImage();
-            int originalWidth = imageIcon.getIconWidth();
-            int originalHeight = imageIcon.getIconHeight();
-
-            if (originalWidth > 0 && originalHeight > 0) {
-                double ratio = Math.min(230.0 / originalWidth, 180.0 / originalHeight);
-                int newWidth = (int) (originalWidth * ratio);
-                int newHeight = (int) (originalHeight * ratio);
-
-                Image newImg = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-                JLabel imageLabel = new JLabel(new ImageIcon(newImg));
-                imageLabel.setHorizontalAlignment(JLabel.CENTER);
-                imagePanel.add(imageLabel, BorderLayout.CENTER);
-            } else {
-                throw new Exception("Image invalide");
-            }
-        } catch (Exception e) {
-            //System.out.println("Erreur lors du chargement de l'image pour " + article.getNom() + ": " + e.getMessage());
-            JLabel placeholder = new JLabel(article.getNom().substring(0, 1).toUpperCase());
-            placeholder.setFont(new Font("Arial", Font.BOLD, 48));
-            placeholder.setForeground(new Color(200, 200, 200));
-            placeholder.setHorizontalAlignment(JLabel.CENTER);
-            imagePanel.add(placeholder, BorderLayout.CENTER);
-        }
-
-        imagePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        p.add(imagePanel);
-        p.add(Box.createRigidArea(new Dimension(0, 15)));
-
-        /// 2. Nom du produit
-        JLabel nameLabel = new JLabel(article.getNom(), SwingConstants.CENTER);
-        nameLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        nameLabel.setForeground(new Color(50, 50, 50));
-        nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        p.add(nameLabel);
-        p.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        /// 3. Marque
-        JLabel brandLabel = new JLabel("Marque: " + article.getMarque());
-        brandLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        brandLabel.setForeground(new Color(100, 100, 100));
-        brandLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        p.add(brandLabel);
-
-        /// 4. Catégorie
-        JLabel categoryLabel = new JLabel("Catégorie: " + article.getCategorie());
-        categoryLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        categoryLabel.setForeground(new Color(100, 100, 100));
-        categoryLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        p.add(categoryLabel);
-
-        /// 5. Prix
-        JLabel priceLabel = new JLabel(String.format("%.2f €", article.getPrixUnitaire()));
-        priceLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        priceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        p.add(priceLabel);
-
-        /// 6. Stock
-        JLabel stockLabel = new JLabel("Stock: " + article.getStock() + " unités");
-        stockLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        stockLabel.setForeground(new Color(100, 100, 100));
-        stockLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        p.add(stockLabel);
-
-        /// 7. Description (truncated)
-        String shortDescription = article.getDescription().length() > 100 ?
-                article.getDescription().substring(0, 100) + "..." : article.getDescription();
-        JLabel descLabel = new JLabel("<html>" + shortDescription + "</html>");
-        descLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        descLabel.setForeground(new Color(120, 120, 120));
-        descLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        p.add(descLabel);
-
-        p.add(Box.createRigidArea(new Dimension(0, 15)));
-
-        /// 8. Bouton Voir détails
-        JButton voirButton = new JButton("Détails");
-        voirButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        voirButton.setBackground(new Color(51, 122, 183));
-        voirButton.setForeground(Color.WHITE);
-        voirButton.setFont(new Font("Arial", Font.BOLD, 14));
-        voirButton.setBorderPainted(false);
-        voirButton.setFocusPainted(false);
-        voirButton.setPreferredSize(new Dimension(120, 35));
-        voirButton.setActionCommand("Détails" + article.getId());
-        voirButton.addActionListener(e -> fenetreControl.actionPerformed(e));
-        p.add(voirButton);
-
-        /// 9. Retirer du panier
-        JButton retirerButton = new JButton("Retirer");
-        retirerButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        retirerButton.setBackground(new Color(51, 122, 183));
-        retirerButton.setForeground(Color.WHITE);
-        retirerButton.setFont(new Font("Arial", Font.BOLD, 14));
-        retirerButton.setBorderPainted(false);
-        retirerButton.setFocusPainted(false);
-        retirerButton.setPreferredSize(new Dimension(120, 35));
-        retirerButton.setActionCommand("Retirer" + article.getId()); /// Retourne Retirer + id de l'article
-        retirerButton.addActionListener(e -> fenetreControl.actionPerformed(e));
-        p.add(retirerButton);
-
-        return p;
-    }
-
     /// Vue modif Article
     public void setModifArticle()
     {
@@ -1334,14 +1326,26 @@ public class Fenetres extends Component
         modif_article.setSize(1200, 800);
         modif_article.setLocationRelativeTo(null);
         modif_article.setLayout(new BorderLayout());
+        modif_article.getContentPane().setBackground(BACKGROUND_COLOR);
 
-        Titre("Sélectionnez l'article à modifier");
+        // Ajout de la barre de navigation
+        JPanel navBar = createNavigationBar();
+        modif_article.add(navBar, BorderLayout.NORTH);
+
+        // Panel principal
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(Color.WHITE);
+
+        // Titre
+        mainPanel.add(createTitlePanel("Sélectionnez l'article à modifier"), BorderLayout.NORTH);
+
+        // Contenu
         ProduitsModif();
         creerRetour();
 
-        modif_article.add(PTitre, BorderLayout.NORTH);
-        modif_article.add(Scroll, BorderLayout.CENTER);
-        modif_article.add(PannelRetour, BorderLayout.SOUTH);
+        mainPanel.add(Scroll, BorderLayout.CENTER);
+        mainPanel.add(PannelRetour, BorderLayout.SOUTH);
+        modif_article.add(mainPanel);
     }
 
     /// Vue Panier du client
@@ -1539,79 +1543,59 @@ public class Fenetres extends Component
 
         imagePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         p.add(imagePanel);
-        p.add(Box.createRigidArea(new Dimension(0, 15)));
-
-        /// 2. Nom du produit
-        JLabel nameLabel = new JLabel(article.getNom(), SwingConstants.CENTER);
-        nameLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        nameLabel.setForeground(new Color(50, 50, 50));
-        nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        p.add(nameLabel);
         p.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        /// 3. Marque
-        JLabel brandLabel = new JLabel("Marque: " + article.getMarque());
-        brandLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        brandLabel.setForeground(new Color(100, 100, 100));
-        brandLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        p.add(brandLabel);
+        // Informations du produit
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBackground(Color.WHITE);
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        /// 4. Catégorie
-        JLabel categoryLabel = new JLabel("Catégorie: " + article.getCategorie());
-        categoryLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        categoryLabel.setForeground(new Color(100, 100, 100));
-        categoryLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        p.add(categoryLabel);
+        // Nom du produit
+        JLabel nameLabel = new JLabel(article.getNom());
+        nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        infoPanel.add(nameLabel);
 
-        /// 5. Prix
+        // Prix et remise
+        if (article.getSeuil_remise() > 0) {
+            JLabel discountLabel = new JLabel("-" + article.getSeuil_remise() + "%");
+            discountLabel.setForeground(Color.RED);
+            discountLabel.setFont(new Font("Arial", Font.BOLD, 12));
+            discountLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            infoPanel.add(discountLabel);
+            infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+
         JLabel priceLabel = new JLabel(String.format("%.2f €", article.getPrixUnitaire()));
-        priceLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        priceLabel.setFont(new Font("Arial", Font.BOLD, 14));
         priceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        p.add(priceLabel);
+        infoPanel.add(priceLabel);
+        infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
-        /// 6. Stock
-        JLabel stockLabel = new JLabel("Stock: " + article.getStock() + " unités");
-        stockLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        // Stock
+        JLabel stockLabel = new JLabel("Stock: " + article.getStock());
+        stockLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         stockLabel.setForeground(new Color(100, 100, 100));
         stockLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        p.add(stockLabel);
+        infoPanel.add(stockLabel);
 
-        /// 7. Description (truncated)
-        String shortDescription = article.getDescription().length() > 100 ?
-                article.getDescription().substring(0, 100) + "..." : article.getDescription();
-        JLabel descLabel = new JLabel("<html>" + shortDescription + "</html>");
-        descLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        descLabel.setForeground(new Color(120, 120, 120));
-        descLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        p.add(descLabel);
+        p.add(infoPanel);
+        p.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        p.add(Box.createRigidArea(new Dimension(0, 15)));
+        // Boutons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        /// 8. Bouton Voir détails
-        JButton voirButton = new JButton("Détails");
-        voirButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        voirButton.setBackground(new Color(51, 122, 183));
-        voirButton.setForeground(Color.WHITE);
-        voirButton.setFont(new Font("Arial", Font.BOLD, 14));
-        voirButton.setBorderPainted(false);
-        voirButton.setFocusPainted(false);
-        voirButton.setPreferredSize(new Dimension(120, 35));
-        voirButton.setActionCommand("Détails" + article.getId());
-        voirButton.addActionListener(e -> fenetreControl.actionPerformed(e));
-        p.add(voirButton);
+        addButton(buttonPanel, "Détails");
+        addButton(buttonPanel, "Modifier");
 
-        /// 9. Modifier l'article
-        JButton modifierButton = new JButton("Modifier");
-        modifierButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        modifierButton.setBackground(new Color(51, 122, 183));
-        modifierButton.setForeground(Color.WHITE);
-        modifierButton.setFont(new Font("Arial", Font.BOLD, 14));
-        modifierButton.setBorderPainted(false);
-        modifierButton.setFocusPainted(false);
-        modifierButton.setPreferredSize(new Dimension(120, 35));
-        modifierButton.setActionCommand("Modifier" + article.getId()); /// Retourne Modifier + id de l'article
-        modifierButton.addActionListener(e -> fenetreControl.actionPerformed(e));
-        p.add(modifierButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+
+        infoPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        infoPanel.add(buttonPanel);
 
         return p;
     }
@@ -1624,6 +1608,7 @@ public class Fenetres extends Component
         modif.setSize(900, 700);
         modif.setTitle("Modification d'un article");
         modif.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        modif.getContentPane().setBackground(BACKGROUND_COLOR);
         modif.setLayout(new BoxLayout(modif.getContentPane(), BoxLayout.Y_AXIS));
         JLabel label1 = new JLabel("Categorie");
         modif.add(label1);
@@ -1682,15 +1667,13 @@ public class Fenetres extends Component
         modif.add(ajout_article_button);
     }
 
-    public void stats(){
+    public void stats() {
         DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
-        UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
-        Utilisateurs user = new Utilisateurs(0, "", "", email, password, "");
-        Utilisateurs user_actuel = userdao.connexionUtilisateur(user);
         stats = new JFrame();
         stats.setSize(500, 400);
         stats.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         stats.setTitle("Profil");
+        stats.getContentPane().setBackground(BACKGROUND_COLOR);
         stats.setLayout(new BorderLayout());
         float pmax, pmin = 0;
         int nombreClients = 0;
@@ -1702,7 +1685,16 @@ public class Fenetres extends Component
 
         JLabel Titre = new JLabel("STATISTIQUES", SwingConstants.CENTER);
         Titre.setFont(new Font("Arial", Font.BOLD, 18));
-        titre.add(Titre);
+        titre.setForeground(Color.WHITE);
+        titre.setBackground(Color.BLACK);
+        titre.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titre.setOpaque(true);
+        titre.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        titre.setPreferredSize(new Dimension(300, 50));
+        titre.setMaximumSize(new Dimension(300, 50));
+        titre.setMinimumSize(new Dimension(300, 50));
+        titre.setLayout(new BorderLayout());
+        titre.add(Titre, BorderLayout.CENTER);
 
         stats.add(titre, BorderLayout.NORTH);
 
@@ -1747,4 +1739,351 @@ public class Fenetres extends Component
         // TODO Implementer Stats, voirs si il n'y a pas besoin de rajouter une valeur dans la table de donnée qui compte le nombre d'achat total.
 
     }
+
+    private JPanel createTitlePanel(String title) {
+        JPanel titlePanel = new JPanel();
+        titlePanel.setPreferredSize(new Dimension(getWidth(), 100));
+        titlePanel.setBackground(Color.WHITE);
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
+        titleLabel.setForeground(new Color(50, 50, 50));
+
+        titlePanel.setLayout(new BorderLayout());
+        titlePanel.add(titleLabel, BorderLayout.CENTER);
+
+        return titlePanel;
+    }
+
+    /// Vue nouvelle article (seulement pour les administrateurs)
+    public void setNewArticle()
+    {
+        ajout_article.setSize(900, 700);
+        ajout_article.setTitle("Nouvel Article");
+        ajout_article.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        ajout_article.getContentPane().setBackground(BACKGROUND_COLOR);
+        ajout_article.setLayout(new BoxLayout(ajout_article.getContentPane(), BoxLayout.Y_AXIS));
+
+        // Catégorie
+        JLabel labelCategorie = new JLabel("Categorie");
+        ajout_article.add(labelCategorie);
+        String[] categories = {"Electromenager", "Nourriture", "Necessite"};
+        categorie = new JComboBox<>(categories);
+        categorie.setSelectedIndex(0);
+        categorie.setBounds(50, 50, 100, 20);
+        ajout_article.add(categorie);
+
+        // Marque
+        JLabel labelMarque = new JLabel("Marque");
+        ajout_article.add(labelMarque);
+        String[] marques = {"Bosch", "Samsung", "Nestlé"};
+        marque = new JComboBox<>(marques);
+        marque.setSelectedIndex(0);
+        marque.setBounds(50, 50, 100, 20);
+        ajout_article.add(marque);
+
+        // Nom
+        JPanel panelNom = new JPanel();
+        JLabel labelNom = new JLabel("Nom");
+        panelNom.add(labelNom);
+        nom_article = new TextField(10);
+        panelNom.add(nom_article);
+        ajout_article.add(panelNom);
+
+        // Prix
+        JPanel panelPrix = new JPanel();
+        JLabel labelPrix = new JLabel("Prix");
+        panelPrix.add(labelPrix);
+        prix = new TextField(10);
+        panelPrix.add(prix);
+        ajout_article.add(panelPrix);
+
+        // Stock
+        JPanel panelStock = new JPanel();
+        JLabel labelStock = new JLabel("Stock");
+        panelStock.add(labelStock);
+        stock = new TextField(10);
+        panelStock.add(stock);
+        ajout_article.add(panelStock);
+
+        // Seuil de remise
+        JPanel panelRemise = new JPanel();
+        JLabel labelRemise = new JLabel("Seuil de remise");
+        panelRemise.add(labelRemise);
+        seuil_remise = new TextField(10);
+        panelRemise.add(seuil_remise);
+        ajout_article.add(panelRemise);
+
+        // Description
+        JPanel panelDescription = new JPanel();
+        JLabel labelDescription = new JLabel("Description");
+        panelDescription.add(labelDescription);
+        description = new TextField(10);
+        panelDescription.add(description);
+        ajout_article.add(panelDescription);
+
+        // Boutons
+        JPanel panelBoutons = new JPanel();
+        addButton(panelBoutons, "Valider l'ajout");
+        addButton(panelBoutons, "Retour");
+        ajout_article.add(panelBoutons);
+    }
+
+    /// Vue du catalogue
+    public void setCatalogue() {
+        catalogue.setSize(1200, 800);
+        catalogue.setTitle("Catalogue");
+        catalogue.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        catalogue.setLayout(new BorderLayout());
+        catalogue.getContentPane().setBackground(BACKGROUND_COLOR);
+
+        // Barre de navigation
+        JPanel navBar = createNavigationBar();
+        catalogue.add(navBar, BorderLayout.NORTH);
+
+        // Panel principal avec fond bordeaux
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(BACKGROUND_COLOR);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // Panel du contenu avec fond blanc
+        JPanel innerPanel = new JPanel(new BorderLayout());
+        innerPanel.setBackground(Color.WHITE);
+        innerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // Barre de recherche en haut
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        searchPanel.setBackground(Color.WHITE);
+
+        JTextField searchField = new JTextField(40);
+        searchField.setPreferredSize(new Dimension(600, 35));
+
+        JButton searchButton = new JButton("Rechercher");
+        searchButton.setBackground(new Color(51, 122, 183));
+        searchButton.setForeground(Color.WHITE);
+        searchButton.setPreferredSize(new Dimension(120, 35));
+        searchButton.setBorderPainted(false);
+
+        searchPanel.add(searchField);
+        searchPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        searchPanel.add(searchButton);
+
+        // Panel des catégories
+        JPanel categoryPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        categoryPanel.setBackground(Color.WHITE);
+        JLabel catLabel = new JLabel("Catégorie:");
+        String[] categories = {"Tous", "Nourriture", "Vêtements", "Livres", "Décoration"};
+        JComboBox<String> categoryFilter = new JComboBox<>(categories);
+        categoryFilter.setPreferredSize(new Dimension(200, 30));
+        categoryPanel.add(catLabel);
+        categoryPanel.add(categoryFilter);
+
+        // Panel du haut combinant recherche et catégories
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(Color.WHITE);
+        topPanel.add(searchPanel, BorderLayout.NORTH);
+        topPanel.add(categoryPanel, BorderLayout.CENTER);
+        innerPanel.add(topPanel, BorderLayout.NORTH);
+
+        // Panel principal avec filtres à gauche et grille de produits à droite
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setBackground(Color.WHITE);
+
+        // Filtres à gauche
+        JPanel filterPanel = new JPanel();
+        filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
+        filterPanel.setBackground(Color.WHITE);
+        filterPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(230, 230, 230)),
+                BorderFactory.createEmptyBorder(10, 10, 10, 20)
+        ));
+        filterPanel.setPreferredSize(new Dimension(200, 0));
+
+        // Titre des filtres
+        JLabel filterTitle = new JLabel("Filtre");
+        filterTitle.setFont(new Font("Arial", Font.BOLD, 16));
+        filterPanel.add(filterTitle);
+        filterPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        // Ajout des différents filtres
+        String[] filterCategories = {"Prix", "Disponibilité", "Nouveautés", "Prix bas"};
+        for (String filter : filterCategories) {
+            JCheckBox checkbox = new JCheckBox(filter);
+            checkbox.setBackground(Color.WHITE);
+            filterPanel.add(checkbox);
+            filterPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        }
+
+        contentPanel.add(filterPanel, BorderLayout.WEST);
+
+        // Grille de produits à droite
+        JPanel productsGrid = new JPanel(new GridLayout(0, 4, 15, 15));
+        productsGrid.setBackground(Color.WHITE);
+
+        try {
+            DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
+            ArticleDAOImpl articleDAO = new ArticleDAOImpl(dao);
+            java.util.List<Article> articles = articleDAO.listerArticles();
+
+            for (Article article : articles) {
+                JPanel productCard = createProductCard(article);
+                productsGrid.add(productCard);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                    "Erreur lors du chargement du catalogue : " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
+        JScrollPane scrollPane = new JScrollPane(productsGrid);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
+
+        innerPanel.add(contentPanel, BorderLayout.CENTER);
+        mainPanel.add(innerPanel, BorderLayout.CENTER);
+
+        // Bouton Retour en bas
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel.setBackground(Color.WHITE);
+        JButton returnButton = new JButton("Retour");
+        returnButton.addActionListener(fenetreControl);
+        bottomPanel.add(returnButton);
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+        catalogue.add(mainPanel);
+    }
+
+    public void afficherDetailsArticle(Article article) {
+        // Créer une nouvelle fenêtre pour les détails
+        JDialog detailsDialog = new JDialog(this, "Détails du produit", true);
+        detailsDialog.setLayout(new BorderLayout(10, 10));
+        detailsDialog.setSize(400, 500);
+        detailsDialog.setLocationRelativeTo(this);
+
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        contentPanel.setBackground(Color.WHITE);
+
+        // Image du produit
+        try {
+            ImageIcon imageIcon = new ImageIcon(article.getImage());
+            Image image = imageIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+            JLabel imageLabel = new JLabel(new ImageIcon(image));
+            imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            contentPanel.add(imageLabel);
+            contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        } catch (Exception e) {
+            System.err.println("Erreur lors du chargement de l'image: " + e.getMessage());
+        }
+
+        // Informations détaillées
+        JLabel nameLabel = new JLabel(article.getNom());
+        nameLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPanel.add(nameLabel);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        JTextArea descriptionArea = new JTextArea(article.getDescription());
+        descriptionArea.setWrapStyleWord(true);
+        descriptionArea.setLineWrap(true);
+        descriptionArea.setEditable(false);
+        descriptionArea.setBackground(Color.WHITE);
+        descriptionArea.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPanel.add(descriptionArea);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        // Prix et remise
+        if (article.getSeuil_remise() > 0) {
+            JLabel discountLabel = new JLabel("Remise: -" + article.getSeuil_remise() + "%");
+            discountLabel.setForeground(Color.RED);
+            discountLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            discountLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            contentPanel.add(discountLabel);
+            contentPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+
+        JLabel priceLabel = new JLabel(String.format("Prix: %.2f €", article.getPrixUnitaire()));
+        priceLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        priceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPanel.add(priceLabel);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        JLabel stockLabel = new JLabel("Stock disponible: " + article.getStock());
+        stockLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        stockLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPanel.add(stockLabel);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        // Bouton Fermer
+        JButton closeButton = new JButton("Fermer");
+        closeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        closeButton.addActionListener(e -> detailsDialog.dispose());
+        contentPanel.add(closeButton);
+
+        detailsDialog.add(contentPanel);
+        detailsDialog.setVisible(true);
+    }
+
+    private void ajouterAuPanier(Article article) {
+        if (article.getStock() > 0) {
+            // Vérifier si l'article est déjà dans le panier
+            boolean articleExiste = false;
+            for (LigneCommande ligne : panier) {
+                if (ligne.getArticle().getId() == article.getId()) {
+                    // Incrémenter la quantité si l'article existe déjà
+                    ligne.setQuantite(ligne.getQuantite() + 1);
+                    articleExiste = true;
+                    break;
+                }
+            }
+
+            // Ajouter un nouvel article si il n'existe pas dans le panier
+            if (!articleExiste) {
+                LigneCommande nouvelleLigne = new LigneCommande(article, 1);
+                panier.add(nouvelleLigne);
+            }
+
+            // Mettre à jour l'affichage du panier
+            mettreAJourPanier();
+            JOptionPane.showMessageDialog(this,
+                    "Article ajouté au panier",
+                    "Succès",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Désolé, cet article n'est plus en stock",
+                    "Stock épuisé",
+                    JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void mettreAJourPanier() {
+        // Calculer le total du panier
+        double total = 0;
+        int nombreArticles = 0;
+
+        for (LigneCommande ligne : panier) {
+            double prixUnitaire = ligne.getArticle().getPrixUnitaire();
+            int quantite = ligne.getQuantite();
+            double remise = ligne.getArticle().getSeuil_remise() / 100.0;
+
+            total += prixUnitaire * quantite * (1 - remise);
+            nombreArticles += quantite;
+        }
+
+        // Mettre à jour le label du panier
+        if (panierLabel != null) {
+            panierLabel.setText(String.format("Panier (%d) - %.2f €", nombreArticles, total));
+        }
+    }
+
+    public JButton getConnexion() {
+        return new JButton("Connexion");
+    }
+
 }

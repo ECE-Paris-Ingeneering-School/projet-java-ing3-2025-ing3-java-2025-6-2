@@ -27,37 +27,33 @@ public class FenetreControl extends JFrame implements ActionListener
         UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
         ArticleDAOImpl artdao = new ArticleDAOImpl(dao);
         JButton button = (JButton) e.getSource();
-        /// Préparation fenêtre évènement
-        JLabel label_event;
-        JPanel erreur_text;
         switch(button.getText())
         {
             /** Valider est utilisé pour la connexion et l'inscription
              * (d'autres actions utilisent le même principe mais avec des noms différents pour éviter de surcharger ce cas précis)
              */
-            case "Valider":
-                if(fenetre.connecter.isVisible())
+            case "Se connecter":
+                fenetre.email = fenetre.mail_id.getText();
+                fenetre.password = fenetre.mdp_id.getText();
+                System.out.println(fenetre.email);
+                System.out.println(fenetre.password);
+                Utilisateurs user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
+                Utilisateurs connect = userdao.connexionUtilisateur(user);
+                if (connect == null)
                 {
-                    fenetre.email = fenetre.mail_id.getText();
-                    fenetre.password = fenetre.mdp_id.getText();
-                    System.out.println(fenetre.email);
-                    System.out.println(fenetre.password);
-                    Utilisateurs user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
-                    Utilisateurs connect = userdao.connexionUtilisateur(user);
-                    if (connect == null)
-                    {
-                        fenetre.setEvent("Erreur", "Erreur pendant la tentative de connexion");
-                        fenetre.event.setVisible(true);
-                    }
-                    else
-                    {
-                        fenetre.setProfil();
-                        fenetre.setPanier();
-                        fenetre.accueil.setVisible(true);
-                        fenetre.connecter.setVisible(false);
-                    }
+                    fenetre.setEvent("Erreur", "Erreur pendant la tentative de connexion");
+                    fenetre.event.setVisible(true);
                 }
-                else if (fenetre.inscrire.isVisible())
+                else
+                {
+                    fenetre.setProfil();
+                    fenetre.setPanier();
+                    fenetre.accueil.setVisible(true);
+                    fenetre.connecter.setVisible(false);
+                }
+                break;
+            case "Valider":
+                if (fenetre.inscrire.isVisible())
                 {
                     int id = new Random().nextInt(1_000_000_000);
                     String nom = fenetre.nom.getText();
@@ -71,12 +67,6 @@ public class FenetreControl extends JFrame implements ActionListener
                     fenetre.setEvent("Inscription", "Inscription terminee");
                     fenetre.connecter.setVisible(true);
                     fenetre.event.setVisible(true);
-                }
-                else if (fenetre.profil.isVisible())
-                {
-                    fenetre.stats();
-                    fenetre.stats.setVisible(true);
-                    fenetre.profil.setVisible(false);
                 }
                 break;
             /// Valider l'ajout d'un article (seulement pour les administrateurs)
@@ -99,7 +89,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.profil.setVisible(true);
                 fenetre.event.setVisible(true);
                 break;
-            case "Inscrire":
+            case "S'inscrire":
                 fenetre.inscrire.setVisible(true);
                 fenetre.connecter.setVisible(false);
                 break;
@@ -164,6 +154,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.inscrire.setVisible(false);
                 fenetre.profil.setVisible(false);
                 fenetre.catalogue.setVisible(false);
+                fenetre.panierFrame.setVisible(false);
                 break;
             case "Connexion" :
                 fenetre.connecter.setVisible(true);
@@ -185,7 +176,7 @@ public class FenetreControl extends JFrame implements ActionListener
                         System.out.println(idStr); /// Correspond à l'id de l'article choisi (converti ensuite en entier pour les prochaines étapes)
                         int id = Integer.parseInt(idStr);
                         Article article = articleDAO.getArticle(id);
-                        new VueArticle().afficherDetails(article);
+                        fenetre.afficherDetailsArticle(article);
                     } catch (NumberFormatException ex)
                     {
                         System.err.println("ID invalide dans la commande : " + cmd);
@@ -193,18 +184,18 @@ public class FenetreControl extends JFrame implements ActionListener
                 }
                 break;
             /// Ajouter permet d'ajouter un article dans le panier de l'utilisateur
-            case "Ajouter":
+            case "Ajouter au panier":
                 articleDAO = new ArticleDAOImpl(dao);
                 cmd = e.getActionCommand();
 
-                if (cmd.startsWith("Ajouter")) {
-                    String idStr = cmd.substring("Ajouter".length()).trim();
+                if (cmd.startsWith("Ajouter au panier")) {
+                    String idStr = cmd.substring("Ajouter au panier".length()).trim();
                     try
                     {
                         int id = Integer.parseInt(idStr);
                         Article article = articleDAO.getArticle(id);
-                        Utilisateurs user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
-                        Utilisateurs connect = userdao.connexionUtilisateur(user);
+                        user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
+                        connect = userdao.connexionUtilisateur(user);
                         Client client = new Client(connect.getIdentifiant(), connect.getNom(), connect.getPrenom(), connect.getEmail(), connect.getMotDePasse(), connect.getType_utilisateur());
                         int quantite_voulu = Integer.parseInt(fenetre.quantite.getText());
                         PanierDAOImpl panierDAO = new PanierDAOImpl(dao);
@@ -248,15 +239,15 @@ public class FenetreControl extends JFrame implements ActionListener
             case "Catalogue" :
                 fenetre.catalogue.setVisible(true);
                 break;
-            case "Passer commande":
+            case "Commander":
                 fenetre.ajout_commande.setVisible(true);
                 break;
             case "Payer":
                 /// Connexion pour récupérer l'utilisateur actuellement en ligne
                 CommandeDAOImpl comdao = new CommandeDAOImpl(dao);
                 PanierDAOImpl panierDAO = new PanierDAOImpl(dao);
-                Utilisateurs user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
-                Utilisateurs connect = userdao.connexionUtilisateur(user);
+                user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
+                connect = userdao.connexionUtilisateur(user);
                 Client client = new Client(connect.getIdentifiant(), connect.getNom(), connect.getPrenom(), connect.getEmail(), connect.getMotDePasse(), connect.getType_utilisateur());
                 String adresse = fenetre.adresse.getText();
                 Panier panier = panierDAO.getPanier(client);
@@ -268,11 +259,11 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.setEvent("Ajout commande", "Commande ajoutée");
                 fenetre.event.setVisible(true);
                 fenetre.ajout_commande.setVisible(false);
-                fenetre.panier.setVisible(false);
+                fenetre.panierFrame.setVisible(false);
                 break;
             case "Valider et payer":
                 String paiement = (String) fenetre.payment_type.getSelectedItem();
-                String numero_carte = fenetre.numero_carte.getText();
+                int numero_carte = Integer.parseInt(fenetre.numero_carte.getText());
                 String exp_date = fenetre.expiration_carte.getText();
                 int cvv = Integer.parseInt(fenetre.cvv.getText());
                 System.out.println("Paiement : " + paiement +" Numero de carte : " + numero_carte + " Date d'expiration : " + exp_date + " Numero CVV : " + cvv);
@@ -298,7 +289,7 @@ public class FenetreControl extends JFrame implements ActionListener
                                 "Stock: " +   " unités");
                 break;
             case "Panier":
-                fenetre.panier.setVisible(true);
+                fenetre.panierFrame.setVisible(true);
                 break;
             case "Statistiques":
                 fenetre.stats();
@@ -313,7 +304,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.ajout_article.setVisible(false);
                 fenetre.event.setVisible(false);
                 fenetre.catalogue.setVisible(false);
-                fenetre.panier.setVisible(false);
+                fenetre.panierFrame.setVisible(false);
                 fenetre.articles.setVisible(false);
                 fenetre.modif.setVisible(false);
                 fenetre.modif_article.setVisible(false);
