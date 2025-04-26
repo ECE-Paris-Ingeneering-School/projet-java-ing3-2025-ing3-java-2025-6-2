@@ -25,7 +25,7 @@ public class Fenetres extends JFrame
     private static final Color BACKGROUND_COLOR = new Color(128, 20, 41); // Rouge bordeaux
 
     /// Fenêtres de navigation
-    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, articles, ajout_commande, modif, modif_article, stats, histoPaiement, gestionClient;
+    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, articles, ajout_commande, modif, modif_article, stats, histoPaiement, gestionClient, histoCommande;
     public JFrame panierFrame; // Renamed from panier to avoid conflict
     /// Zones de saisie connexion et inscriptions
     public TextField nom, prenom, mail, mdp, mail_id, mdp_id;
@@ -73,6 +73,7 @@ public class Fenetres extends JFrame
         stats = new JFrame();
         histoPaiement = new JFrame();
         gestionClient = new JFrame();
+        histoCommande = new JFrame();
 
         /// Configuration des fenêtres
         inscrire.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -86,6 +87,7 @@ public class Fenetres extends JFrame
         stats.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         histoPaiement.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gestionClient.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        histoCommande.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         /// Initialisation des autres composants
         DaoFactory daoFactory = DaoFactory.getInstance("ecommerce_db", "root", "");
@@ -107,6 +109,7 @@ public class Fenetres extends JFrame
         stats.getContentPane().setBackground(BACKGROUND_COLOR);
         histoPaiement.getContentPane().setBackground(BACKGROUND_COLOR);
         gestionClient.getContentPane().setBackground(BACKGROUND_COLOR);
+        histoCommande.getContentPane().setBackground(BACKGROUND_COLOR);
     }
 
     /// Mise en place du controleur
@@ -2062,27 +2065,176 @@ public class Fenetres extends JFrame
         detailsDialog.setVisible(true);
     }
 
+    /// Vue historique des paiements
     public void setHistoriquePaiement(List<Paiement> paiements)
     {
         histoPaiement.setTitle("Historique des paiements");
         histoPaiement.setSize(700, 400);
         histoPaiement.setLocationRelativeTo(null);
 
-        String[] columns = {"Numéro de commande", "Date", "Montant", "Moyen de paiement", "Statut"};
-        String[][] data = new String[paiements.size()][columns.length];
+        String[] columns = {"Numéro de commande", "Date", "Montant", "Moyen de paiement", "Statut", ""};
+        Object[][] data = new Object[paiements.size()][columns.length];
         for (int i = 0; i < paiements.size(); i++) {
             Paiement p = paiements.get(i);
+            JButton boutonVoir = new JButton("Voir");
+            boutonVoir.setActionCommand("Voir" + p.getCommande().getId());
+            boutonVoir.addActionListener(e -> fenetreControl.actionPerformed(e));
             data[i][0] = String.valueOf(p.getCommande().getId());
             data[i][1] = p.getDate();
             data[i][2] = String.format("%.2f €", p.getMontant());
             data[i][3] = p.getMoyen();
             data[i][4] = p.getStatut();
+            data[i][5] = boutonVoir;
         }
-        JTable table = new JTable(data, columns);
+        JTable table = new JTable(new javax.swing.table.DefaultTableModel(data, columns))
+        {
+            public Class<?> getColumnClass(int column) {
+            return (column == 5) ? JButton.class : Object.class; // Important pour afficher le bouton
+        }
+            public boolean isCellEditable(int row, int column) {
+                return column == 5; // Seul le bouton est éditable
+            }
+        };
+
+        // Renderer pour afficher correctement les JButton
+        table.getColumn("").setCellRenderer((table1, value, isSelected, hasFocus, row, column) -> (Component) value);
+
+        table.getColumn("").setCellEditor(new DefaultCellEditor(new JCheckBox())
+        {
+            public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column)
+            {
+                return (Component) value;
+            }
+        });
+
         histoPaiement.add(new JScrollPane(table), BorderLayout.CENTER);
 
         creerRetour();
         histoPaiement.add(PannelRetour, BorderLayout.SOUTH);
+    }
+
+    /// Vue Historique commande
+    public void setHistoCommande(Commande commande)
+    {
+        histoCommande.setTitle("Historique");
+        histoCommande.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        histoCommande.setSize(1200, 800);
+        histoCommande.setLocationRelativeTo(null);
+        histoCommande.setLayout(new BorderLayout());
+        histoCommande.getContentPane().setBackground(BACKGROUND_COLOR);
+
+        /// Panel principal avec fond bordeaux
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(BACKGROUND_COLOR);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        /// Panel du contenu avec fond blanc
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setBackground(Color.WHITE);
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        /// Panel gauche pour les articles du panier
+        JPanel cartItemsPanel = new JPanel();
+        cartItemsPanel.setLayout(new BoxLayout(cartItemsPanel, BoxLayout.Y_AXIS));
+        cartItemsPanel.setBackground(Color.WHITE);
+
+        /// Chargement du panier
+        try {
+            DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
+            Map<Article, Integer> articles_liste = commande.getArticles();
+            List<Article> articles = new ArrayList<>();
+            List<Integer> liste_quantite = new ArrayList<>();
+            /// Titre "Cart"
+            JLabel cartTitle = new JLabel("Commande n°"+commande.getId());
+            cartTitle.setFont(new Font("Arial", Font.BOLD, 24));
+            cartTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+            cartItemsPanel.add(cartTitle);
+            /// Regrouper Article avec sa quantité utilisé par l'utilisateur
+            for(int i = 0 ; i < articles_liste.size() ; i++)
+            {
+                articles.add(articles_liste.keySet().iterator().next());
+                liste_quantite.add(articles_liste.get(articles_liste.keySet().iterator().next()));
+            }
+
+            System.out.println();
+            double total = 0.0;
+
+            for (Article article : articles)
+            {
+                JPanel itemPanel = createCartItemPanel(article);
+                cartItemsPanel.add(itemPanel);
+                cartItemsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+                total += article.getPrixUnitaire()*liste_quantite.get(liste_quantite.size()-1); /// Prix unitaire * quantité voulue par l'utilisateur
+            }
+
+            /// Panel droit pour le résumé
+            JPanel summaryPanel = new JPanel();
+            summaryPanel.setLayout(new BoxLayout(summaryPanel, BoxLayout.Y_AXIS));
+            summaryPanel.setBackground(Color.WHITE);
+            summaryPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
+            summaryPanel.setPreferredSize(new Dimension(300, 0));
+
+            /// Sous-total
+            JPanel subtotalPanel = new JPanel(new BorderLayout());
+            subtotalPanel.setBackground(Color.WHITE);
+            subtotalPanel.add(new JLabel("Sous-total"), BorderLayout.WEST);
+            subtotalPanel.add(new JLabel(String.format("%.2f €", total)), BorderLayout.EAST);
+            summaryPanel.add(subtotalPanel);
+            summaryPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+            /// Livraison
+            JPanel shippingPanel = new JPanel(new BorderLayout());
+            shippingPanel.setBackground(Color.WHITE);
+            shippingPanel.add(new JLabel("Livraison"), BorderLayout.WEST);
+            shippingPanel.add(new JLabel("Gratuit"), BorderLayout.EAST);
+            summaryPanel.add(shippingPanel);
+            summaryPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+            /// Total
+            JPanel totalPanel = new JPanel(new BorderLayout());
+            totalPanel.setBackground(Color.WHITE);
+            JLabel totalLabel = new JLabel("Total");
+            totalLabel.setFont(new Font("Arial", Font.BOLD, 16));
+            JLabel totalAmount = new JLabel(String.format("%.2f €", total));
+            totalAmount.setFont(new Font("Arial", Font.BOLD, 16));
+            totalPanel.add(totalLabel, BorderLayout.WEST);
+            totalPanel.add(totalAmount, BorderLayout.EAST);
+            summaryPanel.add(totalPanel);
+            summaryPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+            /// Bouton Retour
+            JButton returnButton = new JButton("Retour");
+            returnButton.setBackground(new Color(0, 123, 255));
+            returnButton.setForeground(Color.WHITE);
+            returnButton.setFont(new Font("Arial", Font.BOLD, 14));
+            returnButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            returnButton.setBorderPainted(false);
+            returnButton.setPreferredSize(new Dimension(200, 40));
+            returnButton.addActionListener(fenetreControl);
+
+            JPanel buttonPanel = new JPanel();
+            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+            buttonPanel.setBackground(Color.WHITE);
+
+            buttonPanel.add(Box.createVerticalStrut(10));
+            buttonPanel.add(returnButton);
+
+            summaryPanel.add(buttonPanel);
+
+            /// Ajout des panels au contentPanel
+            contentPanel.add(new JScrollPane(cartItemsPanel), BorderLayout.CENTER);
+            contentPanel.add(summaryPanel, BorderLayout.EAST);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                    "Erreur lors du chargement du panier : " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
+        mainPanel.add(contentPanel, BorderLayout.CENTER);
+        histoCommande.add(mainPanel);
     }
 
     public void setGestionClient(List<Utilisateurs> clients)

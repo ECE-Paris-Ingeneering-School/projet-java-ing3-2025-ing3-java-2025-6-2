@@ -282,7 +282,6 @@ public class FenetreControl extends JFrame implements ActionListener
                 Commande commande1 = comdao.getCommande(client);
                 comdao.paiementCommande(commande1);
                 panierDAO.supprimerPanier(client);
-                Paiement paiement1 = new Paiement(0, commande1, commande1.getPrixTotal(), commande1.getStatut(), paiement, commande1.getDate());
                 PaiementDAOImpl paiementDAO = new PaiementDAOImpl(dao);
                 paiementDAO.insertionPaiement(client, paiement);
                 fenetre.setEvent("Paiement commande", "Paiement effectué");
@@ -301,12 +300,29 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.accueil.setVisible(true);
                 break;
             case "Voir":
-                JOptionPane.showMessageDialog(this,
-                        "Détails du produit:\n" +
-                                "Nom: " + fenetre.nom + "\n" +
-                                "Propriétaire: " +   "\n" +
-                                "Prix: " +    " €\n" +
-                                "Stock: " +   " unités");
+                cmd = e.getActionCommand();
+                if (cmd.startsWith("Voir"))
+                {
+                    try
+                    {
+                        String idStr = cmd.substring("Voir".length());
+                        System.out.println(idStr);
+                        int id = Integer.parseInt(idStr);
+                        user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
+                        Utilisateurs user_actuel = userdao.connexionUtilisateur(user);
+                        client = new Client(user_actuel.getIdentifiant(), user_actuel.getNom(),
+                                user_actuel.getPrenom(), user_actuel.getEmail(),
+                                user_actuel.getMotDePasse(), user_actuel.getType_utilisateur());
+                        CommandeDAOImpl commandeDAO = new CommandeDAOImpl(dao);
+                        Commande newcommande = commandeDAO.getCommande(client);
+                        fenetre.setHistoCommande(newcommande);
+                        fenetre.histoCommande.setVisible(true);
+                    }
+                    catch (NumberFormatException ex)
+                    {
+                        System.err.println("ID invalide dans la commande : " + cmd);
+                    }
+                }
                 break;
             case "Panier":
                 fenetre.panierFrame.setVisible(true);
@@ -345,6 +361,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.ajout_commande.setVisible(false);
                 fenetre.gestionClient.setVisible(false);
                 fenetre.histoPaiement.setVisible(false);
+                fenetre.histoCommande.setVisible(false);
                 break;
         }
     }
