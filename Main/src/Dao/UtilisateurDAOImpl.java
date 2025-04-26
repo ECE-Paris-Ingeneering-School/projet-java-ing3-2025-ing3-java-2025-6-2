@@ -74,8 +74,9 @@ public class UtilisateurDAOImpl implements UtilisateurDAO
             String type_utilisateur = utilisateur.getType_utilisateur();
 
             /// Exécution de la requête INSERT INTO de l'objet client en paramètre
-            PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO utilisateur(id_utilisateur, nom, prenom, email, mot_de_passe, type_utilisateur) VALUES ('"+id_utilisateur+"', '"+nom+"', '"+prenom+"', '"+mail+"', '"+mdp+"', '" +type_utilisateur+ "')");
+            PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO utilisateur(id_utilisateur, nom, prenom, email, mot_de_passe, type_utilisateur, fidelite) VALUES ('"+id_utilisateur+"', '"+nom+"', '"+prenom+"', '"+mail+"', '"+mdp+"', '" +type_utilisateur+ "', 'Bronze')");
             preparedStatement.executeUpdate();
+
         }
         catch (SQLException e)
         {
@@ -141,9 +142,24 @@ public class UtilisateurDAOImpl implements UtilisateurDAO
                 client.setTotalAchats(rs.getFloat("total_achats"));
                 // Calcule le niveau de fidélité
                 String niveau = "Bronze";
-                if (client.getTotalAchats() > 1000) niveau = "Argent";
-                if (client.getTotalAchats() > 3000) niveau = "Or";
-                if (client.getTotalAchats() > 7000) niveau = "Platine";
+                if (client.getTotalAchats() > 1000)
+                {
+                    niveau = "Argent";
+                    PreparedStatement preparedStatement = connexion.prepareStatement("UPDATE utilisateur SET fidelite = '" + niveau + "' WHERE id_utilisateur = '"+client.getIdentifiant()+"'");
+                    preparedStatement.executeUpdate();
+                }
+                if (client.getTotalAchats() > 3000)
+                {
+                    niveau = "Gold";
+                    PreparedStatement preparedStatement = connexion.prepareStatement("UPDATE utilisateur SET fidelite = '" + niveau + "' WHERE id_utilisateur = '"+client.getIdentifiant()+"'");
+                    preparedStatement.executeUpdate();
+                }
+                if (client.getTotalAchats() > 7000)
+                {
+                    niveau = "Platine";
+                    PreparedStatement preparedStatement = connexion.prepareStatement("UPDATE utilisateur SET fidelite = '" + niveau + "' WHERE id_utilisateur = '"+client.getIdentifiant()+"'");
+                    preparedStatement.executeUpdate();
+                }
                 client.setNiveauFidelite(niveau);
                 clients.add(client);
             }

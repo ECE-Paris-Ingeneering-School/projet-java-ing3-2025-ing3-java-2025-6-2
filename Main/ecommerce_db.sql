@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : sam. 26 avr. 2025 à 10:12
+-- Généré le : sam. 26 avr. 2025 à 12:54
 -- Version du serveur :  5.7.31
 -- Version de PHP : 7.3.21
 
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `article` (
 INSERT INTO `article` (`id_article`, `nom`, `description`, `prix`, `stock`, `seuil_remise`, `categorie`, `marque`, `date_ajout`) VALUES
 (832745446, 'y', 'Produit y', '14.00', 58, 8, 'Nourriture', 'Samsung', '2025-04-23 16:26:24'),
 (949478470, 'ae', 'ae', '12.00', 115, 5, 'Electromenager', 'Bosch', '2025-04-17 17:28:56'),
-(1768251590, 'lave-vaiselle', 'Un lave-vaiselle comme un autre', '1235.00', 77, 6, 'Electromenager', 'Bosch', '2025-04-19 14:41:04');
+(1768251590, 'lave-vaiselle', 'Un lave-vaiselle comme un autre', '1235.00', 75, 6, 'Electromenager', 'Bosch', '2025-04-19 14:41:04');
 
 -- --------------------------------------------------------
 
@@ -73,8 +73,9 @@ CREATE TABLE IF NOT EXISTS `commande` (
 --
 
 INSERT INTO `commande` (`id_commande`, `id_client`, `date_commande`, `statut`, `adresse_livraison`, `montant_total`) VALUES
-(142877337, 1022904176, '2025-04-26 11:56:57', 'payée', 'rue', '55575.00'),
+(142877337, 1022904176, '2025-04-26 11:56:57', 'payée', 'rue', '2470.00'),
 (431948447, 1022904176, '2025-04-26 12:06:15', 'en attente', 'y', '0.00'),
+(763574769, 1022904176, '2025-04-26 14:46:38', 'en attente', 'rue', '0.00'),
 (850155969, 1022904176, '2025-04-26 12:05:04', 'en attente', 'grue', '0.00');
 
 -- --------------------------------------------------------
@@ -105,6 +106,7 @@ CREATE TABLE IF NOT EXISTS `lignecommande` (
 INSERT INTO `lignecommande` (`id_ligne_commande`, `id_commande`, `id_article`, `id_promotion`, `quantite`, `prix_unitaire`, `prix_apres_remise`) VALUES
 (122056505, 142877337, 1768251590, NULL, 12, '1235.00', '14820.00'),
 (470557474, 142877337, 1768251590, NULL, 3, '1235.00', '3705.00'),
+(748227782, 142877337, 1768251590, NULL, 2, '1235.00', '2470.00'),
 (841392511, 142877337, 1768251590, NULL, 45, '1235.00', '55575.00');
 
 -- --------------------------------------------------------
@@ -122,7 +124,7 @@ CREATE TABLE IF NOT EXISTS `lignepanier` (
   PRIMARY KEY (`id_ligne_panier`),
   KEY `id_panier` (`id_panier`),
   KEY `id_article` (`id_article`)
-) ENGINE=InnoDB AUTO_INCREMENT=929244421 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=988467564 DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -147,7 +149,7 @@ CREATE TABLE IF NOT EXISTS `paiement` (
 --
 
 INSERT INTO `paiement` (`id_paiement`, `id_utilisateur`, `date_commande`, `montant`, `moyen`, `statut`) VALUES
-(966490342, 1022904176, '2025-04-26 12:06:22', '74100.00', 'Visa', 'payée');
+(346120554, 1022904176, '2025-04-26 14:46:43', '76570.00', 'Visa', 'payée');
 
 -- --------------------------------------------------------
 
@@ -217,6 +219,7 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
   `email` varchar(191) NOT NULL,
   `mot_de_passe` varchar(255) NOT NULL,
   `type_utilisateur` enum('client','admin') NOT NULL,
+  `fidelite` varchar(255) DEFAULT NULL,
   `date_creation` datetime DEFAULT CURRENT_TIMESTAMP,
   `date_derniere_connexion` datetime DEFAULT NULL,
   PRIMARY KEY (`id_utilisateur`),
@@ -227,10 +230,10 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
 -- Déchargement des données de la table `utilisateur`
 --
 
-INSERT INTO `utilisateur` (`id_utilisateur`, `nom`, `prenom`, `email`, `mot_de_passe`, `type_utilisateur`, `date_creation`, `date_derniere_connexion`) VALUES
-(1022904176, 'Andria', 'Andy', 'andri@gmail.com', '123456', 'admin', '2025-04-17 11:47:16', NULL),
-(1335405254, 'ae', 'ae', 'ae@mail.com', 'ae', 'client', '2025-04-17 17:25:53', NULL),
-(2139289818, 'Andry', 'Andre', 'andry@mail.fr', 'sardine', 'client', '2025-04-17 14:56:27', NULL);
+INSERT INTO `utilisateur` (`id_utilisateur`, `nom`, `prenom`, `email`, `mot_de_passe`, `type_utilisateur`, `fidelite`, `date_creation`, `date_derniere_connexion`) VALUES
+(1022904176, 'Andria', 'Andy', 'andri@gmail.com', '123456', 'admin', 'Admin', '2025-04-17 11:47:16', NULL),
+(1335405254, 'ae', 'ae', 'ae@mail.com', 'ae', 'client', 'Bronze', '2025-04-17 17:25:53', NULL),
+(2139289818, 'Andry', 'Andre', 'andry@mail.fr', 'sardine', 'client', 'Bronze', '2025-04-17 14:56:27', NULL);
 
 --
 -- Contraintes pour les tables déchargées

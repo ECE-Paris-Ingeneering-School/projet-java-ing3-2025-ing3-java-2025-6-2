@@ -2062,73 +2062,21 @@ public class Fenetres extends JFrame
         detailsDialog.setVisible(true);
     }
 
-    private void ajouterAuPanier(Article article) {
-        if (article.getStock() > 0) {
-            // Vérifier si l'article est déjà dans le panier
-            boolean articleExiste = false;
-            for (LigneCommande ligne : panier) {
-                if (ligne.getArticle().getId() == article.getId()) {
-                    // Incrémenter la quantité si l'article existe déjà
-                    ligne.setQuantite(ligne.getQuantite() + 1);
-                    articleExiste = true;
-                    break;
-                }
-            }
-
-            // Ajouter un nouvel article si il n'existe pas dans le panier
-            if (!articleExiste) {
-                LigneCommande nouvelleLigne = new LigneCommande(article, 1);
-                panier.add(nouvelleLigne);
-            }
-
-            // Mettre à jour l'affichage du panier
-            mettreAJourPanier();
-            JOptionPane.showMessageDialog(this,
-                    "Article ajouté au panier",
-                    "Succès",
-                    JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(this,
-                    "Désolé, cet article n'est plus en stock",
-                    "Stock épuisé",
-                    JOptionPane.WARNING_MESSAGE);
-        }
-    }
-
-    private void mettreAJourPanier() {
-        // Calculer le total du panier
-        double total = 0;
-        int nombreArticles = 0;
-
-        for (LigneCommande ligne : panier) {
-            double prixUnitaire = ligne.getArticle().getPrixUnitaire();
-            int quantite = ligne.getQuantite();
-            double remise = ligne.getArticle().getSeuil_remise() / 100.0;
-
-            total += prixUnitaire * quantite * (1 - remise);
-            nombreArticles += quantite;
-        }
-
-        // Mettre à jour le label du panier
-        if (panierLabel != null) {
-            panierLabel.setText(String.format("Panier (%d) - %.2f €", nombreArticles, total));
-        }
-    }
-
     public void setHistoriquePaiement(List<Paiement> paiements)
     {
         histoPaiement.setTitle("Historique des paiements");
         histoPaiement.setSize(700, 400);
         histoPaiement.setLocationRelativeTo(null);
 
-        String[] columns = {"Date", "Montant", "Moyen de paiement", "Statut"};
+        String[] columns = {"Numéro de commande", "Date", "Montant", "Moyen de paiement", "Statut"};
         String[][] data = new String[paiements.size()][columns.length];
         for (int i = 0; i < paiements.size(); i++) {
             Paiement p = paiements.get(i);
-            data[i][0] = p.getDate();
-            data[i][1] = String.format("%.2f €", p.getMontant());
-            data[i][2] = p.getMoyen();
-            data[i][3] = p.getStatut();
+            data[i][0] = String.valueOf(p.getCommande().getId());
+            data[i][1] = p.getDate();
+            data[i][2] = String.format("%.2f €", p.getMontant());
+            data[i][3] = p.getMoyen();
+            data[i][4] = p.getStatut();
         }
         JTable table = new JTable(data, columns);
         histoPaiement.add(new JScrollPane(table), BorderLayout.CENTER);
@@ -2153,7 +2101,7 @@ public class Fenetres extends JFrame
             data[i][3] = String.valueOf(c.getNbCommandes());
             data[i][4] = String.format("%.2f €", c.getTotalAchats());
             data[i][5] = c.getNiveauFidelite();
-            data[i][6] = String.valueOf((c.getNiveauFidelite().equals("\"Or\") || c.getNiveauFidelite().equals(\"Platine\")) ? \"-10%\" : \"-5%\""))); // exemple
+            data[i][6] = String.valueOf((c.getNiveauFidelite().equals("\"Gold\") || c.getNiveauFidelite().equals(\"Platine\")) ? \"-10%\" : \"-5%\""))); // exemple
         }
         JTable table = new JTable(data, columns);
         gestionClient.add(new JScrollPane(table), BorderLayout.CENTER);
@@ -2161,5 +2109,4 @@ public class Fenetres extends JFrame
         creerRetour();
         gestionClient.add(PannelRetour, BorderLayout.SOUTH);
     }
-
 }
