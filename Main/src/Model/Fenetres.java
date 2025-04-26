@@ -25,7 +25,7 @@ public class Fenetres extends JFrame
     private static final Color BACKGROUND_COLOR = new Color(128, 20, 41); // Rouge bordeaux
 
     /// Fenêtres de navigation
-    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, articles, ajout_commande, modif, modif_article, stats, histoPaiement;
+    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, articles, ajout_commande, modif, modif_article, stats, histoPaiement, gestionClient;
     public JFrame panierFrame; // Renamed from panier to avoid conflict
     /// Zones de saisie connexion et inscriptions
     public TextField nom, prenom, mail, mdp, mail_id, mdp_id;
@@ -72,6 +72,7 @@ public class Fenetres extends JFrame
         modif_article = new JFrame();
         stats = new JFrame();
         histoPaiement = new JFrame();
+        gestionClient = new JFrame();
 
         /// Configuration des fenêtres
         inscrire.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -84,6 +85,7 @@ public class Fenetres extends JFrame
         ajout_article.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         stats.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         histoPaiement.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gestionClient.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         /// Initialisation des autres composants
         DaoFactory daoFactory = DaoFactory.getInstance("ecommerce_db", "root", "");
@@ -104,6 +106,7 @@ public class Fenetres extends JFrame
         modif_article.getContentPane().setBackground(BACKGROUND_COLOR);
         stats.getContentPane().setBackground(BACKGROUND_COLOR);
         histoPaiement.getContentPane().setBackground(BACKGROUND_COLOR);
+        gestionClient.getContentPane().setBackground(BACKGROUND_COLOR);
     }
 
     /// Mise en place du controleur
@@ -2129,6 +2132,34 @@ public class Fenetres extends JFrame
         }
         JTable table = new JTable(data, columns);
         histoPaiement.add(new JScrollPane(table), BorderLayout.CENTER);
+
+        creerRetour();
+        histoPaiement.add(PannelRetour, BorderLayout.SOUTH);
+    }
+
+    public void setGestionClient(List<Utilisateurs> clients)
+    {
+        gestionClient.setTitle("Gestion des clients & fidélité");
+        gestionClient.setSize(900, 500);
+        gestionClient.setLocationRelativeTo(null);
+
+        String[] columns = {"Nom", "Prénom", "Email", "Commandes", "Total Achats", "Niveau", "Promo"};
+        String[][] data = new String[clients.size()][columns.length];
+        for (int i = 0; i < clients.size(); i++) {
+            Utilisateurs c = clients.get(i);
+            data[i][0] = c.getNom();
+            data[i][1] = c.getPrenom();
+            data[i][2] = c.getEmail();
+            data[i][3] = String.valueOf(c.getNbCommandes());
+            data[i][4] = String.format("%.2f €", c.getTotalAchats());
+            data[i][5] = c.getNiveauFidelite();
+            data[i][6] = String.valueOf((c.getNiveauFidelite().equals("\"Or\") || c.getNiveauFidelite().equals(\"Platine\")) ? \"-10%\" : \"-5%\""))); // exemple
+        }
+        JTable table = new JTable(data, columns);
+        gestionClient.add(new JScrollPane(table), BorderLayout.CENTER);
+
+        creerRetour();
+        gestionClient.add(PannelRetour, BorderLayout.SOUTH);
     }
 
 }

@@ -1,6 +1,8 @@
 package Dao;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import Model.Utilisateurs;
 
@@ -113,4 +115,40 @@ public class UtilisateurDAOImpl implements UtilisateurDAO
         }
         return compte;
     }
+
+    public List<Utilisateurs> getAllClientsWithFidelity() {
+        List<Utilisateurs> clients = new ArrayList<>();
+        try {
+            Connection connexion = daoFactory.getConnection();
+            PreparedStatement ps = connexion.prepareStatement(
+                    "SELECT u.*, " +
+                            "  (SELECT COUNT(*) FROM commande c WHERE c.id_client = u.id_utilisateur) AS nb_commandes, " +
+                            "  (SELECT IFNULL(SUM(montant_total),0) FROM commande c WHERE c.id_client = u.id_utilisateur) AS total_achats " +
+                            "FROM utilisateur u WHERE u.type_utilisateur = 'client'"
+            );
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Utilisateurs client = new Utilisateurs(
+                        rs.getInt("id_utilisateur"),
+                        rs.getString("nom"),
+                        rs.getString("prenom"),
+                        rs.getString("email"),
+                        rs.getString("mot_de_passe"),
+                        rs.getString("type_utilisateur")
+                );
+                // Ajoute les infos fidélité
+                client.setNbCommandes(rs.getInt("nb_commandes"));
+                client.setTotalAchats(rs.getFloat("total_achats"));
+                // Calcule le niveau de fidélité
+                String niveau = "Bronze";
+                if (client.getTotalAchats() > 1000) niveau = "Argent";
+                if (client.getTotalAchats() > 3000) niveau = "Or";
+                if (client.getTotalAchats() > 7000) niveau = "Platine";
+                client.setNiveauFidelite(niveau);
+                clients.add(client);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return clients;
+    }
+
 }

@@ -149,6 +149,12 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.profil.setVisible(true);
                 fenetre.event.setVisible(true);
                 break;
+            case "Gerer les dossiers clients":
+                UtilisateurDAOImpl utilisateurDAO = new UtilisateurDAOImpl(dao);
+                List<Utilisateurs> utilisateursList = utilisateurDAO.getAllClientsWithFidelity();
+                fenetre.setGestionClient(utilisateursList);
+                fenetre.gestionClient.setVisible(true);
+                break;
             case "Deconnexion":
                 fenetre.connecter.setVisible(true);
                 fenetre.accueil.setVisible(false);
@@ -325,6 +331,8 @@ public class FenetreControl extends JFrame implements ActionListener
                     fenetre.connecter.setVisible(true);
                 else if(fenetre.ajout_article.isVisible())
                     fenetre.profil.setVisible(true);
+                else if(fenetre.gestionClient.isVisible() || fenetre.histoPaiement.isVisible())
+                    fenetre.profil.setVisible(true);
                 fenetre.ajout_article.setVisible(false);
                 fenetre.event.setVisible(false);
                 fenetre.catalogue.setVisible(false);
@@ -335,6 +343,8 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.stats.setVisible(false);
                 fenetre.profil.setVisible(false);
                 fenetre.ajout_commande.setVisible(false);
+                fenetre.gestionClient.setVisible(false);
+                fenetre.histoPaiement.setVisible(false);
                 break;
         }
     }
