@@ -182,7 +182,7 @@ public class CommandeDAOImpl implements CommandeDAO
                     String mot_de_passe = resultSetClient.getString(4);
                     String type_utilisateur = resultSetClient.getString(5);
                     Client client = new Client(id_client, Nom, Prenom, email, mot_de_passe, type_utilisateur);
-                    Commande nextCommmande = new Commande(id_commande, client, liste);
+                    Commande nextCommmande = new Commande(id_commande, client, liste, "en_attente");
                     articles.add(nextCommmande);
                 }
             }
@@ -208,24 +208,49 @@ public class CommandeDAOImpl implements CommandeDAO
                             "FROM commande WHERE id_client = '" + client.getIdentifiant() + "'"
             );
             ResultSet resultSetPanier = preparedStatementCom.executeQuery();
+            /// Cas nouvelle commande
             if(resultSetPanier.next())
             {
                 Panier panier = panierDAO.getPanier(client);
-                int id_commande = resultSetPanier.getInt("id_commande");
-                PreparedStatement preparedStatementPanier = connexion.prepareStatement(
-                        "SELECT * " +
-                                "FROM lignepanier WHERE id_panier = '" + panier.getId() + "'"
-                );
-                ResultSet resultSetPanier2 = preparedStatementPanier.executeQuery();
-                while(resultSetPanier2.next())
+                if(panier != null)
                 {
-                    int id_article = resultSetPanier2.getInt("id_article");
-                    Article article = articleDAO.getArticle(id_article);
-                    int quantite = resultSetPanier2.getInt("quantite");
-                    liste.put(article, quantite);
+                    int id_commande = resultSetPanier.getInt("id_commande");
+                    String statut = resultSetPanier.getString("statut");
+                    PreparedStatement preparedStatementPanier = connexion.prepareStatement(
+                            "SELECT * " +
+                                    "FROM lignepanier WHERE id_panier = '" + panier.getId() + "'"
+                    );
+                    ResultSet resultSetPanier2 = preparedStatementPanier.executeQuery();
+                    while(resultSetPanier2.next())
+                    {
+                        int id_article = resultSetPanier2.getInt("id_article");
+                        Article article = articleDAO.getArticle(id_article);
+                        int quantite = resultSetPanier2.getInt("quantite");
+                        liste.put(article, quantite);
+                    }
+                    commande = new Commande(id_commande, client, liste, statut);
+                    return commande;
                 }
-                commande = new Commande(id_commande, client, liste);
-                return commande;
+                /// Cas historique commande
+                else
+                {
+                    int id_commande = resultSetPanier.getInt("id_commande");
+                    String statut = resultSetPanier.getString("statut");
+                    PreparedStatement preparedStatementPanier = connexion.prepareStatement(
+                            "SELECT * " +
+                                    "FROM lignecommande WHERE id_commande = '" + id_commande + "'"
+                    );
+                    ResultSet resultSetPanier2 = preparedStatementPanier.executeQuery();
+                    while(resultSetPanier2.next())
+                    {
+                        int id_article = resultSetPanier2.getInt("id_article");
+                        Article article = articleDAO.getArticle(id_article);
+                        int quantite = resultSetPanier2.getInt("quantite");
+                        liste.put(article, quantite);
+                    }
+                    Commande commande1 = new Commande(id_commande, client, liste, statut);
+                    return commande1;
+                }
             }
         }
         catch(SQLException e)

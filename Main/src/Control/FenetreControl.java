@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.Random;
 
 public class FenetreControl extends JFrame implements ActionListener
@@ -275,6 +276,9 @@ public class FenetreControl extends JFrame implements ActionListener
                 Commande commande1 = comdao.getCommande(client);
                 comdao.paiementCommande(commande1);
                 panierDAO.supprimerPanier(client);
+                Paiement paiement1 = new Paiement(0, commande1, commande1.getPrixTotal(), commande1.getStatut(), paiement, commande1.getDate());
+                PaiementDAOImpl paiementDAO = new PaiementDAOImpl(dao);
+                paiementDAO.insertionPaiement(client, paiement);
                 fenetre.setEvent("Paiement commande", "Paiement effectué");
                 fenetre.event.setVisible(true);
                 fenetre.paiement.setVisible(false);
@@ -306,6 +310,16 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.stats.setVisible(true);
                 fenetre.profil.setVisible(false);
                 break;
+            case "Historique":
+                dao = DaoFactory.getInstance("ecommerce_db", "root", "");
+                paiementDAO = new PaiementDAOImpl(dao);
+                user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
+                connect = userdao.connexionUtilisateur(user);
+                client = new Client(connect.getIdentifiant(), connect.getNom(), connect.getPrenom(), connect.getEmail(), connect.getMotDePasse(), connect.getType_utilisateur());
+                List<Paiement> paiements = paiementDAO.getPaiementsUtilisateur(client);
+                fenetre.setHistoriquePaiement(paiements);
+                fenetre.histoPaiement.setVisible(true);
+                break;
             case "Retour":
                 if(fenetre.inscrire.isVisible())
                     fenetre.connecter.setVisible(true);
@@ -320,6 +334,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.modif_article.setVisible(false);
                 fenetre.stats.setVisible(false);
                 fenetre.profil.setVisible(false);
+                fenetre.ajout_commande.setVisible(false);
                 break;
         }
     }

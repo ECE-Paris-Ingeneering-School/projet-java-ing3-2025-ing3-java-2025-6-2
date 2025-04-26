@@ -8,14 +8,16 @@ public class Commande
     private Client client;
     private Map<Article, Integer> articles; // Model.Article et quantité
     private float prixTotal;
+    private String statut;
     private String date;
 
-    public Commande(int id, Client client, Map<Article, Integer> articles)
+    public Commande(int id, Client client, Map<Article, Integer> articles, String statut)
     {
         this.id = id;
         this.client = client;
         this.articles = articles;
         this.prixTotal = calculerPrixTotal();
+        this.statut = statut;
         this.date = new java.util.Date().toString();
     }
 
@@ -55,4 +57,8 @@ public class Commande
         return prixTotal;
     }
     public String getDate() { return date; }
+
+    public String getStatut() {
+        return statut;
+    }
 }

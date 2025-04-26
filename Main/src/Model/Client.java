@@ -21,7 +21,7 @@ public class Client extends Utilisateurs
 
     public Commande passerCommande() {
         // Implémentation de la commande
-        return new Commande(0, this, new HashMap<>());
+        return new Commande(0, this, new HashMap<>(), "en_attente");
     }
 
     // Getters et Setters

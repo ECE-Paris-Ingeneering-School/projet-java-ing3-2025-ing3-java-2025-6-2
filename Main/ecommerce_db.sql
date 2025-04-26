@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : ven. 25 avr. 2025 à 16:34
+-- Généré le : sam. 26 avr. 2025 à 10:12
 -- Version du serveur :  5.7.31
 -- Version de PHP : 7.3.21
 
@@ -46,9 +46,9 @@ CREATE TABLE IF NOT EXISTS `article` (
 --
 
 INSERT INTO `article` (`id_article`, `nom`, `description`, `prix`, `stock`, `seuil_remise`, `categorie`, `marque`, `date_ajout`) VALUES
-(832745446, 'y', 'Produit y', '14.00', 62, 8, 'Nourriture', 'Samsung', '2025-04-23 16:26:24'),
-(949478470, 'ae', 'ae', '12.00', 120, 5, 'Electromenager', 'Bosch', '2025-04-17 17:28:56'),
-(1768251590, 'lave-vaiselle', 'Un lave-vaiselle comme un autre', '1235.00', 142, 6, 'Electromenager', 'Bosch', '2025-04-19 14:41:04');
+(832745446, 'y', 'Produit y', '14.00', 58, 8, 'Nourriture', 'Samsung', '2025-04-23 16:26:24'),
+(949478470, 'ae', 'ae', '12.00', 115, 5, 'Electromenager', 'Bosch', '2025-04-17 17:28:56'),
+(1768251590, 'lave-vaiselle', 'Un lave-vaiselle comme un autre', '1235.00', 77, 6, 'Electromenager', 'Bosch', '2025-04-19 14:41:04');
 
 -- --------------------------------------------------------
 
@@ -66,14 +66,16 @@ CREATE TABLE IF NOT EXISTS `commande` (
   `montant_total` decimal(10,2) NOT NULL,
   PRIMARY KEY (`id_commande`),
   KEY `id_client` (`id_client`)
-) ENGINE=InnoDB AUTO_INCREMENT=607121032 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=850155970 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `commande`
 --
 
 INSERT INTO `commande` (`id_commande`, `id_client`, `date_commande`, `statut`, `adresse_livraison`, `montant_total`) VALUES
-(396664024, 1022904176, '2025-04-25 18:21:47', 'payée', 'wagram', '14820.00');
+(142877337, 1022904176, '2025-04-26 11:56:57', 'payée', 'rue', '55575.00'),
+(431948447, 1022904176, '2025-04-26 12:06:15', 'en attente', 'y', '0.00'),
+(850155969, 1022904176, '2025-04-26 12:05:04', 'en attente', 'grue', '0.00');
 
 -- --------------------------------------------------------
 
@@ -94,14 +96,16 @@ CREATE TABLE IF NOT EXISTS `lignecommande` (
   KEY `id_commande` (`id_commande`),
   KEY `id_article` (`id_article`),
   KEY `id_promotion` (`id_promotion`)
-) ENGINE=InnoDB AUTO_INCREMENT=917018431 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=841392512 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `lignecommande`
 --
 
 INSERT INTO `lignecommande` (`id_ligne_commande`, `id_commande`, `id_article`, `id_promotion`, `quantite`, `prix_unitaire`, `prix_apres_remise`) VALUES
-(645139410, 396664024, 1768251590, NULL, 12, '1235.00', '14820.00');
+(122056505, 142877337, 1768251590, NULL, 12, '1235.00', '14820.00'),
+(470557474, 142877337, 1768251590, NULL, 3, '1235.00', '3705.00'),
+(841392511, 142877337, 1768251590, NULL, 45, '1235.00', '55575.00');
 
 -- --------------------------------------------------------
 
@@ -118,7 +122,32 @@ CREATE TABLE IF NOT EXISTS `lignepanier` (
   PRIMARY KEY (`id_ligne_panier`),
   KEY `id_panier` (`id_panier`),
   KEY `id_article` (`id_article`)
-) ENGINE=InnoDB AUTO_INCREMENT=916152086 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=929244421 DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `paiement`
+--
+
+DROP TABLE IF EXISTS `paiement`;
+CREATE TABLE IF NOT EXISTS `paiement` (
+  `id_paiement` int(11) NOT NULL AUTO_INCREMENT,
+  `id_utilisateur` int(11) NOT NULL,
+  `date_commande` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `montant` decimal(10,2) NOT NULL,
+  `moyen` varchar(255) NOT NULL,
+  `statut` varchar(255) NOT NULL,
+  PRIMARY KEY (`id_paiement`),
+  KEY `paiement_utilisateur` (`id_utilisateur`)
+) ENGINE=InnoDB AUTO_INCREMENT=966490343 DEFAULT CHARSET=latin1;
+
+--
+-- Déchargement des données de la table `paiement`
+--
+
+INSERT INTO `paiement` (`id_paiement`, `id_utilisateur`, `date_commande`, `montant`, `moyen`, `statut`) VALUES
+(966490342, 1022904176, '2025-04-26 12:06:22', '74100.00', 'Visa', 'payée');
 
 -- --------------------------------------------------------
 
@@ -134,7 +163,7 @@ CREATE TABLE IF NOT EXISTS `panier` (
   `date_modification` datetime DEFAULT NULL,
   PRIMARY KEY (`id_panier`),
   KEY `id_client` (`id_client`)
-) ENGINE=InnoDB AUTO_INCREMENT=871985519 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=798505202 DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -227,6 +256,12 @@ ALTER TABLE `lignecommande`
 ALTER TABLE `lignepanier`
   ADD CONSTRAINT `lignepanier_ibfk_1` FOREIGN KEY (`id_panier`) REFERENCES `panier` (`id_panier`) ON DELETE CASCADE,
   ADD CONSTRAINT `lignepanier_ibfk_2` FOREIGN KEY (`id_article`) REFERENCES `article` (`id_article`);
+
+--
+-- Contraintes pour la table `paiement`
+--
+ALTER TABLE `paiement`
+  ADD CONSTRAINT `paiement_utilisateur` FOREIGN KEY (`id_utilisateur`) REFERENCES `utilisateur` (`id_utilisateur`);
 
 --
 -- Contraintes pour la table `panier`

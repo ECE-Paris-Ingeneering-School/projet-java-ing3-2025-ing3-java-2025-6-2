@@ -1,10 +1,6 @@
 package Model;
 
-import Dao.DaoFactory;
-import Dao.ArticleDAO;
-import Dao.ArticleDAOImpl;
-import Dao.UtilisateurDAOImpl;
-import Dao.PanierDAOImpl;
+import Dao.*;
 import Control.FenetreControl;
 
 import javax.swing.*;
@@ -29,7 +25,7 @@ public class Fenetres extends JFrame
     private static final Color BACKGROUND_COLOR = new Color(128, 20, 41); // Rouge bordeaux
 
     /// Fenêtres de navigation
-    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, articles, ajout_commande, modif, modif_article, stats;
+    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, articles, ajout_commande, modif, modif_article, stats, histoPaiement;
     public JFrame panierFrame; // Renamed from panier to avoid conflict
     /// Zones de saisie connexion et inscriptions
     public TextField nom, prenom, mail, mdp, mail_id, mdp_id;
@@ -42,8 +38,8 @@ public class Fenetres extends JFrame
 
     /// Gestion articles
     public TextField nom_article, description, prix, stock, seuil_remise, quantite; /// Zones de saisies article
-public JComboBox<String> type_compte, payment_type, categorie, marque; /// Choix du mode de paiement et du type de compte
-public int id_article;
+    public JComboBox<String> type_compte, payment_type, categorie, marque; /// Choix du mode de paiement et du type de compte
+    public int id_article;
 
     /// Fenetre catalogue
     public JPanel Liste, PannelRetour;
@@ -75,6 +71,7 @@ public int id_article;
         modif = new JFrame();
         modif_article = new JFrame();
         stats = new JFrame();
+        histoPaiement = new JFrame();
 
         /// Configuration des fenêtres
         inscrire.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -86,6 +83,7 @@ public int id_article;
         catalogue.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ajout_article.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         stats.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        histoPaiement.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         /// Initialisation des autres composants
         DaoFactory daoFactory = DaoFactory.getInstance("ecommerce_db", "root", "");
@@ -105,6 +103,7 @@ public int id_article;
         modif.getContentPane().setBackground(BACKGROUND_COLOR);
         modif_article.getContentPane().setBackground(BACKGROUND_COLOR);
         stats.getContentPane().setBackground(BACKGROUND_COLOR);
+        histoPaiement.getContentPane().setBackground(BACKGROUND_COLOR);
     }
 
     /// Mise en place du controleur
@@ -701,6 +700,20 @@ public int id_article;
 
         contentPanel.add(profileInfoPanel, BorderLayout.NORTH);
 
+        JPanel buttongen = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        buttongen.setBackground(Color.WHITE);
+
+        JButton HistoButton = new JButton("Historique");
+        HistoButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        HistoButton.setBackground(new Color(51, 122, 183));
+        HistoButton.setForeground(Color.WHITE);
+        HistoButton.setBorderPainted(false);
+        HistoButton.setFocusPainted(false);
+        HistoButton.addActionListener(fenetreControl);
+        buttongen.add(HistoButton);
+
+        contentPanel.add(buttongen, BorderLayout.SOUTH);
+
         // Panel pour les boutons d'action (uniquement pour les admins)
         if (user_actuel.getType_utilisateur().equals("admin")) {
             JPanel actionPanel = new JPanel();
@@ -720,7 +733,6 @@ public int id_article;
                     "Gerer les dossiers clients",
                     "Statistiques"
             };
-
             JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
             buttonsPanel.setBackground(Color.WHITE);
 
@@ -2100,8 +2112,23 @@ public int id_article;
         }
     }
 
-    public JButton getConnexion() {
-        return new JButton("Connexion");
+    public void setHistoriquePaiement(List<Paiement> paiements)
+    {
+        histoPaiement.setTitle("Historique des paiements");
+        histoPaiement.setSize(700, 400);
+        histoPaiement.setLocationRelativeTo(null);
+
+        String[] columns = {"Date", "Montant", "Moyen de paiement", "Statut"};
+        String[][] data = new String[paiements.size()][columns.length];
+        for (int i = 0; i < paiements.size(); i++) {
+            Paiement p = paiements.get(i);
+            data[i][0] = p.getDate();
+            data[i][1] = String.format("%.2f €", p.getMontant());
+            data[i][2] = p.getMoyen();
+            data[i][3] = p.getStatut();
+        }
+        JTable table = new JTable(data, columns);
+        histoPaiement.add(new JScrollPane(table), BorderLayout.CENTER);
     }
 
 }
