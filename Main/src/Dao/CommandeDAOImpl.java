@@ -21,8 +21,9 @@ public class CommandeDAOImpl implements CommandeDAO
     }
 
     @Override
-    public void nouvelleCommande(Client client, String adresse)
+    public Commande nouvelleCommande(Client client, String adresse)
     {
+        Commande nouvelleCommande =null;
         try
         {
             PanierDAOImpl panier = new PanierDAOImpl(daoFactory);
@@ -36,12 +37,14 @@ public class CommandeDAOImpl implements CommandeDAO
             /// Exécution de la requête INSERT INTO de l'objet client, de son panier et de l'adresse en paramètre
             PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO commande(id_commande, id_client, statut, adresse_livraison, montant_total) VALUES ('"+id_commande+"','"+client.getIdentifiant()+"', 'en attente', '"+adresse+"', '"+panier_client.calculerPrixTotal()+"')");
             preparedStatement.executeUpdate();
+            nouvelleCommande = new Commande(id_commande, client, panier_client.getArticles(), "en attente");
         }
         catch (SQLException e)
         {
             e.printStackTrace();
             System.out.println("Ajout d'une nouvelle commande impossible");
         }
+        return nouvelleCommande;
     }
 
     @Override

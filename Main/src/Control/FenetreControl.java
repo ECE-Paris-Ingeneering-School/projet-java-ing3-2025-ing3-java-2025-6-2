@@ -204,7 +204,11 @@ public class FenetreControl extends JFrame implements ActionListener
                         user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
                         connect = userdao.connexionUtilisateur(user);
                         Client client = new Client(connect.getIdentifiant(), connect.getNom(), connect.getPrenom(), connect.getEmail(), connect.getMotDePasse(), connect.getType_utilisateur());
-                        int quantite_voulu = Integer.parseInt(fenetre.quantite.getText());
+                        String quant= fenetre.quantite.getText();
+                        if (quant.isEmpty()){
+                            quant ="1";
+                        }
+                        int quantite_voulu = Integer.parseInt(quant);
                         PanierDAOImpl panierDAO = new PanierDAOImpl(dao);
                         panierDAO.nouveauPanier(client);
                         Panier panier = panierDAO.getPanier(client);
@@ -259,9 +263,10 @@ public class FenetreControl extends JFrame implements ActionListener
                 String adresse = fenetre.adresse.getText();
                 Panier panier = panierDAO.getPanier(client);
                 /// Ajout d'une nouvelle commande
-                comdao.nouvelleCommande(client, adresse);
-                Commande commande = comdao.getCommande(client);
-                comdao.ajouterDansCommandeEnCours(commande, panier);
+
+                Commande nouveau = comdao.nouvelleCommande(client, adresse);
+                //Commande commande = comdao.getCommande(client); //Test pour regler le bug de creation de nouvelle commande
+                comdao.ajouterDansCommandeEnCours(nouveau, panier);
                 fenetre.paiement.setVisible(true);
                 fenetre.setEvent("Ajout commande", "Commande ajoutée");
                 fenetre.event.setVisible(true);

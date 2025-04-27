@@ -12,7 +12,7 @@ public interface CommandeDAO
     /**Permet de créer une nouvelle commande*
      * @A partir du client, de son panier er de l'adresse saisie
      */
-    public void nouvelleCommande(Client client, String adresse);
+    public Commande nouvelleCommande(Client client, String adresse);
     /** Ajoute les articles du panier dans la commande en cours
      * @Utilise la commande + le panier en cours
      * */
