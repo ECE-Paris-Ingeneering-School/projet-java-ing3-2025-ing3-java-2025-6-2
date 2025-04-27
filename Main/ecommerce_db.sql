@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : Dim 27 avr. 2025 à 16:55
+-- Généré le : Dim 27 avr. 2025 à 18:57
 -- Version du serveur :  5.7.31
 -- Version de PHP : 7.3.21
 
@@ -83,6 +83,32 @@ INSERT INTO `article` (`id_article`, `nom`, `description`, `prix`, `stock`, `seu
 (949478501, 'Portrait de Marie-Antoinette', 'D\'après le tableau de Vigée Le Brun, cadre doré', '59.90', 12, 5, 'Décoration', 'VersaillesArt', 'image/decoration/marie_antoinette.png', 1, '2025-04-17 20:00:39'),
 (949478502, 'Sphère armillaire ancienne', 'Modèle décoratif en laiton, diamètre 30cm', '89.90', 15, 5, 'Décoration', 'AntiqueWorld', 'image/decoration/sphere_armillaire.png', 1, '2025-04-17 20:00:39'),
 (1768251590, 'lave-vaiselle', 'Un lave-vaiselle comme un autre', '1235.00', 75, 6, 'Electromenager', 'Bosch', 'image/default_product.png', 1, '2025-04-19 14:41:04');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `avis`
+--
+
+DROP TABLE IF EXISTS `avis`;
+CREATE TABLE IF NOT EXISTS `avis` (
+  `id_avis` int(11) NOT NULL,
+  `id_utilisateur` int(11) DEFAULT NULL,
+  `id_article` int(11) DEFAULT NULL,
+  `commentaire` text,
+  `note` int(11) DEFAULT NULL,
+  `date` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`id_avis`),
+  KEY `utilisateur_avis` (`id_utilisateur`),
+  KEY `article_avis` (`id_article`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Déchargement des données de la table `avis`
+--
+
+INSERT INTO `avis` (`id_avis`, `id_utilisateur`, `id_article`, `commentaire`, `note`, `date`) VALUES
+(859565961, 1022904176, 832745446, '', 1, '2025-04-27');
 
 -- --------------------------------------------------------
 
@@ -306,6 +332,13 @@ INSERT INTO `utilisateur` (`id_utilisateur`, `nom`, `prenom`, `email`, `mot_de_p
 --
 -- Contraintes pour les tables déchargées
 --
+
+--
+-- Contraintes pour la table `avis`
+--
+ALTER TABLE `avis`
+  ADD CONSTRAINT `article_avis` FOREIGN KEY (`id_article`) REFERENCES `article` (`id_article`),
+  ADD CONSTRAINT `utilisateur_avis` FOREIGN KEY (`id_utilisateur`) REFERENCES `utilisateur` (`id_utilisateur`);
 
 --
 -- Contraintes pour la table `commande`

@@ -257,9 +257,49 @@ public class FenetreControl extends JFrame implements ActionListener
                     }
                 }
                 break;
+            case "Envoyer":
+                ArticleDAOImpl articleDAOImpl = new ArticleDAOImpl(dao);
+                cmd = e.getActionCommand(); /// Récupère la commande + id de l'article
+                if (cmd.startsWith("Envoyer"))
+                {
+                    try
+                    {
+                        String idStr = cmd.substring("Envoyer".length()).trim();
+                        System.out.println("Insert : "+idStr); /// Correspond à l'id de l'article choisi (converti ensuite en entier pour les prochaines étapes)
+                        int id = Integer.parseInt(idStr);
+                        Article article = articleDAOImpl.getArticle(id);
+
+                        user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
+                        connect = userdao.connexionUtilisateur(user);
+                        Client client = new Client(connect.getIdentifiant(), connect.getNom(), connect.getPrenom(), connect.getEmail(), connect.getMotDePasse(), connect.getType_utilisateur());
+                        /// Récupérer le client connecté
+                        String commentaire = fenetre.commentaireField.getText();
+                        int note = (int) fenetre.noteBox.getSelectedItem();
+                        System.out.println("Note pour "+article.getId()+":"+note);
+                        Avis avis = new Avis(new java.util.Random().nextInt(1_000_000_000), client, article, commentaire, note, java.time.LocalDate.now().toString());
+                        article.ajouterAvis(avis);
+                        /// Ajouter en base via DAO
+                        AvisDAO avisDAO = new AvisDAOImpl(dao);
+                        avisDAO.ajouterAvis(avis, client, article);
+                        /// Rafraîchir l'affichage
+                        fenetre.avisPanel.removeAll();
+                        fenetre.setAvisPanel(article);
+                        fenetre.avisPanel.revalidate();
+                        fenetre.avisPanel.repaint();
+                    }
+                    catch (NumberFormatException ex)
+                    {
+                        System.err.println("ID invalide dans la commande : " + cmd);
+                    }
+                }
+                break;
+            /// Vue avis client
+            case "Avis":
+
+                break;
             /// Vue catalogue
             case "Catalogue" :
-                fenetre.setCatalogue();
+                fenetre.setCatalogue("");
                 fenetre.catalogue.setVisible(true);
                 break;
             /// Passer à la commande
@@ -460,6 +500,26 @@ public class FenetreControl extends JFrame implements ActionListener
             case "Promotions":
                 fenetre.setArticlePromo();
                 fenetre.promo.setVisible(true);
+            case "Rechercher":
+                String recherche = fenetre.RechercheEnCours.getText().toLowerCase().trim();
+                System.out.println("Texte de la recherche : " + recherche);
+
+                // Si la recherche n'est pas vide, on effectue la recherche
+                System.out.println("Exécution de la recherche...");
+                // Appel de la méthode pour afficher les résultats filtrés avec la recherche
+                fenetre.setCatalogue(recherche);
+
+                // Forcer la réactualisation de l'affichage
+                fenetre.catalogue.revalidate();
+                fenetre.catalogue.repaint();
+                fenetre.catalogue.setVisible(true);
+                System.out.println("Catalogue réactualisé");
+
+
+                // Réinitialiser le champ de recherche après l'action
+                fenetre.RechercheEnCours.setText(""); // Vide le champ après la recherche
+
+                break;
             /// Déconnexion du compte
             case "Deconnexion":
                 fenetre.setIdentification();
@@ -473,12 +533,16 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.modif_article.setVisible(false);
                 fenetre.stats.setVisible(false);
                 fenetre.profil.setVisible(false);
-                fenetre.ajout_commande.setVisible(false);
                 fenetre.gestionClient.setVisible(false);
                 fenetre.histoPaiement.setVisible(false);
                 fenetre.histoCommande.setVisible(false);
                 fenetre.promo.setVisible(false);
                 fenetre.accueil.setVisible(false);
+                if(fenetre.ajout_commande != null)
+                {
+                    fenetre.ajout_commande.setVisible(false);
+                    fenetre.ajout_commande.getContentPane().removeAll();
+                }
 
                 fenetre.ajout_article.getContentPane().removeAll();
                 fenetre.catalogue.getContentPane().removeAll();
@@ -488,7 +552,6 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.modif_article.getContentPane().removeAll();
                 fenetre.stats.getContentPane().removeAll();
                 fenetre.profil.getContentPane().removeAll();
-                fenetre.ajout_commande.getContentPane().removeAll();
                 fenetre.gestionClient.getContentPane().removeAll();
                 fenetre.histoPaiement.getContentPane().removeAll();
                 fenetre.histoCommande.getContentPane().removeAll();

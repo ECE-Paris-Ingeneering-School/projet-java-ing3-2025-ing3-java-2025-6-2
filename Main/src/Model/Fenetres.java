@@ -52,6 +52,16 @@ public class Fenetres extends JFrame
     public List<LigneCommande> panier; // Changed to public
     public JLabel panierLabel;
 
+    /// Avis
+    public JPanel avisPanel;
+    public JComboBox<Integer> noteBox;
+    public TextField commentaireField;
+
+    /// Recherche
+    public boolean estDispoCheck = false;
+    public boolean PrixBasCheck = false;
+    public JTextField RechercheEnCours;
+
     /// Constructeur de chaque fenêtre
     public Fenetres()
     {
@@ -420,8 +430,197 @@ public class Fenetres extends JFrame
         accueil.repaint();
     }
 
+    /// Fenêtre vue du profil utilisateur
+    public void setProfil()
+    {
+        /// Appel de la requête connexion pour utiliser le profil actuel
+        DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
+        UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
+        Utilisateurs user = new Utilisateurs(0, "", "", email, password, "");
+        Utilisateurs user_actuel = userdao.connexionUtilisateur(user);
+
+        profil.setSize(1200, 800);
+        profil.setTitle("Profil - Maison Close");
+        profil.setLayout(new BorderLayout());
+        profil.getContentPane().setBackground(BACKGROUND_COLOR);
+
+        /// Barre de navigation
+        JPanel navBar = createNavigationBar();
+        profil.add(navBar, BorderLayout.NORTH);
+
+        /// Panel principal avec fond bordeaux
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(BACKGROUND_COLOR);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        /// Panel du contenu avec fond blanc
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setBackground(Color.WHITE);
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+
+        /// Panel pour la photo et les informations
+        JPanel profileInfoPanel = new JPanel(new BorderLayout(30, 0));
+        profileInfoPanel.setBackground(Color.WHITE);
+
+        /// Photo de profil
+        JPanel photoPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.setColor(new Color(240, 240, 240));
+                g.fillRect(0, 0, 200, 200);
+            }
+        };
+        photoPanel.setPreferredSize(new Dimension(200, 200));
+        photoPanel.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
+
+        /// Informations du profil
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBackground(Color.WHITE);
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
+
+        /// Style pour les labels
+        Font titleFont = new Font("Arial", Font.BOLD, 24);
+        Font labelFont = new Font("Arial", Font.BOLD, 16);
+        Font valueFont = new Font("Arial", Font.PLAIN, 16);
+
+        JLabel titleLabel = new JLabel("Informations du profil");
+        titleLabel.setFont(titleFont);
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        infoPanel.add(titleLabel);
+        infoPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        /// Nom
+        JPanel nomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        nomPanel.setBackground(Color.WHITE);
+        JLabel nomLabel = new JLabel("Nom: ");
+        nomLabel.setFont(labelFont);
+        JLabel nomValue = new JLabel(user_actuel.getNom());
+        nomValue.setFont(valueFont);
+        nomPanel.add(nomLabel);
+        nomPanel.add(nomValue);
+        infoPanel.add(nomPanel);
+
+        /// Prénom
+        JPanel prenomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        prenomPanel.setBackground(Color.WHITE);
+        JLabel prenomLabel = new JLabel("Prénom: ");
+        prenomLabel.setFont(labelFont);
+        JLabel prenomValue = new JLabel(user_actuel.getPrenom());
+        prenomValue.setFont(valueFont);
+        prenomPanel.add(prenomLabel);
+        prenomPanel.add(prenomValue);
+        infoPanel.add(prenomPanel);
+
+        /// Email
+        JPanel emailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        emailPanel.setBackground(Color.WHITE);
+        JLabel emailLabel = new JLabel("Email: ");
+        emailLabel.setFont(labelFont);
+        JLabel emailValue = new JLabel(user_actuel.getEmail());
+        emailValue.setFont(valueFont);
+        emailPanel.add(emailLabel);
+        emailPanel.add(emailValue);
+        infoPanel.add(emailPanel);
+
+        /// Type de compte
+        JPanel typePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        typePanel.setBackground(Color.WHITE);
+        JLabel typeLabel = new JLabel("Type de compte: ");
+        typeLabel.setFont(labelFont);
+        JLabel typeValue = new JLabel(user_actuel.getType_utilisateur());
+        typeValue.setFont(valueFont);
+        typePanel.add(typeLabel);
+        typePanel.add(typeValue);
+        infoPanel.add(typePanel);
+
+        profileInfoPanel.add(photoPanel, BorderLayout.WEST);
+        profileInfoPanel.add(infoPanel, BorderLayout.CENTER);
+
+        contentPanel.add(profileInfoPanel, BorderLayout.NORTH);
+
+        JPanel buttongen = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        buttongen.setBackground(Color.WHITE);
+
+        JButton HistoButton = new JButton("Historique");
+        HistoButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        HistoButton.setBackground(new Color(51, 122, 183));
+        HistoButton.setForeground(Color.WHITE);
+        HistoButton.setBorderPainted(false);
+        HistoButton.setFocusPainted(false);
+        HistoButton.addActionListener(fenetreControl);
+        buttongen.add(HistoButton);
+
+        contentPanel.add(buttongen, BorderLayout.SOUTH);
+
+        /// Panel pour les boutons d'action (uniquement pour les admins)
+        if (user_actuel.getType_utilisateur().equals("admin")) {
+            JPanel actionPanel = new JPanel();
+            actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
+            actionPanel.setBackground(Color.WHITE);
+            actionPanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
+
+            JLabel actionTitle = new JLabel("Actions administrateur");
+            actionTitle.setFont(titleFont);
+            actionTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+            actionPanel.add(actionTitle);
+            actionPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+            String[] adminActions = {
+                    "Ajouter article",
+                    "Editer un article",
+                    "Gerer les dossiers clients",
+                    "Statistiques"
+            };
+            JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+            buttonsPanel.setBackground(Color.WHITE);
+
+            for (String action : adminActions) {
+                JButton actionButton = new JButton(action);
+                actionButton.setFont(new Font("Arial", Font.PLAIN, 14));
+                actionButton.setBackground(new Color(51, 122, 183));
+                actionButton.setForeground(Color.WHITE);
+                actionButton.setBorderPainted(false);
+                actionButton.setFocusPainted(false);
+                actionButton.addActionListener(fenetreControl);
+                buttonsPanel.add(actionButton);
+            }
+
+            actionPanel.add(buttonsPanel);
+            contentPanel.add(actionPanel, BorderLayout.CENTER);
+        }
+
+        mainPanel.add(contentPanel, BorderLayout.CENTER);
+
+        /// Bouton Retour en bas
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel.setBackground(Color.WHITE);
+        JButton returnButton = new JButton("Retour");
+        returnButton.addActionListener(fenetreControl);
+        bottomPanel.add(returnButton);
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+        profil.add(mainPanel);
+    }
+
+    /// Gestion de certains événements (côté réaliste et débuggage)
+    public void setEvent(String titre, String description)
+    {
+        event.setSize(300, 100);
+        event.getContentPane().removeAll();
+        event.setTitle(titre);
+        JPanel text = new JPanel();
+        JLabel label_event = new JLabel(description);
+        text.add(label_event);
+        JPanel erreur_button = new JPanel();
+        addButton(erreur_button, "Fermer");
+        event.add(text, BorderLayout.CENTER);
+        event.add(erreur_button, BorderLayout.SOUTH);
+    }
+
     /// Fenetres principales : Barre de navigation
-    private JPanel createNavigationBar()
+    public JPanel createNavigationBar()
     {
         JPanel navBar = new JPanel(new BorderLayout());
         navBar.setBackground(Color.WHITE);
@@ -441,14 +640,28 @@ public class Fenetres extends JFrame
         ImageIcon resizedIcon = new ImageIcon(resizedImage);
         JLabel logoLabel = new JLabel(resizedIcon);
 
-        JTextField searchField = new JTextField(30);
-        searchField.setBorder(BorderFactory.createCompoundBorder(
+        RechercheEnCours = new JTextField(15);
+        RechercheEnCours.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
 
+        JButton bouttonrecherche = new JButton();
+        bouttonrecherche.setPreferredSize(new Dimension(120, 30));
+        bouttonrecherche.setText("Rechercher");
+        bouttonrecherche.setBackground(Color.GRAY);
+        bouttonrecherche.setFocusPainted(false);
+
+        JPanel petitpanel = new JPanel();
+        petitpanel.setLayout(new BorderLayout());
+        petitpanel.add(RechercheEnCours, BorderLayout.CENTER);
+
+
+        bouttonrecherche.addActionListener(e -> fenetreControl.actionPerformed(e));
+        petitpanel.add(bouttonrecherche, BorderLayout.EAST);
+
         leftSection.add(logoLabel);
-        leftSection.add(searchField);
+        leftSection.add(petitpanel);
 
         /// Menu principal (centre)
         JPanel centerSection = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
@@ -639,195 +852,6 @@ public class Fenetres extends JFrame
         returnButton.addActionListener(fenetreControl); // ActionListener pour le bouton Retour
         bottomPanel.add(returnButton);
         promo.add(bottomPanel, BorderLayout.SOUTH);
-    }
-
-    /// Fenêtre vue du profil utilisateur
-    public void setProfil()
-    {
-        /// Appel de la requête connexion pour utiliser le profil actuel
-        DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
-        UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
-        Utilisateurs user = new Utilisateurs(0, "", "", email, password, "");
-        Utilisateurs user_actuel = userdao.connexionUtilisateur(user);
-
-        profil.setSize(1200, 800);
-        profil.setTitle("Profil - Maison Close");
-        profil.setLayout(new BorderLayout());
-        profil.getContentPane().setBackground(BACKGROUND_COLOR);
-
-        /// Barre de navigation
-        JPanel navBar = createNavigationBar();
-        profil.add(navBar, BorderLayout.NORTH);
-
-        /// Panel principal avec fond bordeaux
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(BACKGROUND_COLOR);
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        /// Panel du contenu avec fond blanc
-        JPanel contentPanel = new JPanel(new BorderLayout());
-        contentPanel.setBackground(Color.WHITE);
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-
-        /// Panel pour la photo et les informations
-        JPanel profileInfoPanel = new JPanel(new BorderLayout(30, 0));
-        profileInfoPanel.setBackground(Color.WHITE);
-
-        /// Photo de profil
-        JPanel photoPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                g.setColor(new Color(240, 240, 240));
-                g.fillRect(0, 0, 200, 200);
-            }
-        };
-        photoPanel.setPreferredSize(new Dimension(200, 200));
-        photoPanel.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
-
-        /// Informations du profil
-        JPanel infoPanel = new JPanel();
-        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-        infoPanel.setBackground(Color.WHITE);
-        infoPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
-
-        /// Style pour les labels
-        Font titleFont = new Font("Arial", Font.BOLD, 24);
-        Font labelFont = new Font("Arial", Font.BOLD, 16);
-        Font valueFont = new Font("Arial", Font.PLAIN, 16);
-
-        JLabel titleLabel = new JLabel("Informations du profil");
-        titleLabel.setFont(titleFont);
-        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        infoPanel.add(titleLabel);
-        infoPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        /// Nom
-        JPanel nomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        nomPanel.setBackground(Color.WHITE);
-        JLabel nomLabel = new JLabel("Nom: ");
-        nomLabel.setFont(labelFont);
-        JLabel nomValue = new JLabel(user_actuel.getNom());
-        nomValue.setFont(valueFont);
-        nomPanel.add(nomLabel);
-        nomPanel.add(nomValue);
-        infoPanel.add(nomPanel);
-
-        /// Prénom
-        JPanel prenomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        prenomPanel.setBackground(Color.WHITE);
-        JLabel prenomLabel = new JLabel("Prénom: ");
-        prenomLabel.setFont(labelFont);
-        JLabel prenomValue = new JLabel(user_actuel.getPrenom());
-        prenomValue.setFont(valueFont);
-        prenomPanel.add(prenomLabel);
-        prenomPanel.add(prenomValue);
-        infoPanel.add(prenomPanel);
-
-        /// Email
-        JPanel emailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        emailPanel.setBackground(Color.WHITE);
-        JLabel emailLabel = new JLabel("Email: ");
-        emailLabel.setFont(labelFont);
-        JLabel emailValue = new JLabel(user_actuel.getEmail());
-        emailValue.setFont(valueFont);
-        emailPanel.add(emailLabel);
-        emailPanel.add(emailValue);
-        infoPanel.add(emailPanel);
-
-        /// Type de compte
-        JPanel typePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        typePanel.setBackground(Color.WHITE);
-        JLabel typeLabel = new JLabel("Type de compte: ");
-        typeLabel.setFont(labelFont);
-        JLabel typeValue = new JLabel(user_actuel.getType_utilisateur());
-        typeValue.setFont(valueFont);
-        typePanel.add(typeLabel);
-        typePanel.add(typeValue);
-        infoPanel.add(typePanel);
-
-        profileInfoPanel.add(photoPanel, BorderLayout.WEST);
-        profileInfoPanel.add(infoPanel, BorderLayout.CENTER);
-
-        contentPanel.add(profileInfoPanel, BorderLayout.NORTH);
-
-        JPanel buttongen = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
-        buttongen.setBackground(Color.WHITE);
-
-        JButton HistoButton = new JButton("Historique");
-        HistoButton.setFont(new Font("Arial", Font.PLAIN, 14));
-        HistoButton.setBackground(new Color(51, 122, 183));
-        HistoButton.setForeground(Color.WHITE);
-        HistoButton.setBorderPainted(false);
-        HistoButton.setFocusPainted(false);
-        HistoButton.addActionListener(fenetreControl);
-        buttongen.add(HistoButton);
-
-        contentPanel.add(buttongen, BorderLayout.SOUTH);
-
-        /// Panel pour les boutons d'action (uniquement pour les admins)
-        if (user_actuel.getType_utilisateur().equals("admin")) {
-            JPanel actionPanel = new JPanel();
-            actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
-            actionPanel.setBackground(Color.WHITE);
-            actionPanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
-
-            JLabel actionTitle = new JLabel("Actions administrateur");
-            actionTitle.setFont(titleFont);
-            actionTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-            actionPanel.add(actionTitle);
-            actionPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-            String[] adminActions = {
-                    "Ajouter article",
-                    "Editer un article",
-                    "Gerer les dossiers clients",
-                    "Statistiques"
-            };
-            JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
-            buttonsPanel.setBackground(Color.WHITE);
-
-            for (String action : adminActions) {
-                JButton actionButton = new JButton(action);
-                actionButton.setFont(new Font("Arial", Font.PLAIN, 14));
-                actionButton.setBackground(new Color(51, 122, 183));
-                actionButton.setForeground(Color.WHITE);
-                actionButton.setBorderPainted(false);
-                actionButton.setFocusPainted(false);
-                actionButton.addActionListener(fenetreControl);
-                buttonsPanel.add(actionButton);
-            }
-
-            actionPanel.add(buttonsPanel);
-            contentPanel.add(actionPanel, BorderLayout.CENTER);
-        }
-
-        mainPanel.add(contentPanel, BorderLayout.CENTER);
-
-        /// Bouton Retour en bas
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        bottomPanel.setBackground(Color.WHITE);
-        JButton returnButton = new JButton("Retour");
-        returnButton.addActionListener(fenetreControl);
-        bottomPanel.add(returnButton);
-        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
-
-        profil.add(mainPanel);
-    }
-
-    /// Gestion de certains événements (côté réaliste et débuggage)
-    public void setEvent(String titre, String description)
-    {
-        event.setSize(300, 100);
-        event.getContentPane().removeAll();
-        event.setTitle(titre);
-        JPanel text = new JPanel();
-        JLabel label_event = new JLabel(description);
-        text.add(label_event);
-        JPanel erreur_button = new JPanel();
-        addButton(erreur_button, "Fermer");
-        event.add(text, BorderLayout.CENTER);
-        event.add(erreur_button, BorderLayout.SOUTH);
     }
 
     /// Paiement d'un article
@@ -1021,6 +1045,9 @@ public class Fenetres extends JFrame
         stockLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         infoPanel.add(stockLabel);
 
+        setAvisPanel(article);
+        infoPanel.add(avisPanel);
+
         panel.add(infoPanel);
 
         /// Panel droit pour les boutons
@@ -1039,7 +1066,6 @@ public class Fenetres extends JFrame
         quantite = new TextField(10);
         panel_quantite.add(quantite);
         buttonPanel.add(panel_quantite);
-
 
         JButton addButton = new JButton("Ajouter au panier");
         addButton.setActionCommand("Ajouter au panier" + article.getId());
@@ -1916,7 +1942,8 @@ public class Fenetres extends JFrame
     }
 
     /// Vue du catalogue
-    public void setCatalogue() {
+    public void setCatalogue(String recherche) {
+        System.out.println("catalogue ouvert");
         catalogue.setSize(1200, 800);
         catalogue.setTitle("Catalogue");
         catalogue.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -1941,19 +1968,6 @@ public class Fenetres extends JFrame
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchPanel.setBackground(Color.WHITE);
 
-        JTextField searchField = new JTextField(40);
-        searchField.setPreferredSize(new Dimension(600, 35));
-
-        JButton searchButton = new JButton("Rechercher");
-        searchButton.setBackground(new Color(51, 122, 183));
-        searchButton.setForeground(Color.WHITE);
-        searchButton.setPreferredSize(new Dimension(120, 35));
-        searchButton.setBorderPainted(false);
-
-        searchPanel.add(searchField);
-        searchPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-        searchPanel.add(searchButton);
-
         /// Panel des catégories
         JPanel categoryPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         categoryPanel.setBackground(Color.WHITE);
@@ -1967,7 +1981,6 @@ public class Fenetres extends JFrame
         /// Panel du haut combinant recherche et catégories
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(Color.WHITE);
-        topPanel.add(searchPanel, BorderLayout.NORTH);
         topPanel.add(categoryPanel, BorderLayout.CENTER);
         innerPanel.add(topPanel, BorderLayout.NORTH);
 
@@ -1976,31 +1989,36 @@ public class Fenetres extends JFrame
         contentPanel.setBackground(Color.WHITE);
 
         /// Filtres à gauche
-        JPanel filterPanel = new JPanel();
-        filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
-        filterPanel.setBackground(Color.WHITE);
-        filterPanel.setBorder(BorderFactory.createCompoundBorder(
+        JPanel filtrePanel = new JPanel();
+        filtrePanel.setLayout(new BoxLayout(filtrePanel, BoxLayout.Y_AXIS));
+        filtrePanel.setBackground(Color.WHITE);
+        filtrePanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(230, 230, 230)),
                 BorderFactory.createEmptyBorder(10, 10, 10, 20)
         ));
-        filterPanel.setPreferredSize(new Dimension(200, 0));
+        filtrePanel.setPreferredSize(new Dimension(200, 0));
 
         /// Titre des filtres
-        JLabel filterTitle = new JLabel("Filtre");
-        filterTitle.setFont(new Font("Arial", Font.BOLD, 16));
-        filterPanel.add(filterTitle);
-        filterPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        /// Ajout des différents filtres
-        String[] filterCategories = {"Prix", "Disponibilité", "Nouveautés", "Prix bas"};
-        for (String filter : filterCategories) {
-            JCheckBox checkbox = new JCheckBox(filter);
-            checkbox.setBackground(Color.WHITE);
-            filterPanel.add(checkbox);
-            filterPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        }
+        JLabel filtreTitle = new JLabel("Filtre");
+        filtreTitle.setFont(new Font("Arial", Font.BOLD, 16));
+        filtrePanel.add(filtreTitle);
+        filtrePanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        contentPanel.add(filterPanel, BorderLayout.WEST);
+        JCheckBox DispoCheckBox = new JCheckBox("Disponibilité");
+        DispoCheckBox.setBackground(Color.WHITE);
+        JCheckBox PrixBasCheckBox = new JCheckBox("Prix bas");
+        PrixBasCheckBox.setBackground(Color.WHITE);
+
+        DispoCheckBox.setSelected(estDispoCheck);
+        PrixBasCheckBox.setSelected(PrixBasCheck);
+
+        filtrePanel.add(DispoCheckBox);
+        filtrePanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        filtrePanel.add(PrixBasCheckBox);
+        filtrePanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        contentPanel.add(filtrePanel, BorderLayout.WEST);
 
         /// Grille de produits à droite
         JPanel productsGrid = new JPanel(new GridLayout(0, 4, 15, 15));
@@ -2012,8 +2030,27 @@ public class Fenetres extends JFrame
             java.util.List<Article> articles = articleDAO.listerArticles();
 
             for (Article article : articles) {
-                JPanel productCard = createProductCard(article);
-                productsGrid.add(productCard);
+                boolean matchesSearch = article.getNom().toLowerCase().contains(recherche) ||
+                        article.getDescription().toLowerCase().contains(recherche) ||
+                        article.getCategorie().toLowerCase().contains(recherche) ||
+                        article.getMarque().toLowerCase().contains(recherche);
+
+                String selectedCategory = (String) categoryFilter.getSelectedItem();
+                boolean matchesCategory = selectedCategory.equals("Tous") || article.getCategorie().equals(selectedCategory);
+
+                boolean CaseDispo = !DispoCheckBox.isSelected() || article.getStock()>0;
+                boolean CasePrixBas = !PrixBasCheckBox.isSelected() || article.getPrixUnitaire() < 50.0;
+
+                if (matchesSearch && matchesCategory && CaseDispo && CasePrixBas) {
+                    JPanel productCard = createProductCard(article);
+                    productsGrid.add(productCard);
+                }
+                productsGrid.revalidate();
+                productsGrid.repaint();
+                contentPanel.revalidate();
+                contentPanel.repaint();
+                mainPanel.revalidate();
+                mainPanel.repaint();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -2040,14 +2077,27 @@ public class Fenetres extends JFrame
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         catalogue.add(mainPanel);
+        catalogue.revalidate();
+        catalogue.repaint();
+    }
+
+    public void CheckboxTest(JCheckBox DispoCheckBox,JCheckBox PrixBasCheckBox) {
+        estDispoCheck = DispoCheckBox.isSelected();
+        PrixBasCheck = PrixBasCheckBox.isSelected();
+    }
+    public void CheckboxRend(JCheckBox DispoCheckBox,JCheckBox PrixBasCheckBox) {
+        DispoCheckBox.setSelected(estDispoCheck);
+        PrixBasCheckBox.setSelected(PrixBasCheck);
     }
 
     /// Vue détail d'un article spécifique
-    public void afficherDetailsArticle(Article article) {
+    public void afficherDetailsArticle(Article article)
+    {
+        DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
         /// Créer une nouvelle fenêtre pour les détails
         JDialog detailsDialog = new JDialog(this, "Détails du produit", true);
         detailsDialog.setLayout(new BorderLayout(10, 10));
-        detailsDialog.setSize(400, 500);
+        detailsDialog.setSize(700, 700);
         detailsDialog.setLocationRelativeTo(this);
 
         JPanel contentPanel = new JPanel();
@@ -2104,6 +2154,35 @@ public class Fenetres extends JFrame
         stockLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         contentPanel.add(stockLabel);
         contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        AvisDAOImpl avisDAO = new AvisDAOImpl(dao);
+        List<Avis> liste_avis = avisDAO.getAvisParArticle(article.getId());
+        JLabel avisLabel = new JLabel("Avis: " );
+        avisLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        avisLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        String[] columns = {"Client", "Article", "Commentaire", "Note", "Date"};
+        Object[][] data = new Object[liste_avis.size()][columns.length];
+        for (int i = 0; i < liste_avis.size(); i++) {
+            Avis p = liste_avis.get(i);
+            data[i][0] = p.getClient().getNom();
+            data[i][1] = p.getArticle().getNom();
+            data[i][2] = p.getCommentaire();
+            data[i][3] = p.getNote();
+            data[i][4] = p.getDate();
+            }
+
+        JPanel avis_list = new JPanel();
+        avis_list.setLayout(new BoxLayout(avis_list, BoxLayout.Y_AXIS));
+        avis_list.setBackground(Color.WHITE);
+        avis_list.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JTable table = new JTable(new javax.swing.table.DefaultTableModel(data, columns));
+
+        JScrollPane avis_panel = new JScrollPane(table);
+        avis_panel.setBorder(null);
+        avis_panel.getVerticalScrollBar().setUnitIncrement(16);
+        avis_list.add(avis_panel);
+        contentPanel.add(avis_list);
 
         /// Bouton Fermer
         JButton closeButton = new JButton("Fermer");
@@ -2320,5 +2399,37 @@ public class Fenetres extends JFrame
 
         creerRetour();
         gestionClient.add(PannelRetour, BorderLayout.SOUTH);
+    }
+
+    public void setAvisPanel(Article article)
+    {
+        avisPanel = new JPanel();
+        avisPanel.setLayout(new BoxLayout(avisPanel, BoxLayout.Y_AXIS));
+        avisPanel.setBorder(BorderFactory.createTitledBorder("Avis des clients"));
+
+        /// Affichage des avis existants
+        List<Avis> avisList = article.getAvisList();
+        if (avisList.isEmpty()) {
+            avisPanel.add(new JLabel("Aucun avis pour cet article."));
+        } else {
+            for (Avis avis : avisList) {
+                avisPanel.add(new JLabel(avis.getClient().getNom() + " (" + avis.getNote() + "/5) : " + avis.getCommentaire()));
+            }
+        }
+
+        // Formulaire pour laisser un avis
+        avisPanel.add(new JLabel("Laisser un avis :"));
+        commentaireField = new TextField(20);
+        noteBox = new JComboBox<>(new Integer[]{1,2,3,4,5});
+        JButton envoyerBtn = new JButton("Envoyer");
+
+        avisPanel.add(new JLabel("Note :"));
+        avisPanel.add(noteBox);
+        avisPanel.add(new JLabel("Commentaire :"));
+        avisPanel.add(commentaireField);
+        avisPanel.add(envoyerBtn);
+
+        envoyerBtn.setActionCommand("Envoyer" + article.getId());
+        envoyerBtn.addActionListener(e -> fenetreControl.actionPerformed(e));
     }
 }

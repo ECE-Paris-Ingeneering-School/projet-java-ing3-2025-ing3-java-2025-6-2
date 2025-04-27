@@ -1,5 +1,8 @@
 package Model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Article
 {
     private int id, stock, seuil_remise;
@@ -7,6 +10,7 @@ public class Article
     private float prixUnitaire;
     private boolean disponibilite;
     private String image;
+    private List<Avis> avisList = new ArrayList<>();
 
     public Article(int id, int stock, int seuil_remise, String nom, String marque, String categorie, String description, float prixUnitaire, boolean disponibilite)
     {
@@ -77,5 +81,12 @@ public class Article
     public void setImage(String image)
     {
         this.image = image;
+    }
+    public List<Avis> getAvisList() {
+        return avisList;
+    }
+
+    public void ajouterAvis(Avis avis) {
+        avisList.add(avis);
     }
 }
