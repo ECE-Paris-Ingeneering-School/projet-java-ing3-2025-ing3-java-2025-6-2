@@ -46,7 +46,7 @@ public class FenetreControl extends JFrame implements ActionListener
                     fenetre.event.setVisible(true);
                 }
                 else
-                {
+                {   fenetre.articlepromo();
                     fenetre.setProfil();
                     fenetre.setPanier();
                     fenetre.accueil.setVisible(true);
@@ -367,7 +367,30 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.gestionClient.setVisible(false);
                 fenetre.histoPaiement.setVisible(false);
                 fenetre.histoCommande.setVisible(false);
+                fenetre.promo.setVisible(false);
                 break;
+            case "Promotions":
+                if(fenetre.profil.isVisible()){
+                    fenetre.promo.setVisible(true);
+                    fenetre.profil.setVisible(false);}
+                else if(fenetre.modif_article.isVisible()){
+                    fenetre.promo.setVisible(true);
+                    fenetre.modif_article.setVisible(false);}
+                else if(fenetre.accueil.isVisible()){
+                    fenetre.promo.setVisible(true);
+                }
+                else if(fenetre.articles.isVisible()){
+                    fenetre.promo.setVisible(true);
+                    fenetre.articles.setVisible(false);}
+                else if(fenetre.catalogue.isVisible()){
+                    fenetre.promo.setVisible(true);
+                    fenetre.catalogue.setVisible(false);}
+                else if(fenetre.panierFrame.isVisible()){
+                    fenetre.promo.setVisible(true);
+                    fenetre.panierFrame.setVisible(false);}
+                else if(fenetre.promo.isVisible()){
+                    fenetre.promo.setVisible(false);
+                    fenetre.promo.setVisible(true);}
         }
     }
 }

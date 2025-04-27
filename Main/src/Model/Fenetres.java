@@ -25,8 +25,8 @@ public class Fenetres extends JFrame
     private static final Color BACKGROUND_COLOR = new Color(128, 20, 41); // Rouge bordeaux
 
     /// Fenêtres de navigation
-    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, articles, ajout_commande, modif, modif_article, stats, histoPaiement, gestionClient, histoCommande;
-    public JFrame panierFrame; // Renamed from panier to avoid conflict
+    public JFrame inscrire, connecter, accueil, profil, event, paiement, catalogue, ajout_article, articles, ajout_commande, modif, modif_article, stats, histoPaiement, gestionClient, histoCommande, promo;
+    public JFrame panierFrame;
     /// Zones de saisie connexion et inscriptions
     public TextField nom, prenom, mail, mdp, mail_id, mdp_id;
     /// Zone de saisie de l'adresse pour commande (récupération des autres paramètres par le profil utilisé)
@@ -74,6 +74,7 @@ public class Fenetres extends JFrame
         histoPaiement = new JFrame();
         gestionClient = new JFrame();
         histoCommande = new JFrame();
+        promo = new JFrame();
 
         /// Configuration des fenêtres
         inscrire.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -88,6 +89,7 @@ public class Fenetres extends JFrame
         histoPaiement.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gestionClient.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         histoCommande.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        promo.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         /// Initialisation des autres composants
         DaoFactory daoFactory = DaoFactory.getInstance("ecommerce_db", "root", "");
@@ -110,6 +112,7 @@ public class Fenetres extends JFrame
         histoPaiement.getContentPane().setBackground(BACKGROUND_COLOR);
         gestionClient.getContentPane().setBackground(BACKGROUND_COLOR);
         histoCommande.getContentPane().setBackground(BACKGROUND_COLOR);
+        promo.getContentPane().setBackground(BACKGROUND_COLOR);
     }
 
     /// Mise en place du controleur
@@ -571,29 +574,70 @@ public class Fenetres extends JFrame
         return p;
     }
 
-    private JPanel createPromoSection()
+    public void articlepromo()
     {
-        JPanel promoPanel = new JPanel(new BorderLayout());
-        promoPanel.setBackground(new Color(245, 245, 245));
-        promoPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-        promoPanel.setPreferredSize(new Dimension(0, 200));
+        DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
+        UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
+        Utilisateurs user = new Utilisateurs(0, "", "", email, password, "");
+        Utilisateurs user_actuel = userdao.connexionUtilisateur(user);
 
-        JLabel promoTitle = new JLabel("Offres Spéciales");
-        promoTitle.setFont(new Font("Arial", Font.BOLD, 24));
+        promo.setSize(1200, 800);
+        promo.setTitle("Articles en Promotion - Maison Close");
+        promo.setLayout(new BorderLayout());
+        promo.getContentPane().setBackground(BACKGROUND_COLOR);
 
-        JLabel promoDesc = new JLabel("Jusqu'à 50% de réduction sur une sélection d'articles");
-        promoDesc.setFont(new Font("Arial", Font.PLAIN, 16));
+        // Barre de navigation
+        JPanel navBar = createNavigationBar();
+        promo.add(navBar, BorderLayout.NORTH);
 
-        JPanel textPanel = new JPanel();
-        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-        textPanel.setBackground(new Color(245, 245, 245));
-        textPanel.add(promoTitle);
-        textPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        textPanel.add(promoDesc);
+        // Panel principal avec fond bordeaux
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(BACKGROUND_COLOR);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        promoPanel.add(textPanel, BorderLayout.CENTER);
+        // Panel du contenu avec fond blanc
+        JPanel innerPanel = new JPanel(new BorderLayout());
+        innerPanel.setBackground(Color.WHITE);
+        innerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        return promoPanel;
+
+        JPanel productsGrid = new JPanel(new GridLayout(0, 4, 15, 15));
+        productsGrid.setBackground(Color.WHITE);
+
+        try {
+            ArticleDAOImpl articleDAO = new ArticleDAOImpl(dao);
+            java.util.List<Article> articles = articleDAO.getArticlesEnPromotion();
+
+            for (Article article : articles) {
+                JPanel productCard = createProductCard(article); // Créer la carte pour chaque article
+                productsGrid.add(productCard);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                    "Erreur lors du chargement des articles en promotion : " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
+        // Ajouter la grille des produits dans un JScrollPane
+        JScrollPane scrollPane = new JScrollPane(productsGrid);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        innerPanel.add(scrollPane, BorderLayout.CENTER);
+        mainPanel.add(innerPanel, BorderLayout.CENTER);
+
+        // Ajouter le JScrollPane à la fenêtre promo
+        promo.add(mainPanel, BorderLayout.CENTER);
+
+        // Bouton Retour en bas de la section promo
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel.setBackground(Color.WHITE);
+        JButton returnButton = new JButton("Retour");
+        returnButton.addActionListener(fenetreControl); // ActionListener pour le bouton Retour
+        bottomPanel.add(returnButton);
+        promo.add(bottomPanel, BorderLayout.SOUTH);
     }
 
     /// Fenêtre vue du profil utilisateur

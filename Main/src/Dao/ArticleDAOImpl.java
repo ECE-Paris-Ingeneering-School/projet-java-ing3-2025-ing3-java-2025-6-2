@@ -330,4 +330,5 @@ public class ArticleDAOImpl implements ArticleDAO
     public int Articlemin() {
         return getPrixMinMax("MIN");
     }
+
 }
