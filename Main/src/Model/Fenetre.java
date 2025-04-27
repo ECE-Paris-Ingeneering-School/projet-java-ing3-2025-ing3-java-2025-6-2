@@ -6,6 +6,9 @@ import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+/** Fenetre constitue l'ensemble des fenêtres utilisées dans ce projet
+ * @Réalisé ensemble
+ * */
 public interface Fenetre
 {
     /** Mise en place du controleur*
