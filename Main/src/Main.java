@@ -10,14 +10,6 @@ public class Main
         newFenetre.setControleur(control);
         /// Configuration des fenêtres
         newFenetre.setIdentification();
-        newFenetre.setInscrire();
-        newFenetre.setAccueil();
-        newFenetre.setPaiement();
-        newFenetre.setNewArticle();
-        newFenetre.setModifArticle();
-        newFenetre.setCatalogue();
-        newFenetre.setListeArticles();
-        newFenetre.setNewCommande();
         newFenetre.connecter.setVisible(true);
     }
 }

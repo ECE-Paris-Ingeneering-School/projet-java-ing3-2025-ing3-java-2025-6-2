@@ -30,9 +30,7 @@ public class FenetreControl extends JFrame implements ActionListener
         JButton button = (JButton) e.getSource();
         switch(button.getText())
         {
-            /** Valider est utilisé pour la connexion et l'inscription
-             * (d'autres actions utilisent le même principe mais avec des noms différents pour éviter de surcharger ce cas précis)
-             */
+            /// Connexion à un compte
             case "Se connecter":
                 fenetre.email = fenetre.mail_id.getText();
                 fenetre.password = fenetre.mdp_id.getText();
@@ -40,19 +38,21 @@ public class FenetreControl extends JFrame implements ActionListener
                 System.out.println(fenetre.password);
                 Utilisateurs user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
                 Utilisateurs connect = userdao.connexionUtilisateur(user);
-                if (connect == null)
+                if (connect == null) /// Vérification avec database
                 {
                     fenetre.setEvent("Erreur", "Erreur pendant la tentative de connexion");
                     fenetre.event.setVisible(true);
                 }
                 else
-                {   fenetre.articlepromo();
-                    fenetre.setProfil();
-                    fenetre.setPanier();
+                {
+                    /// Mise en place de certaines fenêtres
+                    fenetre.setAccueil();
                     fenetre.accueil.setVisible(true);
                     fenetre.connecter.setVisible(false);
+                    fenetre.connecter.getContentPane().removeAll();
                 }
                 break;
+            /// Validation d'une inscription
             case "Valider":
                 if (fenetre.inscrire.isVisible())
                 {
@@ -65,6 +65,7 @@ public class FenetreControl extends JFrame implements ActionListener
                     Utilisateurs new_user = new Utilisateurs(id, nom, prenom, mail, mot_de_passe, type_compte);
                     userdao.ajouterUtilisateur(new_user);
                     fenetre.inscrire.setVisible(false);
+                    fenetre.inscrire.getContentPane().removeAll();
                     fenetre.setEvent("Inscription", "Inscription terminee");
                     fenetre.connecter.setVisible(true);
                     fenetre.event.setVisible(true);
@@ -85,28 +86,37 @@ public class FenetreControl extends JFrame implements ActionListener
                 Article new_article = new Article(id_article, stock, seuil_remise, nom, marque, categorie, descriptionText, prix, true);
                 artdao.ajouterArticle(new_article); /// Ajout de l'objet
                 fenetre.ajout_article.setVisible(false);
+                fenetre.ajout_article.getContentPane().removeAll();
                 /// Fenêtre pop-up mise à jour pour confirmer l'action
                 fenetre.setEvent("Ajout article", "Ajout d'un article effectué");
                 fenetre.profil.setVisible(true);
                 fenetre.event.setVisible(true);
                 break;
+            ///Inscription d'un nouveau client
             case "S'inscrire":
+                fenetre.setInscrire();
                 fenetre.inscrire.setVisible(true);
                 fenetre.connecter.setVisible(false);
+                fenetre.connecter.getContentPane().removeAll();
                 break;
             case "Profil":
+                fenetre.setProfil();
                 fenetre.profil.setVisible(true);
                 break;
             case "Accueil":
+                fenetre.setAccueil();
                 fenetre.accueil.setVisible(true);
                 fenetre.connecter.setVisible(false);
+                fenetre.connecter.getContentPane().removeAll();
                 fenetre.profil.setVisible(false);
-                fenetre.inscrire.setVisible(false);
+                fenetre.profil.getContentPane().removeAll();
                 break;
             case "Ajouter article":
+                fenetre.setNewArticle();
                 fenetre.ajout_article.setVisible(true);
                 break;
             case "Editer un article":
+                fenetre.setModifArticle();
                 fenetre.modif_article.setVisible(true);
                 break;
             case "Modifier":
@@ -144,6 +154,9 @@ public class FenetreControl extends JFrame implements ActionListener
                 new_article = new Article(id_article, stock, seuil_remise, nom, marque, categorie, descriptionText, prix, true);
                 artdao.modifierArticle(new_article); /// Modification de l'objet
                 fenetre.modif.setVisible(false);
+                fenetre.modif_article.setVisible(false);
+                fenetre.modif.getContentPane().removeAll();
+                fenetre.modif_article.getContentPane().removeAll();
                 /// Fenêtre pop-up mise à jour pour confirmer l'action
                 fenetre.setEvent("Modification d'un article", "Modification effectuée");
                 fenetre.profil.setVisible(true);
@@ -156,18 +169,41 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.gestionClient.setVisible(true);
                 break;
             case "Deconnexion":
+                fenetre.setIdentification();
                 fenetre.connecter.setVisible(true);
-                fenetre.accueil.setVisible(false);
-                fenetre.inscrire.setVisible(false);
-                fenetre.profil.setVisible(false);
+
+                fenetre.ajout_article.setVisible(false);
                 fenetre.catalogue.setVisible(false);
                 fenetre.panierFrame.setVisible(false);
-                break;
-            case "Connexion" :
-                fenetre.connecter.setVisible(true);
-                fenetre.inscrire.setVisible(false);
+                fenetre.articles.setVisible(false);
+                fenetre.modif.setVisible(false);
+                fenetre.modif_article.setVisible(false);
+                fenetre.stats.setVisible(false);
+                fenetre.profil.setVisible(false);
+                fenetre.ajout_commande.setVisible(false);
+                fenetre.gestionClient.setVisible(false);
+                fenetre.histoPaiement.setVisible(false);
+                fenetre.histoCommande.setVisible(false);
+                fenetre.promo.setVisible(false);
+                fenetre.accueil.setVisible(false);
+
+                fenetre.ajout_article.getContentPane().removeAll();
+                fenetre.catalogue.getContentPane().removeAll();
+                fenetre.panierFrame.getContentPane().removeAll();
+                fenetre.articles.getContentPane().removeAll();
+                fenetre.modif.getContentPane().removeAll();
+                fenetre.modif_article.getContentPane().removeAll();
+                fenetre.stats.getContentPane().removeAll();
+                fenetre.profil.getContentPane().removeAll();
+                fenetre.ajout_commande.getContentPane().removeAll();
+                fenetre.gestionClient.getContentPane().removeAll();
+                fenetre.histoPaiement.getContentPane().removeAll();
+                fenetre.histoCommande.getContentPane().removeAll();
+                fenetre.promo.getContentPane().removeAll();
+                fenetre.accueil.getContentPane().removeAll();
                 break;
             case "Articles":
+                fenetre.setListeArticles();
                 fenetre.articles.setVisible(true);
                 break;
             /// Consultez les détails d'un article (en vue console)
@@ -248,12 +284,15 @@ public class FenetreControl extends JFrame implements ActionListener
                 }
                 break;
             case "Catalogue" :
+                fenetre.setCatalogue();
                 fenetre.catalogue.setVisible(true);
                 break;
             case "Commander":
+                fenetre.setNewCommande();
                 fenetre.ajout_commande.setVisible(true);
                 break;
             case "Payer":
+                fenetre.setPaiement();
                 /// Connexion pour récupérer l'utilisateur actuellement en ligne
                 CommandeDAOImpl comdao = new CommandeDAOImpl(dao);
                 PanierDAOImpl panierDAO = new PanierDAOImpl(dao);
@@ -265,13 +304,15 @@ public class FenetreControl extends JFrame implements ActionListener
                 /// Ajout d'une nouvelle commande
 
                 Commande nouveau = comdao.nouvelleCommande(client, adresse);
-                //Commande commande = comdao.getCommande(client); //Test pour regler le bug de creation de nouvelle commande
                 comdao.ajouterDansCommandeEnCours(nouveau, panier);
+                fenetre.setPaiement();
                 fenetre.paiement.setVisible(true);
                 fenetre.setEvent("Ajout commande", "Commande ajoutée");
                 fenetre.event.setVisible(true);
                 fenetre.ajout_commande.setVisible(false);
                 fenetre.panierFrame.setVisible(false);
+                fenetre.ajout_commande.getContentPane().removeAll();
+                fenetre.panierFrame.getContentPane().removeAll();
                 break;
             case "Valider et payer":
                 String paiement = (String) fenetre.payment_type.getSelectedItem();
@@ -292,6 +333,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.setEvent("Paiement commande", "Paiement effectué");
                 fenetre.event.setVisible(true);
                 fenetre.paiement.setVisible(false);
+                fenetre.paiement.getContentPane().removeAll();
                 break;
             case "Annuler":
                 comdao = new CommandeDAOImpl(dao);
@@ -300,8 +342,10 @@ public class FenetreControl extends JFrame implements ActionListener
                 client = new Client(connect.getIdentifiant(), connect.getNom(), connect.getPrenom(), connect.getEmail(), connect.getMotDePasse(), connect.getType_utilisateur());
                 comdao.modifierCommande(client);
                 fenetre.paiement.setVisible(false);
+                fenetre.paiement.getContentPane().removeAll();
                 fenetre.setEvent("Commande", "Commande annulée");
                 fenetre.event.setVisible(false);
+                fenetre.setAccueil();
                 fenetre.accueil.setVisible(true);
                 break;
             case "Voir":
@@ -330,12 +374,12 @@ public class FenetreControl extends JFrame implements ActionListener
                 }
                 break;
             case "Panier":
+                fenetre.setPanier();
                 fenetre.panierFrame.setVisible(true);
                 break;
             case "Statistiques":
                 fenetre.stats();
                 fenetre.stats.setVisible(true);
-                fenetre.profil.setVisible(false);
                 break;
             case "Historique":
                 dao = DaoFactory.getInstance("ecommerce_db", "root", "");
@@ -348,49 +392,88 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.histoPaiement.setVisible(true);
                 break;
             case "Retour":
+                if(fenetre.promo.isVisible())
+                {
+                    fenetre.promo.setVisible(false);
+                    fenetre.promo.getContentPane().removeAll();
+                }
+                else if (fenetre.modif.isVisible())
+                {
+                    fenetre.modif.setVisible(false);
+                    fenetre.modif.getContentPane().removeAll();
+                }
+                else if (fenetre.modif_article.isVisible())
+                {
+                    fenetre.modif_article.setVisible(false);
+                    fenetre.modif_article.getContentPane().removeAll();
+                }
+                else if (fenetre.ajout_article.isVisible())
+                {
+                    fenetre.ajout_article.setVisible(false);
+                    fenetre.ajout_article.getContentPane().removeAll();
+                }
+                else if (fenetre.histoCommande.isVisible())
+                {
+                    fenetre.histoCommande.setVisible(false);
+                    fenetre.histoCommande.getContentPane().removeAll();
+                }
+                else if (fenetre.histoPaiement.isVisible())
+                {
+                    fenetre.histoPaiement.setVisible(false);
+                    fenetre.histoPaiement.getContentPane().removeAll();
+                }
+                else if (fenetre.gestionClient.isVisible())
+                {
+                    fenetre.gestionClient.setVisible(false);
+                    fenetre.gestionClient.getContentPane().removeAll();
+                }
+                else if(fenetre.ajout_commande.isVisible())
+                {
+                    fenetre.ajout_commande.setVisible(false);
+                    fenetre.ajout_commande.getContentPane().removeAll();
+                }
+                else if (fenetre.profil.isVisible())
+                {
+                    fenetre.profil.setVisible(false);
+                    fenetre.profil.getContentPane().removeAll();
+                }
+                else if (fenetre.stats.isVisible())
+                {
+                    fenetre.stats.setVisible(false);
+                    fenetre.stats.getContentPane().removeAll();
+                }
+                else if(fenetre.articles.isVisible())
+                {
+                    fenetre.articles.setVisible(false);
+                    fenetre.articles.getContentPane().removeAll();
+                }
+                else if(fenetre.panierFrame.isVisible())
+                {
+                    fenetre.panierFrame.setVisible(false);
+                    fenetre.panierFrame.getContentPane().removeAll();
+                }
+                else if (fenetre.catalogue.isVisible())
+                {
+                    fenetre.catalogue.setVisible(false);
+                    fenetre.catalogue.getContentPane().removeAll();
+                }
+                break;
+            case "Fermer":
                 if(fenetre.inscrire.isVisible())
+                {
+                    fenetre.setIdentification();
                     fenetre.connecter.setVisible(true);
-                else if(fenetre.ajout_article.isVisible())
-                    fenetre.profil.setVisible(true);
-                else if(fenetre.gestionClient.isVisible() || fenetre.histoPaiement.isVisible())
-                    fenetre.profil.setVisible(true);
-                fenetre.ajout_article.setVisible(false);
+                    fenetre.inscrire.setVisible(false);
+                }
+                if(fenetre.inscrire != null)
+                {
+                    fenetre.inscrire.getContentPane().removeAll();
+                }
                 fenetre.event.setVisible(false);
-                fenetre.catalogue.setVisible(false);
-                fenetre.panierFrame.setVisible(false);
-                fenetre.articles.setVisible(false);
-                fenetre.modif.setVisible(false);
-                fenetre.modif_article.setVisible(false);
-                fenetre.stats.setVisible(false);
-                fenetre.profil.setVisible(false);
-                fenetre.ajout_commande.setVisible(false);
-                fenetre.gestionClient.setVisible(false);
-                fenetre.histoPaiement.setVisible(false);
-                fenetre.histoCommande.setVisible(false);
-                fenetre.promo.setVisible(false);
                 break;
             case "Promotions":
-                if(fenetre.profil.isVisible()){
-                    fenetre.promo.setVisible(true);
-                    fenetre.profil.setVisible(false);}
-                else if(fenetre.modif_article.isVisible()){
-                    fenetre.promo.setVisible(true);
-                    fenetre.modif_article.setVisible(false);}
-                else if(fenetre.accueil.isVisible()){
-                    fenetre.promo.setVisible(true);
-                }
-                else if(fenetre.articles.isVisible()){
-                    fenetre.promo.setVisible(true);
-                    fenetre.articles.setVisible(false);}
-                else if(fenetre.catalogue.isVisible()){
-                    fenetre.promo.setVisible(true);
-                    fenetre.catalogue.setVisible(false);}
-                else if(fenetre.panierFrame.isVisible()){
-                    fenetre.promo.setVisible(true);
-                    fenetre.panierFrame.setVisible(false);}
-                else if(fenetre.promo.isVisible()){
-                    fenetre.promo.setVisible(false);
-                    fenetre.promo.setVisible(true);}
+                fenetre.setArticlePromo();
+                fenetre.promo.setVisible(true);
         }
     }
 }

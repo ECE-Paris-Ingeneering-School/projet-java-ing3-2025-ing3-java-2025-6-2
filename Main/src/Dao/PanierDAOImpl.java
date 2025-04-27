@@ -86,7 +86,7 @@ public class PanierDAOImpl implements PanierDAO
             PanierDAOImpl panierDAO = new PanierDAOImpl(daoFactory);
             ArticleDAOImpl articleDAO = new ArticleDAOImpl(daoFactory);
             /// Vérifier si le panier existe ou si le stock d'un article est suffisant
-            if(panierDAO.getPanier(client) == null || articleDAO.getArticle(article.getId()).getStock() < 1)
+            if(panierDAO.getPanier(client) == null || articleDAO.getArticle(article.getId()).getStock() < quantite)
             {
                 System.out.println("Ajout d'un nouvel article impossible");
             }

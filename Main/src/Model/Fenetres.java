@@ -246,7 +246,7 @@ public class Fenetres extends JFrame
         validerButton.setFocusPainted(false);
         validerButton.addActionListener(fenetreControl);
 
-        JButton retourButton = new JButton("Retour");
+        JButton retourButton = new JButton("Fermer");
         retourButton.setBackground(new Color(240, 240, 240));
         retourButton.setForeground(Color.BLACK);
         retourButton.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -574,7 +574,7 @@ public class Fenetres extends JFrame
         return p;
     }
 
-    public void articlepromo()
+    public void setArticlePromo()
     {
         DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
         UtilisateurDAOImpl userdao = new UtilisateurDAOImpl(dao);
@@ -824,7 +824,7 @@ public class Fenetres extends JFrame
         JLabel label_event = new JLabel(description);
         text.add(label_event);
         JPanel erreur_button = new JPanel();
-        addButton(erreur_button, "Retour");
+        addButton(erreur_button, "Fermer");
         event.add(text, BorderLayout.CENTER);
         event.add(erreur_button, BorderLayout.SOUTH);
     }
@@ -2120,15 +2120,23 @@ public class Fenetres extends JFrame
         Object[][] data = new Object[paiements.size()][columns.length];
         for (int i = 0; i < paiements.size(); i++) {
             Paiement p = paiements.get(i);
-            JButton boutonVoir = new JButton("Voir");
-            boutonVoir.setActionCommand("Voir" + p.getCommande().getId());
-            boutonVoir.addActionListener(e -> fenetreControl.actionPerformed(e));
-            data[i][0] = String.valueOf(p.getCommande().getId());
-            data[i][1] = p.getDate();
-            data[i][2] = String.format("%.2f €", p.getMontant());
-            data[i][3] = p.getMoyen();
-            data[i][4] = p.getStatut();
-            data[i][5] = boutonVoir;
+            if (p.getCommande() == null)
+            {
+                setEvent("Erreur", "Pas de commandes passées");
+                event.setVisible(true);
+            }
+            else
+            {
+                JButton boutonVoir = new JButton("Voir");
+                boutonVoir.setActionCommand("Voir" + p.getCommande().getId());
+                boutonVoir.addActionListener(e -> fenetreControl.actionPerformed(e));
+                data[i][0] = String.valueOf(p.getCommande().getId());
+                data[i][1] = p.getDate();
+                data[i][2] = String.format("%.2f €", p.getMontant());
+                data[i][3] = p.getMoyen();
+                data[i][4] = p.getStatut();
+                data[i][5] = boutonVoir;
+            }
         }
         JTable table = new JTable(new javax.swing.table.DefaultTableModel(data, columns))
         {
