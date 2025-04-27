@@ -357,6 +357,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.ajout_article.setVisible(false);
                 fenetre.event.setVisible(false);
                 fenetre.catalogue.setVisible(false);
+                fenetre.setCatalogue("");
                 fenetre.panierFrame.setVisible(false);
                 fenetre.articles.setVisible(false);
                 fenetre.modif.setVisible(false);
@@ -391,6 +392,19 @@ public class FenetreControl extends JFrame implements ActionListener
                 else if(fenetre.promo.isVisible()){
                     fenetre.promo.setVisible(false);
                     fenetre.promo.setVisible(true);}
+                break;
+            /*case "Rechercher":
+                fenetre.createNavigationBar();
+                String recherche = fenetre.createNavigationBar().getText().toLowerCase().trim();
+                System.out.println(recherche);
+                // Appel de la méthode pour afficher les résultats filtrés
+                fenetre.setCatalogue(recherche);
+                fenetre.catalogue.revalidate();
+                fenetre.catalogue.repaint();
+                fenetre.catalogue.setVisible(true);
+                fenetre.RechercheEnCours.setText("");
+                System.out.println(recherche);
+                break;*/
         }
     }
 }

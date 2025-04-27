@@ -5,6 +5,7 @@ public class Main
 {
     public static void main(String[] args)
     {
+        String recherche = "";
         Fenetres newFenetre = new Fenetres();
         FenetreControl control = new FenetreControl(newFenetre);
         newFenetre.setControleur(control);
@@ -15,7 +16,7 @@ public class Main
         newFenetre.setPaiement();
         newFenetre.setNewArticle();
         newFenetre.setModifArticle();
-        newFenetre.setCatalogue();
+        newFenetre.setCatalogue( recherche);
         newFenetre.setListeArticles();
         newFenetre.setNewCommande();
         newFenetre.connecter.setVisible(true);

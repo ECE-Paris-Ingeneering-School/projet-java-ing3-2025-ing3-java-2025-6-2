@@ -35,6 +35,8 @@ public class Fenetres extends JFrame
     public TextField numero_carte, expiration_carte, cvv;
     /// Inscription utilisateur dans la database
     public String email, password;
+    /// String de la recherche trouvé ici:
+    //public JTextField RechercheEnCours;
 
     /// Gestion articles
     public TextField nom_article, description, prix, stock, seuil_remise, quantite; /// Zones de saisies article
@@ -51,6 +53,12 @@ public class Fenetres extends JFrame
 
     public List<LigneCommande> panier; // Changed to public
     public JLabel panierLabel;
+
+
+    /// checkboxes
+
+    private boolean estDispoCheck = false;
+    private boolean PrixBasCheck = false;
 
     /// Constructeur de chaque fenêtre
     public Fenetres()
@@ -421,7 +429,7 @@ public class Fenetres extends JFrame
     }
 
     /// Accueil : Barre de navigation
-    private JPanel createNavigationBar()
+    public JPanel createNavigationBar()
     {
         JPanel navBar = new JPanel(new BorderLayout());
         navBar.setBackground(Color.WHITE);
@@ -440,15 +448,47 @@ public class Fenetres extends JFrame
         Image resizedImage = originalImage.getScaledInstance(100, 40, Image.SCALE_SMOOTH);
         ImageIcon resizedIcon = new ImageIcon(resizedImage);
         JLabel logoLabel = new JLabel(resizedIcon);
-
-        JTextField searchField = new JTextField(30);
-        searchField.setBorder(BorderFactory.createCompoundBorder(
+        JTextField RechercheEnCours = new JTextField(15);
+        RechercheEnCours.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
+        JButton bouttonrecherche = new JButton();
+        bouttonrecherche.setPreferredSize(new Dimension(120, 30));
+        bouttonrecherche.setText("Rechercher");
+        bouttonrecherche.setBackground(Color.GRAY);
+        bouttonrecherche.setFocusPainted(false);
 
+        //JButton bouttonrecherche = createNavButton("Rechercher", e -> fenetreControl.actionPerformed(e));
+
+        JPanel petitpanel = new JPanel();
+        petitpanel.setLayout(new BorderLayout());
+        petitpanel.add(RechercheEnCours, BorderLayout.CENTER);
+
+
+        bouttonrecherche.addActionListener(e -> {
+            String recherche = RechercheEnCours.getText().toLowerCase().trim();
+            System.out.println("Texte de la recherche : " + recherche);
+
+            // Si la recherche n'est pas vide, on effectue la recherche
+                System.out.println("Exécution de la recherche...");
+                // Appel de la méthode pour afficher les résultats filtrés avec la recherche
+                setCatalogue(recherche);
+
+                // Forcer la réactualisation de l'affichage
+                catalogue.revalidate();
+                catalogue.repaint();
+                catalogue.setVisible(true);
+                System.out.println("Catalogue réactualisé");
+
+
+            // Réinitialiser le champ de recherche après l'action
+            RechercheEnCours.setText(""); // Vide le champ après la recherche
+        });
+        petitpanel.add(bouttonrecherche, BorderLayout.EAST);
         leftSection.add(logoLabel);
-        leftSection.add(searchField);
+        leftSection.add(petitpanel);
+
 
         /// Menu principal (centre)
         JPanel centerSection = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
@@ -1911,7 +1951,9 @@ public class Fenetres extends JFrame
     }
 
     /// Vue du catalogue
-    public void setCatalogue() {
+    public void setCatalogue(String recherche) {
+        catalogue.getContentPane().removeAll();
+        System.out.println("catalogue ouvert");
         catalogue.setSize(1200, 800);
         catalogue.setTitle("Catalogue");
         catalogue.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -1933,21 +1975,21 @@ public class Fenetres extends JFrame
         innerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         // Barre de recherche en haut
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        searchPanel.setBackground(Color.WHITE);
+        //JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        //searchPanel.setBackground(Color.WHITE);
 
-        JTextField searchField = new JTextField(40);
-        searchField.setPreferredSize(new Dimension(600, 35));
+        //JTextField searchField = new JTextField(40);
+        //searchField.setPreferredSize(new Dimension(600, 35));
 
-        JButton searchButton = new JButton("Rechercher");
-        searchButton.setBackground(new Color(51, 122, 183));
-        searchButton.setForeground(Color.WHITE);
-        searchButton.setPreferredSize(new Dimension(120, 35));
-        searchButton.setBorderPainted(false);
+        //JButton searchButton = new JButton("Rechercher");
+       // searchButton.setBackground(new Color(51, 122, 183));
+       // searchButton.setForeground(Color.WHITE);
+        //searchButton.setPreferredSize(new Dimension(120, 35));
+        //searchButton.setBorderPainted(false);
 
-        searchPanel.add(searchField);
-        searchPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-        searchPanel.add(searchButton);
+        //searchPanel.add(searchField);
+        //searchPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        //searchPanel.add(searchButton);
 
         // Panel des catégories
         JPanel categoryPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -1962,7 +2004,7 @@ public class Fenetres extends JFrame
         // Panel du haut combinant recherche et catégories
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(Color.WHITE);
-        topPanel.add(searchPanel, BorderLayout.NORTH);
+       // topPanel.add(searchPanel, BorderLayout.NORTH);
         topPanel.add(categoryPanel, BorderLayout.CENTER);
         innerPanel.add(topPanel, BorderLayout.NORTH);
 
@@ -1971,45 +2013,68 @@ public class Fenetres extends JFrame
         contentPanel.setBackground(Color.WHITE);
 
         // Filtres à gauche
-        JPanel filterPanel = new JPanel();
-        filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
-        filterPanel.setBackground(Color.WHITE);
-        filterPanel.setBorder(BorderFactory.createCompoundBorder(
+        JPanel filtrePanel = new JPanel();
+        filtrePanel.setLayout(new BoxLayout(filtrePanel, BoxLayout.Y_AXIS));
+        filtrePanel.setBackground(Color.WHITE);
+        filtrePanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(230, 230, 230)),
                 BorderFactory.createEmptyBorder(10, 10, 10, 20)
         ));
-        filterPanel.setPreferredSize(new Dimension(200, 0));
+        filtrePanel.setPreferredSize(new Dimension(200, 0));
 
         // Titre des filtres
-        JLabel filterTitle = new JLabel("Filtre");
-        filterTitle.setFont(new Font("Arial", Font.BOLD, 16));
-        filterPanel.add(filterTitle);
-        filterPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        JLabel filtreTitle = new JLabel("Filtre");
+        filtreTitle.setFont(new Font("Arial", Font.BOLD, 16));
+        filtrePanel.add(filtreTitle);
+        filtrePanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Ajout des différents filtres
-        String[] filterCategories = {"Prix", "Disponibilité", "Nouveautés", "Prix bas"};
-        for (String filter : filterCategories) {
-            JCheckBox checkbox = new JCheckBox(filter);
-            checkbox.setBackground(Color.WHITE);
-            filterPanel.add(checkbox);
-            filterPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        }
+        JCheckBox DispoCheckBox = new JCheckBox("Disponibilité");
+        DispoCheckBox.setBackground(Color.WHITE);
+        JCheckBox PrixBasCheckBox = new JCheckBox("Prix bas");
+        PrixBasCheckBox.setBackground(Color.WHITE);
 
-        contentPanel.add(filterPanel, BorderLayout.WEST);
+        DispoCheckBox.setSelected(estDispoCheck);
+        PrixBasCheckBox.setSelected(PrixBasCheck);
+
+        filtrePanel.add(DispoCheckBox);
+        filtrePanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        filtrePanel.add(PrixBasCheckBox);
+        filtrePanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        contentPanel.add(filtrePanel, BorderLayout.WEST);
 
         // Grille de produits à droite
         JPanel productsGrid = new JPanel(new GridLayout(0, 4, 15, 15));
         productsGrid.setBackground(Color.WHITE);
-
+        productsGrid.removeAll();
         try {
             DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
             ArticleDAOImpl articleDAO = new ArticleDAOImpl(dao);
             java.util.List<Article> articles = articleDAO.listerArticles();
-
             for (Article article : articles) {
-                JPanel productCard = createProductCard(article);
-                productsGrid.add(productCard);
+                boolean matchesSearch = article.getNom().toLowerCase().contains(recherche) ||
+                        article.getDescription().toLowerCase().contains(recherche) ||
+                        article.getCategorie().toLowerCase().contains(recherche) ||
+                        article.getMarque().toLowerCase().contains(recherche);
+
+                String selectedCategory = (String) categoryFilter.getSelectedItem();
+                boolean matchesCategory = selectedCategory.equals("Tous") || article.getCategorie().equals(selectedCategory);
+
+                boolean CaseDispo = !DispoCheckBox.isSelected() || article.getStock()>0;
+                boolean CasePrixBas = !PrixBasCheckBox.isSelected() || article.getPrixUnitaire() < 50.0;
+
+                if (matchesSearch && matchesCategory && CaseDispo && CasePrixBas) {
+                    JPanel productCard = createProductCard(article);
+                    productsGrid.add(productCard);
+                }
+                productsGrid.revalidate();
+                productsGrid.repaint();
+                contentPanel.revalidate();
+                contentPanel.repaint();
+                mainPanel.revalidate();
+                mainPanel.repaint();
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this,
@@ -2035,7 +2100,19 @@ public class Fenetres extends JFrame
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         catalogue.add(mainPanel);
+        catalogue.revalidate();
+        catalogue.repaint();
     }
+
+    public void CheckboxTest(JCheckBox DispoCheckBox,JCheckBox PrixBasCheckBox) {
+        estDispoCheck = DispoCheckBox.isSelected();
+        PrixBasCheck = PrixBasCheckBox.isSelected();
+    }
+    public void CheckboxRend(JCheckBox DispoCheckBox,JCheckBox PrixBasCheckBox) {
+        DispoCheckBox.setSelected(estDispoCheck);
+        PrixBasCheckBox.setSelected(PrixBasCheck);
+    }
+
 
     public void afficherDetailsArticle(Article article) {
         // Créer une nouvelle fenêtre pour les détails

@@ -331,4 +331,32 @@ public class ArticleDAOImpl implements ArticleDAO
         return getPrixMinMax("MIN");
     }
 
+    public List<Article> getNouveau() {
+        List<Article> articles = new ArrayList<>();
+        return articles;
+    }
+    public List<Article> getDispo() {
+        List<Article> articles = new ArrayList<>();
+        return articles;
+    }
+    public int getPrixBasFiltre() {
+        int price = 0;
+        String query = "SELECT prix AS comptArt FROM article WHERE prix<50";
+
+        try
+        {
+            Connection connexion = daoFactory.getConnection();
+            PreparedStatement preparedStatement = connexion.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next())
+            {
+                price = resultSet.getInt("comptArt");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Erreur lors de la récupération du prix ");
+        }
+        return price;
+    }
 }

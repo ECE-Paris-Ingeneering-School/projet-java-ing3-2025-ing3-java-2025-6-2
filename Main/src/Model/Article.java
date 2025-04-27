@@ -78,4 +78,5 @@ public class Article
     {
         this.image = image;
     }
+
 }
