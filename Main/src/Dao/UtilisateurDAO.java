@@ -5,7 +5,7 @@ import Model.Utilisateurs;
 import java.util.List;
 
 /** Gestion de la base de données utilisateur
- * @Par Andy et Alara
+ * @Réalisé ensemble
  */
 public interface UtilisateurDAO
 {

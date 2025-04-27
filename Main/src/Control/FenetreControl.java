@@ -70,6 +70,7 @@ public class FenetreControl extends JFrame implements ActionListener
                     fenetre.inscrire.setVisible(false);
                     fenetre.inscrire.getContentPane().removeAll();
                     fenetre.setEvent("Inscription", "Inscription terminee");
+                    fenetre.setIdentification();
                     fenetre.connecter.setVisible(true);
                     fenetre.event.setVisible(true);
                 }

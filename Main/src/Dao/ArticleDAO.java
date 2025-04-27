@@ -5,7 +5,7 @@ import Model.Article;
 import java.util.List;
 
 /** Gestion des articles et de la table associée
- * @Par Andy et Alara
+ * @Réalisé ensemble
  * */
 public interface ArticleDAO
 {

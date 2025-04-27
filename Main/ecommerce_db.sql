@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : Dim 27 avr. 2025 à 18:57
+-- Généré le : Dim 27 avr. 2025 à 19:31
 -- Version du serveur :  5.7.31
 -- Version de PHP : 7.3.21
 
@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `article` (
 --
 
 INSERT INTO `article` (`id_article`, `nom`, `description`, `prix`, `stock`, `seuil_remise`, `categorie`, `marque`, `image_principale`, `disponibilite`, `date_ajout`) VALUES
+(379355638, 'Tele', 'Une télévision comme une autre', '123.00', 145, 4, 'Electromenager', 'Samsung', 'image/default_product.png', 1, '2025-04-27 21:28:54'),
 (832745446, 'y', 'Produit y', '14.00', 57, 8, 'Nourriture', 'Samsung', 'image/default_product.png', 1, '2025-04-23 16:26:24'),
 (949478470, 'ae', 'Un produit test', '12.00', 115, 5, 'Electromenager', 'Bosch', 'image/default_product.png', 1, '2025-04-17 17:28:56'),
 (949478471, 'Café en grains Bio', 'Café Arabica 100% bio, origine Brésil, paquet de 1kg', '12.90', 47, 10, 'Nourriture', 'Ethica', 'image/nourriture/cafe_bio.png', 1, '2025-04-17 20:00:39'),
@@ -283,24 +284,6 @@ CREATE TABLE IF NOT EXISTS `promotion` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `session`
---
-
-DROP TABLE IF EXISTS `session`;
-CREATE TABLE IF NOT EXISTS `session` (
-  `id_session` varchar(255) NOT NULL,
-  `id_utilisateur` int(11) NOT NULL,
-  `date_debut` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `date_expiration` datetime NOT NULL,
-  `adresse_ip` varchar(45) DEFAULT NULL,
-  `user_agent` text,
-  PRIMARY KEY (`id_session`),
-  KEY `id_utilisateur` (`id_utilisateur`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
 -- Structure de la table `utilisateur`
 --
 
@@ -324,8 +307,10 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
 --
 
 INSERT INTO `utilisateur` (`id_utilisateur`, `nom`, `prenom`, `email`, `mot_de_passe`, `type_utilisateur`, `fidelite`, `date_creation`, `date_derniere_connexion`) VALUES
-(121615499, 'Andriamanga', 'Andy', 'anyandri@gmail.com', 'Andy*2004', 'client', 'Bronze', '2025-04-27 16:03:16', NULL),
-(1022904176, 'Andria', 'Andy', 'andri@gmail.com', '123456', 'admin', 'Admin', '2025-04-17 11:47:16', NULL),
+(121615499, 'Andriamanga', 'Andy', 'andyandria@gmail.com', 'Andy*2004', 'client', 'Bronze', '2025-04-27 16:03:16', NULL),
+(405552660, 'Lanquetin', 'Octave', 'olanquetin@mail.com', 'olanquetin', 'admin', 'Bronze', '2025-04-27 21:26:39', NULL),
+(979134441, 'Tanguy', 'Alara', 'atanguy@mail.com', 'atanguy', 'admin', 'Bronze', '2025-04-27 21:28:07', NULL),
+(1022904176, 'Andria', 'Andy', 'andri@gmail.com', '123456', 'admin', 'Bronze', '2025-04-17 11:47:16', NULL),
 (1335405254, 'ae', 'ae', 'ae@mail.com', 'ae', 'client', 'Bronze', '2025-04-17 17:25:53', NULL),
 (2139289818, 'Andry', 'Andre', 'andry@mail.fr', 'sardine', 'client', 'Bronze', '2025-04-17 14:56:27', NULL);
 
@@ -378,12 +363,6 @@ ALTER TABLE `panier`
 --
 ALTER TABLE `promotion`
   ADD CONSTRAINT `promotion_ibfk_1` FOREIGN KEY (`id_article`) REFERENCES `article` (`id_article`);
-
---
--- Contraintes pour la table `session`
---
-ALTER TABLE `session`
-  ADD CONSTRAINT `session_ibfk_1` FOREIGN KEY (`id_utilisateur`) REFERENCES `utilisateur` (`id_utilisateur`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

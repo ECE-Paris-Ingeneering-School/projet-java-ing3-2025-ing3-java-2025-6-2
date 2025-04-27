@@ -19,7 +19,7 @@ import Exception.ErrorType;
 /** Fenetres constitue l'ensemble des interfaces graphiques utilisées au cour du projet
  * @L'ensemble des liens entre elles sont effectuées ici
  */
-public class Fenetres extends JFrame
+public class Fenetres extends JFrame implements Fenetre
 {
     /// Constante pour la couleur de fond
     private static final Color BACKGROUND_COLOR = new Color(128, 20, 41); // Rouge bordeaux
@@ -125,13 +125,11 @@ public class Fenetres extends JFrame
         promo.getContentPane().setBackground(BACKGROUND_COLOR);
     }
 
-    /// Mise en place du controleur
     public void setControleur(FenetreControl controleur)
     {
         this.fenetreControl = controleur;
     }
 
-    /// Fenêtre inscription utilisateur
     public void setInscrire()
     {
         inscrire.setSize(900, 700);
@@ -272,7 +270,6 @@ public class Fenetres extends JFrame
         inscrire.add(mainPanel);
     }
 
-    /// Fenêtre connexion utilisateur
     public void setIdentification()
     {
         connecter.setSize(900, 700);
@@ -358,7 +355,6 @@ public class Fenetres extends JFrame
         connecter.add(mainPanel, gbc);
     }
 
-    /// Fenêtre page d'accueil
     public void setAccueil()
     {
         /// Configuration de la fenêtre principale
@@ -430,7 +426,6 @@ public class Fenetres extends JFrame
         accueil.repaint();
     }
 
-    /// Fenêtre vue du profil utilisateur
     public void setProfil()
     {
         /// Appel de la requête connexion pour utiliser le profil actuel
@@ -604,7 +599,6 @@ public class Fenetres extends JFrame
         profil.add(mainPanel);
     }
 
-    /// Gestion de certains événements (côté réaliste et débuggage)
     public void setEvent(String titre, String description)
     {
         event.setSize(300, 100);
@@ -619,7 +613,6 @@ public class Fenetres extends JFrame
         event.add(erreur_button, BorderLayout.SOUTH);
     }
 
-    /// Fenetres principales : Barre de navigation
     public JPanel createNavigationBar()
     {
         JPanel navBar = new JPanel(new BorderLayout());
@@ -699,8 +692,7 @@ public class Fenetres extends JFrame
         return navBar;
     }
 
-    /// Fenetres principales : Création d'un bouton de navigation
-    private JButton createNavButton(String text, ActionListener listener) {
+    public JButton createNavButton(String text, ActionListener listener) {
         JButton button = new JButton(text);
         button.setBorderPainted(false);
         button.setContentAreaFilled(false);
@@ -725,8 +717,7 @@ public class Fenetres extends JFrame
         return card;
     }
 
-    /// Méthode pour créer une carte de produit avec image
-    private JPanel createProductCard(Article article) {
+    public JPanel createProductCard(Article article) {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
         p.setBackground(Color.WHITE);
@@ -854,7 +845,6 @@ public class Fenetres extends JFrame
         promo.add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    /// Paiement d'un article
     public void setPaiement()
     {
         paiement = new JFrame();
@@ -895,7 +885,6 @@ public class Fenetres extends JFrame
         paiement.add(paiement_button);
     }
 
-    /// Ajout d'un bouton sur une page
     public void addButton(JPanel panel, String label)
     {
         JButton button = new JButton(label);
@@ -906,7 +895,6 @@ public class Fenetres extends JFrame
         panel.add(button);
     }
 
-    /// Vue Articles
     public void setListeArticles()
     {
         articles.setTitle("Articles");
@@ -965,8 +953,7 @@ public class Fenetres extends JFrame
         articles.add(mainPanel);
     }
 
-    /// Carte d'identité d'un article
-    private JPanel createArticlePanel(Article article) {
+    public JPanel createArticlePanel(Article article) {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.setBackground(Color.WHITE);
@@ -1080,8 +1067,7 @@ public class Fenetres extends JFrame
         return panel;
     }
 
-    /// Méthode pour obtenir le nom du fichier image correspondant
-    private String getImageFileName(String nomArticle, String categorie) {
+    public String getImageFileName(String nomArticle, String categorie) {
         // Normalisation de la catégorie
         String categorieNormalisee = categorie.toLowerCase()
                 .replace("vêtements", "vetements")
@@ -1150,8 +1136,7 @@ public class Fenetres extends JFrame
         return "default_product.png";
     }
 
-    /// Pour certaines fenêtres : Bouton retour
-    private void creerRetour() {
+    public void creerRetour() {
         PannelRetour = new JPanel();
         PannelRetour.setBackground(new Color(240, 240, 240));
         PannelRetour.setPreferredSize(new Dimension(getWidth(), 100));
@@ -1160,7 +1145,6 @@ public class Fenetres extends JFrame
         addButton(PannelRetour, "Retour");
     }
 
-    /// Vue Panier
     public void setPanier() {
         panierFrame.setTitle("Panier");
         panierFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -1307,8 +1291,7 @@ public class Fenetres extends JFrame
         panierFrame.add(mainPanel);
     }
 
-    /// Carte d'identité d'un produit
-    private JPanel createCartItemPanel(Article article) {
+    public JPanel createCartItemPanel(Article article) {
         JPanel itemPanel = new JPanel(new BorderLayout(15, 0));
         itemPanel.setBackground(Color.WHITE);
         itemPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -1400,7 +1383,6 @@ public class Fenetres extends JFrame
         return itemPanel;
     }
 
-    /// Vue nouvelle commande (adresse à renseigner, le reste est récupéré)
     public void setNewCommande()
     {
         ajout_commande = new JFrame();
@@ -1421,7 +1403,6 @@ public class Fenetres extends JFrame
         ajout_commande.add(ajout_article_button);
     }
 
-    /// Vue modif Article
     public void setModifArticle()
     {
         modif_article.setTitle("Modifier un article");
@@ -1451,8 +1432,7 @@ public class Fenetres extends JFrame
         modif_article.add(mainPanel);
     }
 
-    /// Vue Modification d'un produit (pour admin)
-    private void ProduitsModif()
+    public void ProduitsModif()
     {
         try
         {
@@ -1567,8 +1547,7 @@ public class Fenetres extends JFrame
         }
     }
 
-    /// Modifier un article (seulement pour les admins)
-    private JPanel modifArticle(Article article)
+    public JPanel modifArticle(Article article)
     {
         JPanel p = new JPanel();
         p.setBackground(Color.WHITE);
@@ -1709,7 +1688,6 @@ public class Fenetres extends JFrame
         return p;
     }
 
-    /// Modification d'un article (seulement pour les admins), sur la même base que ajouter un article
     public void setModifierArticle(Article article)
     {
         id_article = article.getId();
@@ -1850,8 +1828,7 @@ public class Fenetres extends JFrame
 
     }
 
-    /// Titre d'un panel d'une page
-    private JPanel createTitlePanel(String title) {
+    public JPanel createTitlePanel(String title) {
         JPanel titlePanel = new JPanel();
         titlePanel.setPreferredSize(new Dimension(getWidth(), 100));
         titlePanel.setBackground(Color.WHITE);
@@ -1867,7 +1844,6 @@ public class Fenetres extends JFrame
         return titlePanel;
     }
 
-    /// Vue nouvelle article (seulement pour les administrateurs)
     public void setNewArticle()
     {
         ajout_article.setSize(900, 700);
@@ -1941,7 +1917,6 @@ public class Fenetres extends JFrame
         ajout_article.add(panelBoutons);
     }
 
-    /// Vue du catalogue
     public void setCatalogue(String recherche) {
         System.out.println("catalogue ouvert");
         catalogue.setSize(1200, 800);
@@ -2090,7 +2065,6 @@ public class Fenetres extends JFrame
         PrixBasCheckBox.setSelected(PrixBasCheck);
     }
 
-    /// Vue détail d'un article spécifique
     public void afficherDetailsArticle(Article article)
     {
         DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
@@ -2164,7 +2138,7 @@ public class Fenetres extends JFrame
         Object[][] data = new Object[liste_avis.size()][columns.length];
         for (int i = 0; i < liste_avis.size(); i++) {
             Avis p = liste_avis.get(i);
-            data[i][0] = p.getClient().getNom();
+            data[i][0] = p.getClient().getIdentifiant();
             data[i][1] = p.getArticle().getNom();
             data[i][2] = p.getCommentaire();
             data[i][3] = p.getNote();
@@ -2194,7 +2168,6 @@ public class Fenetres extends JFrame
         detailsDialog.setVisible(true);
     }
 
-    /// Vue historique des paiements
     public void setHistoriquePaiement(List<Paiement> paiements)
     {
         histoPaiement.setTitle("Historique des paiements");
@@ -2251,7 +2224,6 @@ public class Fenetres extends JFrame
         histoPaiement.add(PannelRetour, BorderLayout.SOUTH);
     }
 
-    /// Vue Historique commande
     public void setHistoCommande(Commande commande)
     {
         histoCommande.setTitle("Historique");
@@ -2375,7 +2347,6 @@ public class Fenetres extends JFrame
         histoCommande.add(mainPanel);
     }
 
-    /// Vue générale de l'ensemble des clients enregistrés
     public void setGestionClient(List<Utilisateurs> clients)
     {
         gestionClient.setTitle("Gestion des clients & fidélité");
