@@ -16,15 +16,12 @@ public class UtilisateurDAOImpl implements UtilisateurDAO
         this.daoFactory = daoFactory;
     }
 
-    /** Utilisé dans le profil
-     * @Récupère les informations d'un utilisateur pour les afficher dans son profil ou dans les autres pages nécessitant l'utilisation de ses données
-     */
     public Utilisateurs connexionUtilisateur(Utilisateurs utilisateur)
     {
         Utilisateurs user = null;
         try
         {
-            /// connexion à la base de données
+            /// Connexion à la base de données
             Connection connexion = daoFactory.getConnection();
             Statement statement = connexion.createStatement();
 
@@ -42,22 +39,13 @@ public class UtilisateurDAOImpl implements UtilisateurDAO
         }
         catch (SQLException e)
         {
-            ///traitement de l'exception
+            /// Traitement de l'exception
             e.printStackTrace();
             System.out.println("Utilisateur inconnu");
         }
         return user;
     }
 
-    @Override
-    public UtilisateurDAO getUtilisateur()
-    {
-        return this;
-    }
-
-    /** Utilisé pour la création d'un compte
-     * @Ajoute un nouvel utilisateur dans la base de données
-     */
     public void ajouterUtilisateur(Utilisateurs utilisateur)
     {
         try
@@ -65,7 +53,7 @@ public class UtilisateurDAOImpl implements UtilisateurDAO
             /// connexion
             Connection connexion = daoFactory.getConnection();
 
-            /// récupération des informations saisies dans la page d'inscription
+            /// Récupération des informations saisies dans la page d'inscription
             int id_utilisateur = utilisateur.getIdentifiant();
             String nom = utilisateur.getNom();
             String prenom = utilisateur.getPrenom();
@@ -73,7 +61,7 @@ public class UtilisateurDAOImpl implements UtilisateurDAO
             String mdp = utilisateur.getMotDePasse();
             String type_utilisateur = utilisateur.getType_utilisateur();
 
-            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+            /// Exécution de la requête INSERT INTO de l'objet utilisateur en paramètre
             PreparedStatement preparedStatement = connexion.prepareStatement("INSERT INTO utilisateur(id_utilisateur, nom, prenom, email, mot_de_passe, type_utilisateur, fidelite) VALUES ('"+id_utilisateur+"', '"+nom+"', '"+prenom+"', '"+mail+"', '"+mdp+"', '" +type_utilisateur+ "', 'Bronze')");
             preparedStatement.executeUpdate();
 
@@ -81,7 +69,7 @@ public class UtilisateurDAOImpl implements UtilisateurDAO
         catch (SQLException e)
         {
             e.printStackTrace();
-            System.out.println("Ajout du client impossible");
+            System.out.println("Ajout de l'utilisateur impossible");
         }
     }
 
@@ -93,7 +81,7 @@ public class UtilisateurDAOImpl implements UtilisateurDAO
         try {
             connexion = daoFactory.getConnection();
 
-            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+            /// EComptage du nombre de clients dans la liste d'utilisateurs
             preparedStatement = connexion.prepareStatement("SELECT COUNT(*) AS comptCli FROM utilisateur WHERE type_utilisateur = ?");
             preparedStatement.setString(1, "client");
             resultSet = preparedStatement.executeQuery();

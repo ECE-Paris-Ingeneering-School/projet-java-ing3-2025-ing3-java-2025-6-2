@@ -2,26 +2,32 @@ package Dao;
 
 import Model.Utilisateurs;
 
+import java.util.List;
+
 /** Gestion de la base de données utilisateur
+ * @Par Andy et Alara
  */
 public interface UtilisateurDAO
 {
-    /**
-     * Utilisé dans le profil
-     *
-     * @Récupère les informations d'un utilisateur pour les afficher dans son profil
-     */
-    public UtilisateurDAO getUtilisateur();
 
-    /** Utilisé pour la création d'un compte
-     * @Ajoute un nouvel utilisateur dans la base de données
+    /** Ajoute un nouvel utilisateur dans la base de données
+     * @param utilisateur Utilisateur à ajouter
      */
     public void ajouterUtilisateur(Utilisateurs utilisateur);
 
     /** Utilisé pour la connexion
-     * @Permet à un utilisateur de se connecter
+     * @param utilisateur L'utilisateur qui se connecte
+     * @return l'utilisateur connecté (connexion normale ou récupération des informations)
      */
     public Utilisateurs connexionUtilisateur(Utilisateurs utilisateur);
 
+    /** Compte le nombre de client
+     * @return Le nombre de clients enregistrés
+     * */
     public int compteClients();
+
+    /** Récupère l'ensemble des statuts des clients et les mets à jour si nécessaire
+     * @return La liste des utilisateurs
+     * */
+    public List<Utilisateurs> getAllClientsWithFidelity();
 }

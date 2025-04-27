@@ -7,26 +7,39 @@ import Model.Panier;
 
 import java.util.List;
 
+/** Gestion des commandes et de la table associée
+ * @Par Andy et Octave
+ * */
 public interface CommandeDAO
 {
-    /**Permet de créer une nouvelle commande*
-     * @A partir du client, de son panier er de l'adresse saisie
+    /**Permet de créer une nouvelle commande
+     * @param client Client concerné
+     * @param adresse Adresse saisie
+     * @return Nouvelle commande créée
      */
     public Commande nouvelleCommande(Client client, String adresse);
+
     /** Ajoute les articles du panier dans la commande en cours
-     * @Utilise la commande + le panier en cours
+     * @param commande Commande nouvellement créée
+     * @param panier Le dernier panier enregistré
      * */
     public void ajouterDansCommandeEnCours(Commande commande, Panier panier);
+
     /** Modifie les informations de la commande (généralement son statut)
-     * @Utilise le client concerné
+     * @param client Le client passant commande
      */
     public void modifierCommande(Client client);
+
+    /** Met à jour le statut de la commande
+     * @param commande La commande nouvellement créée et traitée
+     * */
     public void paiementCommande(Commande commande);
+
     /** Récupère une commande spécifique
-     * @Utilise le client concerné
+     * @param client Le client connecté
+     * @return La commande recherchée
      * */
     public Commande getCommande(Client client);
-    /** Récupère l'ensemble des commandes
-     * */
+
     public List<Commande> getCommandes(int limit, int id_commande);
 }

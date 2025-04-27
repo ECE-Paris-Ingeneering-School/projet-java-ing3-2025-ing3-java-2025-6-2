@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : Dim 27 avr. 2025 à 15:37
+-- Généré le : Dim 27 avr. 2025 à 16:55
 -- Version du serveur :  5.7.31
 -- Version de PHP : 7.3.21
 
@@ -50,9 +50,9 @@ CREATE TABLE IF NOT EXISTS `article` (
 INSERT INTO `article` (`id_article`, `nom`, `description`, `prix`, `stock`, `seuil_remise`, `categorie`, `marque`, `image_principale`, `disponibilite`, `date_ajout`) VALUES
 (832745446, 'y', 'Produit y', '14.00', 57, 8, 'Nourriture', 'Samsung', 'image/default_product.png', 1, '2025-04-23 16:26:24'),
 (949478470, 'ae', 'Un produit test', '12.00', 115, 5, 'Electromenager', 'Bosch', 'image/default_product.png', 1, '2025-04-17 17:28:56'),
-(949478471, 'Café en grains Bio', 'Café Arabica 100% bio, origine Brésil, paquet de 1kg', '12.90', 48, 10, 'Nourriture', 'Ethica', 'image/nourriture/cafe_bio.png', 1, '2025-04-17 20:00:39'),
+(949478471, 'Café en grains Bio', 'Café Arabica 100% bio, origine Brésil, paquet de 1kg', '12.90', 47, 10, 'Nourriture', 'Ethica', 'image/nourriture/cafe_bio.png', 1, '2025-04-17 20:00:39'),
 (949478472, 'Chocolat noir 70%', 'Tablette de chocolat noir équitable, 200g', '3.50', 100, 20, 'Nourriture', 'Alter Eco', 'image/nourriture/chocolat_noir.png', 1, '2025-04-17 20:00:39'),
-(949478473, 'Miel de lavande', 'Miel artisanal de Provence, pot en verre de 500g', '8.20', 30, 5, 'Nourriture', 'Miel & Nous', 'image/nourriture/miel_lavande.png', 1, '2025-04-17 20:00:39'),
+(949478473, 'Miel de lavande', 'Miel artisanal de Provence, pot en verre de 500g', '8.20', 29, 5, 'Nourriture', 'Miel & Nous', 'image/nourriture/miel_lavande.png', 1, '2025-04-17 20:00:39'),
 (949478474, 'Pâtes complètes', 'Pâtes artisanales à la farine complète, sachet de 500g', '2.10', 80, 15, 'Nourriture', 'Terra Bio', 'image/nourriture/pates_completes.png', 1, '2025-04-17 20:00:39'),
 (949478475, 'Huile d\'olive extra vierge', 'Huile d\'olive AOP de Nyons, bouteille de 75cl', '9.90', 39, 5, 'Nourriture', 'Oliviers & Co', 'image/nourriture/huile_olive.png', 1, '2025-04-17 20:00:39'),
 (949478476, 'Confiture de framboise', 'Confiture maison sans additifs, pot de 370g', '4.50', 60, 10, 'Nourriture', 'Maison Douce', 'image/nourriture/confiture_framboise.png', 1, '2025-04-17 20:00:39'),
@@ -107,7 +107,8 @@ CREATE TABLE IF NOT EXISTS `commande` (
 --
 
 INSERT INTO `commande` (`id_commande`, `id_client`, `date_commande`, `statut`, `adresse_livraison`, `montant_total`) VALUES
-(97874786, 121615499, '2025-04-27 16:30:51', 'payée', 'ty', '12.00');
+(97874786, 121615499, '2025-04-27 16:30:51', 'payée', 'ty', '12.00'),
+(818365035, 1022904176, '2025-04-27 17:42:17', 'payée', 'taro', '14.00');
 
 -- --------------------------------------------------------
 
@@ -135,7 +136,8 @@ CREATE TABLE IF NOT EXISTS `lignecommande` (
 --
 
 INSERT INTO `lignecommande` (`id_ligne_commande`, `id_commande`, `id_article`, `id_promotion`, `quantite`, `prix_unitaire`, `prix_apres_remise`) VALUES
-(224221002, 97874786, 949478471, NULL, 1, '12.00', '12.00');
+(224221002, 97874786, 949478471, NULL, 1, '12.00', '12.00'),
+(532661992, 818365035, 832745446, NULL, 1, '14.00', '14.00');
 
 -- --------------------------------------------------------
 
@@ -159,7 +161,8 @@ CREATE TABLE IF NOT EXISTS `lignepanier` (
 --
 
 INSERT INTO `lignepanier` (`id_ligne_panier`, `id_panier`, `id_article`, `quantite`) VALUES
-(215919625, 809005795, 832745446, 1);
+(416839297, 853999664, 949478473, 1),
+(492374271, 853999664, 949478471, 1);
 
 -- --------------------------------------------------------
 
@@ -184,6 +187,7 @@ CREATE TABLE IF NOT EXISTS `paiement` (
 --
 
 INSERT INTO `paiement` (`id_paiement`, `id_utilisateur`, `date_commande`, `montant`, `moyen`, `statut`) VALUES
+(113131525, 1022904176, '2025-04-27 17:42:24', '14.00', 'Visa', 'payée'),
 (308505197, 121615499, '2025-04-27 16:15:07', '12.90', 'Visa', 'payée'),
 (346120554, 1022904176, '2025-04-26 14:46:43', '76570.00', 'Visa', 'payée'),
 (646544179, 121615499, '2025-04-27 16:16:45', '15.90', 'PayPal', 'payée'),
@@ -203,14 +207,14 @@ CREATE TABLE IF NOT EXISTS `panier` (
   `date_modification` datetime DEFAULT NULL,
   PRIMARY KEY (`id_panier`),
   KEY `id_client` (`id_client`)
-) ENGINE=InnoDB AUTO_INCREMENT=809005796 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=853999665 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `panier`
 --
 
 INSERT INTO `panier` (`id_panier`, `id_client`, `date_creation`, `date_modification`) VALUES
-(809005795, 1022904176, '2025-04-27 16:48:59', NULL);
+(853999664, 121615499, '2025-04-27 17:43:58', NULL);
 
 -- --------------------------------------------------------
 

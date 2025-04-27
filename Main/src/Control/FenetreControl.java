@@ -13,14 +13,17 @@ import java.util.Random;
 
 public class FenetreControl extends JFrame implements ActionListener
 {
-    private Fenetres fenetre; /// L'ensemble des fenêtres utilisées
+    private Fenetres fenetre; /// L'ensemble des fenêtres et variables utilisées (champs, JFrame et autres variables si nécessaires)
 
     public FenetreControl(Fenetres fenetre)
     {
         this.fenetre = fenetre;
     }
 
-    /// Action des boutons de chaque fenêtre
+    /** Action des boutons de chaque fenêtre
+     * @Pour ouvrir une fenêtre, mise en place de l'affichage et ouverture de la fenêtre
+     * @Après la fermeture d'une fenêtre, on vide son contenu (pour les principales) ou on garde la fenêtre telle quelle pour une mise à jour ultérieure (pour event)
+     * */
     @Override
     public void actionPerformed(ActionEvent e)
     {
@@ -92,17 +95,19 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.profil.setVisible(true);
                 fenetre.event.setVisible(true);
                 break;
-            ///Inscription d'un nouveau client
+            /// Inscription d'un nouveau client
             case "S'inscrire":
                 fenetre.setInscrire();
                 fenetre.inscrire.setVisible(true);
                 fenetre.connecter.setVisible(false);
                 fenetre.connecter.getContentPane().removeAll();
                 break;
+            /// Vue du profil
             case "Profil":
                 fenetre.setProfil();
                 fenetre.profil.setVisible(true);
                 break;
+            /// Vue de l'accueil
             case "Accueil":
                 fenetre.setAccueil();
                 fenetre.accueil.setVisible(true);
@@ -111,10 +116,12 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.profil.setVisible(false);
                 fenetre.profil.getContentPane().removeAll();
                 break;
+            /// Ajout d'un article
             case "Ajouter article":
                 fenetre.setNewArticle();
                 fenetre.ajout_article.setVisible(true);
                 break;
+            /// Modification d'un article
             case "Editer un article":
                 fenetre.setModifArticle();
                 fenetre.modif_article.setVisible(true);
@@ -162,46 +169,14 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.profil.setVisible(true);
                 fenetre.event.setVisible(true);
                 break;
+            /// Vue des dossiers clients
             case "Gerer les dossiers clients":
                 UtilisateurDAOImpl utilisateurDAO = new UtilisateurDAOImpl(dao);
                 List<Utilisateurs> utilisateursList = utilisateurDAO.getAllClientsWithFidelity();
                 fenetre.setGestionClient(utilisateursList);
                 fenetre.gestionClient.setVisible(true);
                 break;
-            case "Deconnexion":
-                fenetre.setIdentification();
-                fenetre.connecter.setVisible(true);
-
-                fenetre.ajout_article.setVisible(false);
-                fenetre.catalogue.setVisible(false);
-                fenetre.panierFrame.setVisible(false);
-                fenetre.articles.setVisible(false);
-                fenetre.modif.setVisible(false);
-                fenetre.modif_article.setVisible(false);
-                fenetre.stats.setVisible(false);
-                fenetre.profil.setVisible(false);
-                fenetre.ajout_commande.setVisible(false);
-                fenetre.gestionClient.setVisible(false);
-                fenetre.histoPaiement.setVisible(false);
-                fenetre.histoCommande.setVisible(false);
-                fenetre.promo.setVisible(false);
-                fenetre.accueil.setVisible(false);
-
-                fenetre.ajout_article.getContentPane().removeAll();
-                fenetre.catalogue.getContentPane().removeAll();
-                fenetre.panierFrame.getContentPane().removeAll();
-                fenetre.articles.getContentPane().removeAll();
-                fenetre.modif.getContentPane().removeAll();
-                fenetre.modif_article.getContentPane().removeAll();
-                fenetre.stats.getContentPane().removeAll();
-                fenetre.profil.getContentPane().removeAll();
-                fenetre.ajout_commande.getContentPane().removeAll();
-                fenetre.gestionClient.getContentPane().removeAll();
-                fenetre.histoPaiement.getContentPane().removeAll();
-                fenetre.histoCommande.getContentPane().removeAll();
-                fenetre.promo.getContentPane().removeAll();
-                fenetre.accueil.getContentPane().removeAll();
-                break;
+            /// Vue articles
             case "Articles":
                 fenetre.setListeArticles();
                 fenetre.articles.setVisible(true);
@@ -259,8 +234,7 @@ public class FenetreControl extends JFrame implements ActionListener
                     }
                 }
                 break;
-
-            /// Même principe que pour Ajouter  mais dans l'autre sens, et sans l'id du client
+            /// Même principe que pour Ajouter mais dans l'autre sens, et sans l'id du client
             case "Retirer":
                 articleDAO = new ArticleDAOImpl(dao);
                 cmd = e.getActionCommand();
@@ -283,14 +257,17 @@ public class FenetreControl extends JFrame implements ActionListener
                     }
                 }
                 break;
+            /// Vue catalogue
             case "Catalogue" :
                 fenetre.setCatalogue();
                 fenetre.catalogue.setVisible(true);
                 break;
+            /// Passer à la commande
             case "Commander":
                 fenetre.setNewCommande();
                 fenetre.ajout_commande.setVisible(true);
                 break;
+            /// Procéder au paiement
             case "Payer":
                 fenetre.setPaiement();
                 /// Connexion pour récupérer l'utilisateur actuellement en ligne
@@ -314,6 +291,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.ajout_commande.getContentPane().removeAll();
                 fenetre.panierFrame.getContentPane().removeAll();
                 break;
+            /// Validation du paiement
             case "Valider et payer":
                 String paiement = (String) fenetre.payment_type.getSelectedItem();
                 int numero_carte = Integer.parseInt(fenetre.numero_carte.getText());
@@ -335,6 +313,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.paiement.setVisible(false);
                 fenetre.paiement.getContentPane().removeAll();
                 break;
+            /// Annuler une commande
             case "Annuler":
                 comdao = new CommandeDAOImpl(dao);
                 user = new Utilisateurs(0, "", "", fenetre.email, fenetre.password, "");
@@ -348,6 +327,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.setAccueil();
                 fenetre.accueil.setVisible(true);
                 break;
+            /// Voir l'historique du='une commande
             case "Voir":
                 cmd = e.getActionCommand();
                 if (cmd.startsWith("Voir"))
@@ -373,14 +353,17 @@ public class FenetreControl extends JFrame implements ActionListener
                     }
                 }
                 break;
+            /// Vue du panier
             case "Panier":
                 fenetre.setPanier();
                 fenetre.panierFrame.setVisible(true);
                 break;
+            /// Vue des statistiques
             case "Statistiques":
                 fenetre.stats();
                 fenetre.stats.setVisible(true);
                 break;
+            /// Vue de l'historique
             case "Historique":
                 dao = DaoFactory.getInstance("ecommerce_db", "root", "");
                 paiementDAO = new PaiementDAOImpl(dao);
@@ -391,6 +374,7 @@ public class FenetreControl extends JFrame implements ActionListener
                 fenetre.setHistoriquePaiement(paiements);
                 fenetre.histoPaiement.setVisible(true);
                 break;
+            /// Fermeture d'une fenêtre
             case "Retour":
                 if(fenetre.promo.isVisible())
                 {
@@ -427,20 +411,15 @@ public class FenetreControl extends JFrame implements ActionListener
                     fenetre.gestionClient.setVisible(false);
                     fenetre.gestionClient.getContentPane().removeAll();
                 }
-                else if(fenetre.ajout_commande.isVisible())
+                else if (fenetre.stats.isVisible())
                 {
-                    fenetre.ajout_commande.setVisible(false);
-                    fenetre.ajout_commande.getContentPane().removeAll();
+                    fenetre.stats.setVisible(false);
+                    fenetre.stats.getContentPane().removeAll();
                 }
                 else if (fenetre.profil.isVisible())
                 {
                     fenetre.profil.setVisible(false);
                     fenetre.profil.getContentPane().removeAll();
-                }
-                else if (fenetre.stats.isVisible())
-                {
-                    fenetre.stats.setVisible(false);
-                    fenetre.stats.getContentPane().removeAll();
                 }
                 else if(fenetre.articles.isVisible())
                 {
@@ -457,7 +436,13 @@ public class FenetreControl extends JFrame implements ActionListener
                     fenetre.catalogue.setVisible(false);
                     fenetre.catalogue.getContentPane().removeAll();
                 }
+                else if(fenetre.ajout_commande.isVisible())
+                {
+                    fenetre.ajout_commande.setVisible(false);
+                    fenetre.ajout_commande.getContentPane().removeAll();
+                }
                 break;
+            /// Fermeture alternative
             case "Fermer":
                 if(fenetre.inscrire.isVisible())
                 {
@@ -471,9 +456,45 @@ public class FenetreControl extends JFrame implements ActionListener
                 }
                 fenetre.event.setVisible(false);
                 break;
+            /// Vue promotion
             case "Promotions":
                 fenetre.setArticlePromo();
                 fenetre.promo.setVisible(true);
+            /// Déconnexion du compte
+            case "Deconnexion":
+                fenetre.setIdentification();
+                fenetre.connecter.setVisible(true);
+
+                fenetre.ajout_article.setVisible(false);
+                fenetre.catalogue.setVisible(false);
+                fenetre.panierFrame.setVisible(false);
+                fenetre.articles.setVisible(false);
+                fenetre.modif.setVisible(false);
+                fenetre.modif_article.setVisible(false);
+                fenetre.stats.setVisible(false);
+                fenetre.profil.setVisible(false);
+                fenetre.ajout_commande.setVisible(false);
+                fenetre.gestionClient.setVisible(false);
+                fenetre.histoPaiement.setVisible(false);
+                fenetre.histoCommande.setVisible(false);
+                fenetre.promo.setVisible(false);
+                fenetre.accueil.setVisible(false);
+
+                fenetre.ajout_article.getContentPane().removeAll();
+                fenetre.catalogue.getContentPane().removeAll();
+                fenetre.panierFrame.getContentPane().removeAll();
+                fenetre.articles.getContentPane().removeAll();
+                fenetre.modif.getContentPane().removeAll();
+                fenetre.modif_article.getContentPane().removeAll();
+                fenetre.stats.getContentPane().removeAll();
+                fenetre.profil.getContentPane().removeAll();
+                fenetre.ajout_commande.getContentPane().removeAll();
+                fenetre.gestionClient.getContentPane().removeAll();
+                fenetre.histoPaiement.getContentPane().removeAll();
+                fenetre.histoCommande.getContentPane().removeAll();
+                fenetre.promo.getContentPane().removeAll();
+                fenetre.accueil.getContentPane().removeAll();
+                break;
         }
     }
 }

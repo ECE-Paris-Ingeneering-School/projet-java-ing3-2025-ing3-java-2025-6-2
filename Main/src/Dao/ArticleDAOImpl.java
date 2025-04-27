@@ -50,6 +50,7 @@ public class ArticleDAOImpl implements ArticleDAO
                 /// Par défaut, on considère que l'article est disponible
                 boolean disponibilite = true;
 
+                /// Création de l'objet correspondant
                 article = new Article(id_article, stock, seuil_remise, nom, marque, categorie, description, prix, disponibilite);
                 return article;
             }
@@ -68,10 +69,10 @@ public class ArticleDAOImpl implements ArticleDAO
     {
         try
         {
-            // connexion
+            /// connexion
             Connection connexion = daoFactory.getConnection();
 
-            /// récupération des informations saisies dans la page d'inscription
+            /// Récupération des informations saisies dans la page d'ajout d'un article
             int id_article = article.getId();
             String nom = article.getNom();
             String description = article.getDescription();
@@ -81,7 +82,7 @@ public class ArticleDAOImpl implements ArticleDAO
             String categroie = article.getCategorie();
             String marque = article.getMarque();
 
-            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+            /// Exécution de la requête INSERT INTO de l'objet article en paramètre
             PreparedStatement preparedStatement = connexion.prepareStatement(
                 "INSERT INTO article(id_article, nom, description, prix, stock, seuil_remise, categorie, marque) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
@@ -110,7 +111,7 @@ public class ArticleDAOImpl implements ArticleDAO
             // connexion
             Connection connexion = daoFactory.getConnection();
 
-            /// récupération des informations saisies dans la page d'inscription
+            /// Récupération des informations saisies dans la page de modification d'un article
             int id_article = article.getId();
             String nom = article.getNom();
             String description = article.getDescription();
@@ -120,7 +121,7 @@ public class ArticleDAOImpl implements ArticleDAO
             String categroie = article.getCategorie();
             String marque = article.getMarque();
 
-            /// Exécution de la requête INSERT INTO de l'objet client en paramètre
+            /// Exécution de la requête UPDATE de l'objet article en paramètre
             PreparedStatement preparedStatement = connexion.prepareStatement(
                     "UPDATE article " +
                             "SET nom = '"+nom+"', description = '"+description+"', prix = '"+prix+"', stock = '"+stock+"', seuil_remise = '"+seuil_remise+"', categorie = '"+categroie+"', marque = '"+marque+"' " +

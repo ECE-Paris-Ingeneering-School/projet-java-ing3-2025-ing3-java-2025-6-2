@@ -25,6 +25,7 @@ public class PaiementDAOImpl implements PaiementDAO
     {
         try
         {
+            /// Récupération de la commande en cours et ajout du paiement
             CommandeDAOImpl commandeDAOImpl = new CommandeDAOImpl(daoFactory);
             Commande commande = commandeDAOImpl.getCommande(client);
             Connection connexion = daoFactory.getConnection();
@@ -43,7 +44,7 @@ public class PaiementDAOImpl implements PaiementDAO
 
     public List<Paiement> getPaiementsUtilisateur(Client client)
     {
-        List<Paiement> paiements = new ArrayList<>();
+        List<Paiement> paiements = new ArrayList<>(); /// Liste des paiements à récupérer
         try {
             CommandeDAOImpl commandeDAOImpl = new CommandeDAOImpl(daoFactory);
             Commande commande = commandeDAOImpl.getCommande(client);

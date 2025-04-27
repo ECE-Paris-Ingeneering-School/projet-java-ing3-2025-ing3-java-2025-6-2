@@ -95,7 +95,7 @@ public class Fenetres extends JFrame
         DaoFactory daoFactory = DaoFactory.getInstance("ecommerce_db", "root", "");
         articleDao = new ArticleDAOImpl(daoFactory);
 
-        // Application de la couleur de fond à toutes les fenêtres
+        /// Application de la couleur de fond à toutes les fenêtres
         inscrire.getContentPane().setBackground(BACKGROUND_COLOR);
         connecter.getContentPane().setBackground(BACKGROUND_COLOR);
         accueil.getContentPane().setBackground(BACKGROUND_COLOR);
@@ -420,7 +420,7 @@ public class Fenetres extends JFrame
         accueil.repaint();
     }
 
-    /// Accueil : Barre de navigation
+    /// Fenetres principales : Barre de navigation
     private JPanel createNavigationBar()
     {
         JPanel navBar = new JPanel(new BorderLayout());
@@ -486,7 +486,7 @@ public class Fenetres extends JFrame
         return navBar;
     }
 
-    /// Accueil : Création d'un bouton de navigation
+    /// Fenetres principales : Création d'un bouton de navigation
     private JButton createNavButton(String text, ActionListener listener) {
         JButton button = new JButton(text);
         button.setBorderPainted(false);
@@ -520,7 +520,7 @@ public class Fenetres extends JFrame
         p.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
         p.setMaximumSize(new Dimension(200, 300));
 
-        // Image
+        /// Image
         String imagePath = getImageFileName(article.getNom(), article.getCategorie());
         ImageIcon imageIcon = new ImageIcon(imagePath);
         Image image = imageIcon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH);
@@ -529,19 +529,19 @@ public class Fenetres extends JFrame
         p.add(imageLabel);
         p.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Panel d'informations
+        /// Panel d'informations
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setBackground(Color.WHITE);
 
-        // Nom de l'article
+        /// Nom de l'article
         JLabel nameLabel = new JLabel(article.getNom());
         nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
         nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         infoPanel.add(nameLabel);
         infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
-        // Description
+        /// Description
         JLabel descLabel = new JLabel("<html><div style='width:150px'>" + article.getDescription() + "</div></html>");
         descLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         descLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -551,7 +551,7 @@ public class Fenetres extends JFrame
         p.add(infoPanel);
         p.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Boutons
+        /// Boutons
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.setBackground(Color.WHITE);
@@ -574,6 +574,7 @@ public class Fenetres extends JFrame
         return p;
     }
 
+    /// Page promotions
     public void setArticlePromo()
     {
         DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
@@ -586,16 +587,16 @@ public class Fenetres extends JFrame
         promo.setLayout(new BorderLayout());
         promo.getContentPane().setBackground(BACKGROUND_COLOR);
 
-        // Barre de navigation
+        /// Barre de navigation
         JPanel navBar = createNavigationBar();
         promo.add(navBar, BorderLayout.NORTH);
 
-        // Panel principal avec fond bordeaux
+        /// Panel principal avec fond bordeaux
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(BACKGROUND_COLOR);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Panel du contenu avec fond blanc
+        /// Panel du contenu avec fond blanc
         JPanel innerPanel = new JPanel(new BorderLayout());
         innerPanel.setBackground(Color.WHITE);
         innerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -620,7 +621,7 @@ public class Fenetres extends JFrame
                     JOptionPane.ERROR_MESSAGE);
         }
 
-        // Ajouter la grille des produits dans un JScrollPane
+        /// Ajouter la grille des produits dans un JScrollPane
         JScrollPane scrollPane = new JScrollPane(productsGrid);
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
@@ -628,10 +629,10 @@ public class Fenetres extends JFrame
         innerPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(innerPanel, BorderLayout.CENTER);
 
-        // Ajouter le JScrollPane à la fenêtre promo
+        /// Ajouter le JScrollPane à la fenêtre promo
         promo.add(mainPanel, BorderLayout.CENTER);
 
-        // Bouton Retour en bas de la section promo
+        /// Bouton Retour en bas de la section promo
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setBackground(Color.WHITE);
         JButton returnButton = new JButton("Retour");
@@ -654,25 +655,25 @@ public class Fenetres extends JFrame
         profil.setLayout(new BorderLayout());
         profil.getContentPane().setBackground(BACKGROUND_COLOR);
 
-        // Barre de navigation
+        /// Barre de navigation
         JPanel navBar = createNavigationBar();
         profil.add(navBar, BorderLayout.NORTH);
 
-        // Panel principal avec fond bordeaux
+        /// Panel principal avec fond bordeaux
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(BACKGROUND_COLOR);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Panel du contenu avec fond blanc
+        /// Panel du contenu avec fond blanc
         JPanel contentPanel = new JPanel(new BorderLayout());
         contentPanel.setBackground(Color.WHITE);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        // Panel pour la photo et les informations
+        /// Panel pour la photo et les informations
         JPanel profileInfoPanel = new JPanel(new BorderLayout(30, 0));
         profileInfoPanel.setBackground(Color.WHITE);
 
-        // Photo de profil
+        /// Photo de profil
         JPanel photoPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -684,13 +685,13 @@ public class Fenetres extends JFrame
         photoPanel.setPreferredSize(new Dimension(200, 200));
         photoPanel.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
 
-        // Informations du profil
+        /// Informations du profil
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setBackground(Color.WHITE);
         infoPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
 
-        // Style pour les labels
+        /// Style pour les labels
         Font titleFont = new Font("Arial", Font.BOLD, 24);
         Font labelFont = new Font("Arial", Font.BOLD, 16);
         Font valueFont = new Font("Arial", Font.PLAIN, 16);
@@ -701,7 +702,7 @@ public class Fenetres extends JFrame
         infoPanel.add(titleLabel);
         infoPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Nom
+        /// Nom
         JPanel nomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         nomPanel.setBackground(Color.WHITE);
         JLabel nomLabel = new JLabel("Nom: ");
@@ -712,7 +713,7 @@ public class Fenetres extends JFrame
         nomPanel.add(nomValue);
         infoPanel.add(nomPanel);
 
-        // Prénom
+        /// Prénom
         JPanel prenomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         prenomPanel.setBackground(Color.WHITE);
         JLabel prenomLabel = new JLabel("Prénom: ");
@@ -723,7 +724,7 @@ public class Fenetres extends JFrame
         prenomPanel.add(prenomValue);
         infoPanel.add(prenomPanel);
 
-        // Email
+        /// Email
         JPanel emailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         emailPanel.setBackground(Color.WHITE);
         JLabel emailLabel = new JLabel("Email: ");
@@ -734,7 +735,7 @@ public class Fenetres extends JFrame
         emailPanel.add(emailValue);
         infoPanel.add(emailPanel);
 
-        // Type de compte
+        /// Type de compte
         JPanel typePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         typePanel.setBackground(Color.WHITE);
         JLabel typeLabel = new JLabel("Type de compte: ");
@@ -764,7 +765,7 @@ public class Fenetres extends JFrame
 
         contentPanel.add(buttongen, BorderLayout.SOUTH);
 
-        // Panel pour les boutons d'action (uniquement pour les admins)
+        /// Panel pour les boutons d'action (uniquement pour les admins)
         if (user_actuel.getType_utilisateur().equals("admin")) {
             JPanel actionPanel = new JPanel();
             actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
@@ -803,7 +804,7 @@ public class Fenetres extends JFrame
 
         mainPanel.add(contentPanel, BorderLayout.CENTER);
 
-        // Bouton Retour en bas
+        /// Bouton Retour en bas
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setBackground(Color.WHITE);
         JButton returnButton = new JButton("Retour");
@@ -814,7 +815,7 @@ public class Fenetres extends JFrame
         profil.add(mainPanel);
     }
 
-    /// Gestion des erreurs
+    /// Gestion de certains événements (côté réaliste et débuggage)
     public void setEvent(String titre, String description)
     {
         event.setSize(300, 100);
@@ -891,16 +892,16 @@ public class Fenetres extends JFrame
         articles.setLayout(new BorderLayout());
         articles.getContentPane().setBackground(BACKGROUND_COLOR);
 
-        // Barre de navigation
+        /// Barre de navigation
         JPanel navBar = createNavigationBar();
         articles.add(navBar, BorderLayout.NORTH);
 
-        // Panel principal avec fond bordeaux
+        /// Panel principal avec fond bordeaux
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(BACKGROUND_COLOR);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Panel pour la liste verticale des articles avec fond blanc
+        /// Panel pour la liste verticale des articles avec fond blanc
         JPanel articlesList = new JPanel();
         articlesList.setLayout(new BoxLayout(articlesList, BoxLayout.Y_AXIS));
         articlesList.setBackground(Color.WHITE);
@@ -929,7 +930,7 @@ public class Fenetres extends JFrame
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Bouton Retour en bas
+        /// Bouton Retour en bas
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setBackground(Color.WHITE);
         JButton returnButton = new JButton("Retour");
@@ -940,6 +941,7 @@ public class Fenetres extends JFrame
         articles.add(mainPanel);
     }
 
+    /// Carte d'identité d'un article
     private JPanel createArticlePanel(Article article) {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -949,7 +951,7 @@ public class Fenetres extends JFrame
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
 
-        // Panel gauche pour l'image
+        /// Panel gauche pour l'image
         JPanel imagePanel = new JPanel();
         imagePanel.setPreferredSize(new Dimension(200, 200));
         imagePanel.setBackground(Color.WHITE);
@@ -958,7 +960,7 @@ public class Fenetres extends JFrame
         String defaultImagePath = "Main/src/View/image/default_product.png";
 
         try {
-            // Construire le chemin complet de l'image
+            /// Construire le chemin complet de l'image
             String fullImagePath = imagePath != null ?
                     String.format("Main/src/View/image/%s/%s",
                             article.getCategorie().toLowerCase()
@@ -970,14 +972,14 @@ public class Fenetres extends JFrame
                             imagePath) :
                     defaultImagePath;
 
-            // Vérifier si le fichier existe
+            /// Vérifier si le fichier existe
             File imageFile = new File(fullImagePath);
             if (!imageFile.exists()) {
                 System.out.println("Image non trouvée: " + fullImagePath);
                 fullImagePath = defaultImagePath;
             }
 
-            // Charger et redimensionner l'image
+            /// Charger et redimensionner l'image
             ImageIcon imageIcon = new ImageIcon(fullImagePath);
             Image image = imageIcon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH);
             JLabel imageLabel = new JLabel(new ImageIcon(image));
@@ -995,7 +997,7 @@ public class Fenetres extends JFrame
 
         panel.add(imagePanel, BorderLayout.WEST);
 
-        // Panel central pour les informations
+        /// Panel central pour les informations
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setBackground(Color.WHITE);
@@ -1021,7 +1023,7 @@ public class Fenetres extends JFrame
 
         panel.add(infoPanel);
 
-        // Panel droit pour les boutons
+        /// Panel droit pour les boutons
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         buttonPanel.setBackground(Color.WHITE);
@@ -1064,7 +1066,7 @@ public class Fenetres extends JFrame
                 .replace("ù", "u")
                 .replace("ç", "c");
 
-        // Normalisation du nom
+        /// Normalisation du nom
         String nom = nomArticle.toLowerCase()
                 .replace("é", "e")
                 .replace("è", "e")
@@ -1072,7 +1074,7 @@ public class Fenetres extends JFrame
                 .replace("ù", "u")
                 .replace("ç", "c");
 
-        // Pour chaque catégorie, retourner le nom exact du fichier
+        /// Pour chaque catégorie, retourner le nom exact du fichier
         switch (categorieNormalisee) {
             case "nourriture":
                 if (nom.contains("cafe") || nom.contains("café")) return "cafe_bio.png";
@@ -1122,7 +1124,7 @@ public class Fenetres extends JFrame
         return "default_product.png";
     }
 
-    /// Articles : Bouton retour
+    /// Pour certaines fenêtres : Bouton retour
     private void creerRetour() {
         PannelRetour = new JPanel();
         PannelRetour.setBackground(new Color(240, 240, 240));
@@ -1279,6 +1281,7 @@ public class Fenetres extends JFrame
         panierFrame.add(mainPanel);
     }
 
+    /// Carte d'identité d'un produit
     private JPanel createCartItemPanel(Article article) {
         JPanel itemPanel = new JPanel(new BorderLayout(15, 0));
         itemPanel.setBackground(Color.WHITE);
@@ -1287,7 +1290,7 @@ public class Fenetres extends JFrame
                 BorderFactory.createEmptyBorder(10, 0, 10, 0)
         ));
 
-        // Image du produit
+        /// Image du produit
         JPanel imagePanel = new JPanel(new BorderLayout());
         imagePanel.setBackground(Color.WHITE);
         imagePanel.setPreferredSize(new Dimension(100, 100));
@@ -1295,7 +1298,7 @@ public class Fenetres extends JFrame
         String defaultImagePath = "Main/src/View/image/default_product.png";
 
         try {
-            // Normaliser la catégorie pour le chemin du dossier
+            /// Normaliser la catégorie pour le chemin du dossier
             String categorieDossier = article.getCategorie().toLowerCase()
                     .replace("vêtements", "vetements")
                     .replace("vêtement", "vetements")
@@ -1306,10 +1309,10 @@ public class Fenetres extends JFrame
                     .replace("ç", "c")
                     .replace("ê", "e");
 
-            // Obtenir le nom du fichier image
+            /// Obtenir le nom du fichier image
             String imageFileName = getImageFileName(article.getNom(), article.getCategorie());
 
-            // Construire le chemin complet
+            /// Construire le chemin complet
             String fullImagePath;
             if (imageFileName.equals("default_product.png")) {
                 fullImagePath = defaultImagePath;
@@ -1317,7 +1320,7 @@ public class Fenetres extends JFrame
                 fullImagePath = String.format("Main/src/View/image/%s/%s", categorieDossier, imageFileName);
             }
 
-            // Vérifier si le fichier existe
+            /// Vérifier si le fichier existe
             File imageFile = new File(fullImagePath);
             if (!imageFile.exists()) {
                 System.out.println("Image non trouvée: " + fullImagePath + ", utilisation de l'image par défaut");
@@ -1338,7 +1341,7 @@ public class Fenetres extends JFrame
             imagePanel.add(defaultLabel, BorderLayout.CENTER);
         }
 
-        // Informations de l'article
+        /// Informations de l'article
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setBackground(Color.WHITE);
@@ -1346,7 +1349,7 @@ public class Fenetres extends JFrame
         JLabel nameLabel = new JLabel(article.getNom());
         nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
 
-        // Sélecteur de quantité
+        /// Sélecteur de quantité
         JPanel quantityPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         quantityPanel.setBackground(Color.WHITE);
         JComboBox<Integer> quantitySelector = new JComboBox<>(new Integer[]{1, 2, 3, 4, 5});
@@ -1357,7 +1360,7 @@ public class Fenetres extends JFrame
         infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         infoPanel.add(quantityPanel);
 
-        // Prix
+        /// Prix
         JPanel pricePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         pricePanel.setBackground(Color.WHITE);
         JLabel priceLabel = new JLabel(String.format("%.2f €", article.getPrixUnitaire()));
@@ -1589,7 +1592,7 @@ public class Fenetres extends JFrame
                 imageIcon = new ImageIcon(defaultImagePath);
             }
 
-            // Redimensionner l'image
+            /// Redimensionner l'image
             Image img = imageIcon.getImage();
             int originalWidth = imageIcon.getIconWidth();
             int originalHeight = imageIcon.getIconHeight();
@@ -1619,19 +1622,19 @@ public class Fenetres extends JFrame
         p.add(imagePanel);
         p.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Informations du produit
+        /// Informations du produit
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setBackground(Color.WHITE);
         infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Nom du produit
+        /// Nom du produit
         JLabel nameLabel = new JLabel(article.getNom());
         nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
         nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         infoPanel.add(nameLabel);
 
-        // Prix et remise
+        /// Prix et remise
         if (article.getSeuil_remise() > 0) {
             JLabel discountLabel = new JLabel("-" + article.getSeuil_remise() + "%");
             discountLabel.setForeground(Color.RED);
@@ -1647,7 +1650,7 @@ public class Fenetres extends JFrame
         infoPanel.add(priceLabel);
         infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
-        // Stock
+        /// Stock
         JLabel stockLabel = new JLabel("Stock: " + article.getStock());
         stockLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         stockLabel.setForeground(new Color(100, 100, 100));
@@ -1657,7 +1660,7 @@ public class Fenetres extends JFrame
         p.add(infoPanel);
         p.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Boutons
+        /// Boutons
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.setBackground(Color.WHITE);
@@ -1747,6 +1750,7 @@ public class Fenetres extends JFrame
         modif.add(ajout_article_button);
     }
 
+    /// Affichage des statistiques
     public void stats() {
         DaoFactory dao = DaoFactory.getInstance("ecommerce_db", "root", "");
         stats = new JFrame();
@@ -1820,6 +1824,7 @@ public class Fenetres extends JFrame
 
     }
 
+    /// Titre d'un panel d'une page
     private JPanel createTitlePanel(String title) {
         JPanel titlePanel = new JPanel();
         titlePanel.setPreferredSize(new Dimension(getWidth(), 100));
@@ -1845,7 +1850,7 @@ public class Fenetres extends JFrame
         ajout_article.getContentPane().setBackground(BACKGROUND_COLOR);
         ajout_article.setLayout(new BoxLayout(ajout_article.getContentPane(), BoxLayout.Y_AXIS));
 
-        // Catégorie
+        /// Catégorie
         JLabel labelCategorie = new JLabel("Categorie");
         ajout_article.add(labelCategorie);
         String[] categories = {"Electromenager", "Nourriture", "Necessite"};
@@ -1854,7 +1859,7 @@ public class Fenetres extends JFrame
         categorie.setBounds(50, 50, 100, 20);
         ajout_article.add(categorie);
 
-        // Marque
+        /// Marque
         JLabel labelMarque = new JLabel("Marque");
         ajout_article.add(labelMarque);
         String[] marques = {"Bosch", "Samsung", "Nestlé"};
@@ -1863,7 +1868,7 @@ public class Fenetres extends JFrame
         marque.setBounds(50, 50, 100, 20);
         ajout_article.add(marque);
 
-        // Nom
+        /// Nom
         JPanel panelNom = new JPanel();
         JLabel labelNom = new JLabel("Nom");
         panelNom.add(labelNom);
@@ -1871,7 +1876,7 @@ public class Fenetres extends JFrame
         panelNom.add(nom_article);
         ajout_article.add(panelNom);
 
-        // Prix
+        /// Prix
         JPanel panelPrix = new JPanel();
         JLabel labelPrix = new JLabel("Prix");
         panelPrix.add(labelPrix);
@@ -1879,7 +1884,7 @@ public class Fenetres extends JFrame
         panelPrix.add(prix);
         ajout_article.add(panelPrix);
 
-        // Stock
+        /// Stock
         JPanel panelStock = new JPanel();
         JLabel labelStock = new JLabel("Stock");
         panelStock.add(labelStock);
@@ -1887,7 +1892,7 @@ public class Fenetres extends JFrame
         panelStock.add(stock);
         ajout_article.add(panelStock);
 
-        // Seuil de remise
+        /// Seuil de remise
         JPanel panelRemise = new JPanel();
         JLabel labelRemise = new JLabel("Seuil de remise");
         panelRemise.add(labelRemise);
@@ -1895,7 +1900,7 @@ public class Fenetres extends JFrame
         panelRemise.add(seuil_remise);
         ajout_article.add(panelRemise);
 
-        // Description
+        /// Description
         JPanel panelDescription = new JPanel();
         JLabel labelDescription = new JLabel("Description");
         panelDescription.add(labelDescription);
@@ -1903,7 +1908,7 @@ public class Fenetres extends JFrame
         panelDescription.add(description);
         ajout_article.add(panelDescription);
 
-        // Boutons
+        /// Boutons
         JPanel panelBoutons = new JPanel();
         addButton(panelBoutons, "Valider l'ajout");
         addButton(panelBoutons, "Retour");
@@ -1918,21 +1923,21 @@ public class Fenetres extends JFrame
         catalogue.setLayout(new BorderLayout());
         catalogue.getContentPane().setBackground(BACKGROUND_COLOR);
 
-        // Barre de navigation
+        /// Barre de navigation
         JPanel navBar = createNavigationBar();
         catalogue.add(navBar, BorderLayout.NORTH);
 
-        // Panel principal avec fond bordeaux
+        /// Panel principal avec fond bordeaux
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(BACKGROUND_COLOR);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Panel du contenu avec fond blanc
+        /// Panel du contenu avec fond blanc
         JPanel innerPanel = new JPanel(new BorderLayout());
         innerPanel.setBackground(Color.WHITE);
         innerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Barre de recherche en haut
+        /// Barre de recherche en haut
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchPanel.setBackground(Color.WHITE);
 
@@ -1949,7 +1954,7 @@ public class Fenetres extends JFrame
         searchPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         searchPanel.add(searchButton);
 
-        // Panel des catégories
+        /// Panel des catégories
         JPanel categoryPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         categoryPanel.setBackground(Color.WHITE);
         JLabel catLabel = new JLabel("Catégorie:");
@@ -1959,18 +1964,18 @@ public class Fenetres extends JFrame
         categoryPanel.add(catLabel);
         categoryPanel.add(categoryFilter);
 
-        // Panel du haut combinant recherche et catégories
+        /// Panel du haut combinant recherche et catégories
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(Color.WHITE);
         topPanel.add(searchPanel, BorderLayout.NORTH);
         topPanel.add(categoryPanel, BorderLayout.CENTER);
         innerPanel.add(topPanel, BorderLayout.NORTH);
 
-        // Panel principal avec filtres à gauche et grille de produits à droite
+        /// Panel principal avec filtres à gauche et grille de produits à droite
         JPanel contentPanel = new JPanel(new BorderLayout());
         contentPanel.setBackground(Color.WHITE);
 
-        // Filtres à gauche
+        /// Filtres à gauche
         JPanel filterPanel = new JPanel();
         filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
         filterPanel.setBackground(Color.WHITE);
@@ -1980,13 +1985,13 @@ public class Fenetres extends JFrame
         ));
         filterPanel.setPreferredSize(new Dimension(200, 0));
 
-        // Titre des filtres
+        /// Titre des filtres
         JLabel filterTitle = new JLabel("Filtre");
         filterTitle.setFont(new Font("Arial", Font.BOLD, 16));
         filterPanel.add(filterTitle);
         filterPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Ajout des différents filtres
+        /// Ajout des différents filtres
         String[] filterCategories = {"Prix", "Disponibilité", "Nouveautés", "Prix bas"};
         for (String filter : filterCategories) {
             JCheckBox checkbox = new JCheckBox(filter);
@@ -1997,7 +2002,7 @@ public class Fenetres extends JFrame
 
         contentPanel.add(filterPanel, BorderLayout.WEST);
 
-        // Grille de produits à droite
+        /// Grille de produits à droite
         JPanel productsGrid = new JPanel(new GridLayout(0, 4, 15, 15));
         productsGrid.setBackground(Color.WHITE);
 
@@ -2026,7 +2031,7 @@ public class Fenetres extends JFrame
         innerPanel.add(contentPanel, BorderLayout.CENTER);
         mainPanel.add(innerPanel, BorderLayout.CENTER);
 
-        // Bouton Retour en bas
+        /// Bouton Retour en bas
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setBackground(Color.WHITE);
         JButton returnButton = new JButton("Retour");
@@ -2037,8 +2042,9 @@ public class Fenetres extends JFrame
         catalogue.add(mainPanel);
     }
 
+    /// Vue détail d'un article spécifique
     public void afficherDetailsArticle(Article article) {
-        // Créer une nouvelle fenêtre pour les détails
+        /// Créer une nouvelle fenêtre pour les détails
         JDialog detailsDialog = new JDialog(this, "Détails du produit", true);
         detailsDialog.setLayout(new BorderLayout(10, 10));
         detailsDialog.setSize(400, 500);
@@ -2049,7 +2055,7 @@ public class Fenetres extends JFrame
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         contentPanel.setBackground(Color.WHITE);
 
-        // Image du produit
+        /// Image du produit
         try {
             ImageIcon imageIcon = new ImageIcon(article.getImage());
             Image image = imageIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
@@ -2061,7 +2067,7 @@ public class Fenetres extends JFrame
             System.err.println("Erreur lors du chargement de l'image: " + e.getMessage());
         }
 
-        // Informations détaillées
+        /// Informations détaillées
         JLabel nameLabel = new JLabel(article.getNom());
         nameLabel.setFont(new Font("Arial", Font.BOLD, 18));
         nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -2077,7 +2083,7 @@ public class Fenetres extends JFrame
         contentPanel.add(descriptionArea);
         contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Prix et remise
+        /// Prix et remise
         if (article.getSeuil_remise() > 0) {
             JLabel discountLabel = new JLabel("Remise: -" + article.getSeuil_remise() + "%");
             discountLabel.setForeground(Color.RED);
@@ -2099,7 +2105,7 @@ public class Fenetres extends JFrame
         contentPanel.add(stockLabel);
         contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Bouton Fermer
+        /// Bouton Fermer
         JButton closeButton = new JButton("Fermer");
         closeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         closeButton.addActionListener(e -> detailsDialog.dispose());
@@ -2116,6 +2122,7 @@ public class Fenetres extends JFrame
         histoPaiement.setSize(700, 400);
         histoPaiement.setLocationRelativeTo(null);
 
+        /// Vue tableau de chaque paiement avec la commande associée
         String[] columns = {"Numéro de commande", "Date", "Montant", "Moyen de paiement", "Statut", ""};
         Object[][] data = new Object[paiements.size()][columns.length];
         for (int i = 0; i < paiements.size(); i++) {
@@ -2148,7 +2155,7 @@ public class Fenetres extends JFrame
             }
         };
 
-        // Renderer pour afficher correctement les JButton
+        /// Affichage du bouton voir pour chaque occurence
         table.getColumn("").setCellRenderer((table1, value, isSelected, hasFocus, row, column) -> (Component) value);
 
         table.getColumn("").setCellEditor(new DefaultCellEditor(new JCheckBox())
@@ -2289,6 +2296,7 @@ public class Fenetres extends JFrame
         histoCommande.add(mainPanel);
     }
 
+    /// Vue générale de l'ensemble des clients enregistrés
     public void setGestionClient(List<Utilisateurs> clients)
     {
         gestionClient.setTitle("Gestion des clients & fidélité");

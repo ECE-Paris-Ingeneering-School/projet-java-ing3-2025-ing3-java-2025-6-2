@@ -26,6 +26,7 @@ public class CommandeDAOImpl implements CommandeDAO
         Commande nouvelleCommande =null;
         try
         {
+            /// Récupération du panier actuel
             PanierDAOImpl panier = new PanierDAOImpl(daoFactory);
             Panier panier_client = panier.getPanier(client);
             /// connexion
@@ -50,10 +51,10 @@ public class CommandeDAOImpl implements CommandeDAO
     @Override
     public void ajouterDansCommandeEnCours(Commande commande, Panier panier)
     {
-        Map<Article, Integer> articlesEnCours = new LinkedHashMap<>();
+        Map<Article, Integer> articlesEnCours = new LinkedHashMap<>(); /// Liste des articles dans le panier actuel à insérer dans la commande
         try
         {
-            /// connexion
+            /// Connexion et récupération des articles du panier
             Connection connexion = daoFactory.getConnection();
             ArticleDAOImpl articleDAO = new ArticleDAOImpl(daoFactory);
             PreparedStatement preparedStatement = connexion.prepareStatement("SELECT * from lignepanier WHERE id_panier = '"+panier.getId()+"'");
@@ -74,22 +75,21 @@ public class CommandeDAOImpl implements CommandeDAO
                     int prix = resultSet1.getInt("prix");
                     int id_ligne_commande = new Random().nextInt(1_000_000_000);
 
-                    /// Exécution de la requête INSERT INTO de l'objet commande en paramètre
+                    /// Exécution de la requête INSERT INTO de l'objet lignecommande en paramètre avec l'ID de la commande en cours
                     preparedStatement = connexion.prepareStatement("INSERT INTO lignecommande(id_ligne_commande, id_commande, id_article, quantite, prix_unitaire, prix_apres_remise) VALUES ('" + id_ligne_commande + "','" + commande.getId() + "', '" + id_article + "', '" + quantite_ajouter + "', '" + prix + "', '" + quantite_ajouter*prix + "')");
                     preparedStatement.executeUpdate();
 
-                    /// Mise à jour
+                    /// Mise à jour du prix total
                     preparedStatement = connexion.prepareStatement("UPDATE commande SET montant_total = '"+quantite_ajouter*prix+"' WHERE id_commande = '"+commande.getId()+"'");
                     preparedStatement.executeUpdate();
 
                 }
-                /// récupération des informations saisies dans la page de commande
             }
         }
         catch (SQLException e)
         {
             e.printStackTrace();
-            System.out.println("Ajout de l'article dans la commande impossible");
+            System.out.println("Ajout d'un article dans la commande impossible");
         }
     }
 
@@ -100,10 +100,10 @@ public class CommandeDAOImpl implements CommandeDAO
             /// connexion
             Connection connexion = daoFactory.getConnection();
 
-            /// récupération des informations saisies dans la page d'inscription
+            /// Récupération des informations saisies dans la page d'inscription
             int id_client = client.getIdentifiant();
 
-            /// Mise à jour du statut de la commande en mode annulée
+            /// Mise à jour du statut de la commande en mode annulée (si annulation du paiement)
             PreparedStatement preparedStatement = connexion.prepareStatement(
                     "UPDATE commande " +
                             "SET statut = 'annulée' WHERE id_client = '"+id_client+"'"
@@ -114,7 +114,7 @@ public class CommandeDAOImpl implements CommandeDAO
         catch (SQLException e)
         {
             e.printStackTrace();
-            System.out.println("Modification de la commande impossible");
+            System.out.println("Modification du statut de la commande impossible");
         }
     }
 
@@ -123,27 +123,27 @@ public class CommandeDAOImpl implements CommandeDAO
     {
         try
         {
-            // connexion
+            /// connexion
             Connection connexion = daoFactory.getConnection();
 
-            /// récupération des informations saisies dans la page de commande
+            /// Récupération des informations saisies dans la page de commande
             int id_commande = commande.getId();
 
-            /// Mise à jour du statut en mode payé
+            /// Mise à jour du statut de la commande en mode payé
             PreparedStatement preparedStatement = connexion.prepareStatement("UPDATE commande SET statut = 'payée' WHERE id_commande = '"+id_commande+"'");
             preparedStatement.executeUpdate();
         }
         catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Ajout du client impossible");
+            System.out.println("Mise à jour du statut de la commande impossible");
         }
     }
 
     @Override
     public List<Commande> getCommandes(int limit, int id_commande)
     {
-        List<Commande> articles = new ArrayList<>();
-        Map<Article, Integer> liste = new HashMap<>();
+        List<Commande> articles = new ArrayList<>(); /// Liste des articles de la commande
+        Map<Article, Integer> liste = new HashMap<>(); /// Liste des articles à récupérer
         try
         {
             Connection connexion = daoFactory.getConnection();
@@ -205,13 +205,13 @@ public class CommandeDAOImpl implements CommandeDAO
             Connection connexion = daoFactory.getConnection();
             PanierDAOImpl panierDAO = new PanierDAOImpl(daoFactory);
             ArticleDAOImpl articleDAO = new ArticleDAOImpl(daoFactory);
-            /// Récupération de l'id du panier en fonction du client
+            /// Récupération de l'id de la commande en fonction du client
             PreparedStatement preparedStatementCom = connexion.prepareStatement(
                     "SELECT * " +
                             "FROM commande WHERE id_client = '" + client.getIdentifiant() + "'"
             );
             ResultSet resultSetPanier = preparedStatementCom.executeQuery();
-            /// Cas nouvelle commande
+            /// Cas d'une nouvelle commande
             if(resultSetPanier.next())
             {
                 Panier panier = panierDAO.getPanier(client);
@@ -234,7 +234,7 @@ public class CommandeDAOImpl implements CommandeDAO
                     commande = new Commande(id_commande, client, liste, statut);
                     return commande;
                 }
-                /// Cas historique commande
+                /// Cas pour afficher l'historique commande
                 else
                 {
                     int id_commande = resultSetPanier.getInt("id_commande");
@@ -259,7 +259,7 @@ public class CommandeDAOImpl implements CommandeDAO
         catch(SQLException e)
         {
             e.printStackTrace();
-            System.out.println("Ajout d'une nouvelle commande impossible");
+            System.out.println("Récupération de la commande impossible");
         }
         return commande;
     }
